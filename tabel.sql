@@ -33,20 +33,20 @@ CREATE TABLE `data_pegawai_lembur` (
 
 CREATE TABLE `data_spt_lembur` (
   `id` int(11) NOT NULL auto_increment,
-  `jenis_hari` enum ('1', '2') DEFAULT '1',
+  `jenis_hari` enum ('1', '2') DEFAULT '1' COMMENT '1=hari libur, 2=hari kerja',
   `ids_pegawai` text DEFAULT NULL,
   `waktu_mulai` datetime DEFAULT NULL,
   `jml_jam` varchar(50) DEFAULT NULL,
   `uang_makan` double DEFAULT NULL,
   `ket_lembur` text DEFAULT NULL,
-  `status_ver_ppk` enum ('0', '1') DEFAULT NULL,
+  `status_ver_ppk` enum ('0', '1') DEFAULT NULL COMMENT '0=ditolak, 1=disetujui',
   `ket_ver_ppk` text DEFAULT NULL,
-  `status_ver_bendahara` enum ('0', '1') DEFAULT NULL,
+  `status_ver_bendahara` enum ('0', '1') DEFAULT NULL COMMENT '0=ditolak, 1=disetujui',
   `ket_ver_bendahara` text DEFAULT NULL,
   `user` text DEFAULT NULL,
-  `status` enum ('0', '1', '2', '3') DEFAULT NULL,
+  `status` enum ('0', '1', '2', '3') DEFAULT NULL COMMENT '0=belum diverifikasi, 1=disetujui kasubag keuangan, 2=disetujui ppk, 3=selesai ', 
   `update_at` datetime NOT NULL,
-  `active` enum ('0', '1') DEFAULT '1',
+  `active` enum ('0', '1') DEFAULT '1' COMMENT '0=hapus, 1=aktif',
   PRIMARY KEY  (id)
 );
 
@@ -57,6 +57,6 @@ CREATE TABLE `data_spj_lembur` (
   `foto_lembur` text DEFAULT NULL,
   `user` text DEFAULT NULL,
   `update_at` datetime NOT NULL,
-  `active` enum ('0', '1') DEFAULT '1',
+  `active` enum ('0', '1') DEFAULT '1' COMMENT '0=hapus, 1=aktif',
   PRIMARY KEY  (id)
 );
