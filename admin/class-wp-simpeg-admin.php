@@ -106,11 +106,11 @@ class Wp_Simpeg_Admin {
 
 	// https://www.wpbeginner.com/wp-tutorials/how-to-create-custom-post-types-in-wordpress/
 	function simpeg_create_posttype() {
-	    register_post_type( 'Istansi',
+	    register_post_type( 'Instansi',
 	        array(
 	            'labels' => array(
-	                'name' => __( 'Istansi' ),
-	                'singular_name' => __( 'Istansi' )
+	                'name' => __( 'Instansi' ),
+	                'singular_name' => __( 'Instansi' )
 	            ),
 	            'hierarchical'        => false,
 		        'public'              => true,
@@ -125,7 +125,7 @@ class Wp_Simpeg_Admin {
 		        'publicly_queryable'  => true,
 		        'capability_type'     => 'post',
 		        'show_in_rest' 		  => true,
-	            'rewrite' 			  => array('slug' => 'istansi'),
+	            'rewrite' 			  => array('slug' => 'instansi'),
         		'supports'            => array( 'title', 'editor', 'author', 'thumbnail', 'comments', 'revisions', 'custom-fields', ),
 	        )
 	    );
@@ -138,9 +138,9 @@ class Wp_Simpeg_Admin {
 		foreach ($user_all as $k => $v) {
 			$users[$v->ID] = $v->data->display_name.' ('.implode(',', $v->roles).')';
 		}
-		Container::make( 'post_meta', __( 'Detail Istansi' ) )
+		Container::make( 'post_meta', __( 'Detail Instansi' ) )
 	    ->add_fields( array(
-	        Field::make( 'select', 'simpeg_instansi_kepala', __( 'Kepala Istansi' ) )
+	        Field::make( 'select', 'simpeg_instansi_kepala', __( 'Kepala Instansi' ) )
 	        ->add_options( $users ),
 	        Field::make( 'html', 'simpeg_instansi', __( '' ) )
 	    ) );

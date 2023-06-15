@@ -1,0 +1,62 @@
+CREATE TABLE `data_pegawai_lembur` (
+  `id` int(11) NOT NULL auto_increment,
+  `nip` varchar(50) DEFAULT NULL,
+  `nama` varchar(60) DEFAULT NULL,
+  `tempat_lahir` text DEFAULT NULL,
+  `tanggal_lahir` date DEFAULT NULL,
+  `status` varchar(50) DEFAULT NULL,
+  `gol_ruang` text DEFAULT NULL,
+  `tmt_pangkat` date DEFAULT NULL,
+  `eselon` text DEFAULT NULL,
+  `jabatan` text DEFAULT NULL,
+  `tipe_pegawai` text DEFAULT NULL,
+  `tmt_jabatan` date DEFAULT NULL,
+  `agama` varchar(20) DEFAULT NULL,
+  `alamat` text DEFAULT NULL,
+  `satuan_kerja` text DEFAULT NULL,
+  `unit_kerja_induk` text DEFAULT NULL,
+  `tmt_pensiun` date DEFAULT NULL,
+  `pendidikan` varchar(20) DEFAULT NULL,
+  `kode_pendidikan` varchar(20) DEFAULT NULL,
+  `nama_sekolah` text DEFAULT NULL,
+  `nama_pendidikan` text DEFAULT NULL,
+  `lulus` year (4) DEFAULT NULL,
+  `karpeg` text DEFAULT NULL,
+  `karis_karsu` text DEFAULT NULL,
+  `nilai_prestasi` int(11) DEFAULT NULL,
+  `no_hp` varchar(50) DEFAULT NULL,
+  `email` text DEFAULT NULL,
+  `update_at` datetime NOT NULL,
+  `active` tinyint(4) DEFAULT 1,
+  PRIMARY KEY  (id)
+);
+
+CREATE TABLE `data_spt_lembur` (
+  `id` int(11) NOT NULL auto_increment,
+  `jenis_hari` enum ('1', '2') DEFAULT '1',
+  `ids_pegawai` text DEFAULT NULL,
+  `waktu_mulai` datetime DEFAULT NULL,
+  `jml_jam` varchar(50) DEFAULT NULL,
+  `uang_makan` double DEFAULT NULL,
+  `ket_lembur` text DEFAULT NULL,
+  `status_ver_ppk` enum ('0', '1') DEFAULT NULL,
+  `ket_ver_ppk` text DEFAULT NULL,
+  `status_ver_bendahara` enum ('0', '1') DEFAULT NULL,
+  `ket_ver_bendahara` text DEFAULT NULL,
+  `user` text DEFAULT NULL,
+  `status` enum ('0', '1', '2', '3') DEFAULT NULL,
+  `update_at` datetime NOT NULL,
+  `active` enum ('0', '1') DEFAULT '1',
+  PRIMARY KEY  (id)
+);
+
+CREATE TABLE `data_spj_lembur` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_spj` int(11) NOT NULL,
+  `file_daftar_hadir` text DEFAULT NULL,
+  `foto_lembur` text DEFAULT NULL,
+  `user` text DEFAULT NULL,
+  `update_at` datetime NOT NULL,
+  `active` enum ('0', '1') DEFAULT '1',
+  PRIMARY KEY  (id)
+);
