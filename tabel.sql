@@ -56,6 +56,7 @@ CREATE TABLE `data_pegawai_lembur` (
   `tmt_jabatan` date DEFAULT NULL,
   `agama` varchar(20) DEFAULT NULL,
   `alamat` text DEFAULT NULL,
+  `no_hp` varchar(50) DEFAULT NULL,
   `satuan_kerja` text DEFAULT NULL,
   `unit_kerja_induk` text DEFAULT NULL,
   `tmt_pensiun` date DEFAULT NULL,
@@ -67,8 +68,8 @@ CREATE TABLE `data_pegawai_lembur` (
   `karpeg` text DEFAULT NULL,
   `karis_karsu` text DEFAULT NULL,
   `nilai_prestasi` int(11) DEFAULT NULL,
-  `no_hp` varchar(50) DEFAULT NULL,
   `email` text DEFAULT NULL,
+  `tahun` year DEFAULT NULL,
   `update_at` datetime NOT NULL,
   `active` tinyint(4) DEFAULT 1,
   PRIMARY KEY  (id)

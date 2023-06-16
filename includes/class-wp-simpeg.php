@@ -124,6 +124,13 @@ class Wp_Simpeg {
 
 		$this->loader = new Wp_Simpeg_Loader();
 
+		// Functions tambahan
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-wp-simpeg-functions.php';
+
+		$this->functions = new SIMPEG_Functions( $this->plugin_name, $this->version );
+
+		$this->loader->add_action('template_redirect', $this->functions, 'allow_access_private_post', 0);
+
 	}
 
 	/**
@@ -152,12 +159,15 @@ class Wp_Simpeg {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Wp_Simpeg_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Wp_Simpeg_Admin( $this->get_plugin_name(), $this->get_version(), $this->functions );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'init', $plugin_admin, 'simpeg_create_posttype' );
-		$this->loader->add_action('carbon_fields_register_fields', $plugin_admin, 'simpeg_istansi_meta');
+		$this->loader->add_action('carbon_fields_register_fields', $plugin_admin, 'crb_simpeg_options');
+
+		$this->loader->add_action('wp_ajax_import_excel_simpeg_pegawai',  $plugin_admin, 'import_excel_simpeg_pegawai');
+
 		add_shortcode('nama_kepala', array($plugin_admin, 'nama_kepala'));
 	}
 
@@ -170,7 +180,7 @@ class Wp_Simpeg {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Wp_Simpeg_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new Wp_Simpeg_Public( $this->get_plugin_name(), $this->get_version(), $this->functions );
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );

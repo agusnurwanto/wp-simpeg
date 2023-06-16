@@ -51,10 +51,11 @@ class Wp_Simpeg_Admin {
 	 * @param      string    $plugin_name       The name of this plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct( $plugin_name, $version, $functions ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
+		$this->functions = $functions;
 
 	}
 
@@ -100,6 +101,8 @@ class Wp_Simpeg_Admin {
 		 * class.
 		 */
 
+		wp_enqueue_script( $this->plugin_name.'jszip', plugin_dir_url( __FILE__ ) . 'js/jszip.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name.'xlsx', plugin_dir_url( __FILE__ ) . 'js/xlsx.js', array( 'jquery' ), $this->version, false );
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp-simpeg-admin.js', array( 'jquery' ), $this->version, false );
 
 	}
@@ -132,7 +135,48 @@ class Wp_Simpeg_Admin {
 	}
 
 	// https://docs.carbonfields.net/#/fields/select
-	function simpeg_istansi_meta(){
+	function crb_simpeg_options(){
+
+		$management_data_pegawai = $this->functions->generatePage(array(
+			'nama_page' => 'Management Data Pegawai',
+			'content' => '[management_data_pegawai_simpeg]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+
+		$basic_options_container = Container::make( 'theme_options', __( 'SIMPEG Options' ) )
+			->set_page_menu_position( 4 )
+			->add_fields( array(
+	        	Field::make( 'html', 'crb_simpeg_html' )
+	        		->set_html( 'Settings SIMPEG')
+	        ) );
+
+		Container::make( 'theme_options', __( 'Data Pegawai' ) )
+			->set_page_parent( $basic_options_container )
+			->add_fields( array(
+		    	Field::make( 'html', 'crb_simpeg_pegawai_hide_sidebar' )
+		        	->set_html( '
+		        		<style>
+		        			.postbox-container { display: none; }
+		        			#poststuff #post-body.columns-2 { margin: 0 !important; }
+		        		</style>
+		        	' ),
+		        Field::make( 'html', 'crb_simpeg_halaman_terkait_pegawai' )
+		        	->set_html( '
+					<h5>HALAMAN TERKAIT</h5>
+	            	<ol>
+	            		<li><a target="_blank" href="'.$management_data_pegawai['url'].'">'.$management_data_pegawai['title'].'</a></li>
+	            	</ol>
+		        	' ),
+		        Field::make( 'html', 'crb_simpeg_pegawai_upload_html' )
+	            	->set_html( '<h3>Import EXCEL data Pegawai</h3>Pilih file excel .xlsx : <input type="file" id="file-excel" onchange="filePickedSatset(event);"><br>Contoh format file excel bisa <a target="_blank" href="'.SIMPEG_PLUGIN_URL. 'excel/contoh_simpeg_pegawai.xlsx">download di sini</a>. Sheet file excel yang akan diimport harus diberi nama <b>data</b>. Untuk kolom nilai angka ditulis tanpa tanda titik.' ),
+		        Field::make( 'html', 'crb_simpeg_pegawai' )
+	            	->set_html( 'Data JSON : <textarea id="data-excel" class="cf-select__input"></textarea>' ),
+		        Field::make( 'html', 'crb_simpeg_pegawai_save_button' )
+	            	->set_html( '<a onclick="import_excel_simpeg_pegawai(); return false" href="javascript:void(0);" class="button button-primary">Import WP</a>' )
+	        ) );
+
 		$user_all = get_users();
 		$users = array();
 		foreach ($user_all as $k => $v) {
@@ -150,6 +194,82 @@ class Wp_Simpeg_Admin {
 		$id_kepala = carbon_get_post_meta( get_the_ID(), 'simpeg_instansi_kepala' );
 		$kepala = get_user_by('id', $id_kepala);
 		return $kepala->display_name;
+	}
+
+	public function import_excel_simpeg_pegawai(){
+		global $wpdb;
+		$ret = array(
+			'status'	=> 'success',
+			'message'	=> 'Berhasil import excel!'
+		);
+		if (!empty($_POST)) {
+			$ret['data'] = array(
+				'insert' => 0, 
+				'update' => 0,
+				'error' => array()
+			);
+			foreach ($_POST['data'] as $k => $data) {
+				$newData = array();
+				foreach($data as $kk => $vv){
+					$newData[trim(preg_replace('/\s+/', ' ', $kk))] = trim(preg_replace('/\s+/', ' ', $vv));
+				}
+				$data_db = array(
+					'id_skpd' => $newData['id_skpd'],
+				    'nik' => $newData['nik'],
+				    'nip' => $newData['nip'],
+				    'nama' => $newData['nama'],
+				    'tempat_lahir' => $newData['tempat_lahir'],
+				    'tanggal_lahir' => $newData['tanggal_lahir'],
+				    'status' => $newData['status'],
+				    'gol_ruang' => $newData['gol_ruang'],
+				    'tmt_pangkat' => $newData['tmt_pangkat'],
+				    'eselon' => $newData['eselon'],
+				    'jabatan' => $newData['jabatan'],
+				    'tipe_pegawai' => $newData['tipe_pegawai'],
+				    'tmt_jabatan' => $newData['tmt_jabatan'],
+				    'agama' => $newData['agama'],
+				    'no_hp' => $newData['no_hp'],
+				    'alamat' => $newData['alamat'],
+				    'satuan_kerja' => $newData['satuan_kerja'],
+				    'unit_kerja_induk' => $newData['unit_kerja_induk'],
+				    'tmt_pensiun' => $newData['tmt_pensiun'],
+				    'pendidikan' => $newData['pendidikan'],
+				    'kode_pendidikan' => $newData['kode_pendidikan'],
+				    'nama_sekolah' => $newData['nama_sekolah'],
+				    'nama_pendidikan' => $newData['nama_pendidikan'],
+				    'lulus' => $newData['lulus'],
+				    'karpeg' => $newData['karpeg'],
+				    'karis_karsu' => $newData['karis_karsu'],
+				    'nilai_prestasi' => $newData['nilai_prestasi'],
+				    'email' => $newData['email'],
+				    'tahun' => $newData['tahun']
+				);
+				$wpdb->last_error = "";
+				$cek_id = $wpdb->get_var($wpdb->prepare("
+					SELECT 
+						id 
+					from data_pegawai_lembur 
+					where nip=%s"
+					, $newData['nip']));
+				if(empty($cek_id)){
+					$wpdb->insert("data_pegawai_lembur", $data_db);
+					$ret['data']['insert']++;
+				}else{
+					$wpdb->update("data_pegawai_lembur", $data_db, array(
+						"id" => $cek_id
+					));
+					$ret['data']['update']++;
+				}
+				if(!empty($wpdb->last_error)){
+					$ret['data']['error'][] = array($wpdb->last_error, $data_db);
+				};
+
+			}
+		} else {
+			$ret['status'] = 'error';
+			$ret['message'] = 'Format Salah!';
+		}
+		die(json_encode($ret));
 	}
 
 }
