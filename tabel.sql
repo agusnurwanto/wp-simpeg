@@ -42,14 +42,21 @@ CREATE TABLE `data_unit_lembur` (
 CREATE TABLE `data_pegawai_lembur` (
   `id` int(11) NOT NULL auto_increment,
   `id_skpd` int(11) NOT NULL,
-  `nik` varchar(50) DEFAULT NULL,
   `nip` varchar(50) DEFAULT NULL,
+  `nik` varchar(50) DEFAULT NULL,
+  `gelar_depan` text DEFAULT NULL,
   `nama` varchar(60) DEFAULT NULL,
+  `gelar_belakang` text DEFAULT NULL,
   `tempat_lahir` text DEFAULT NULL,
   `tanggal_lahir` date DEFAULT NULL,
+  `jenis_kelamin` varchar(10) DEFAULT NULL,
+  `kode_jenis_kelamin` int(11) DEFAULT NULL,
   `status` varchar(50) DEFAULT NULL,
   `gol_ruang` text DEFAULT NULL,
+  `kode_gol` int(11) DEFAULT NULL,
   `tmt_pangkat` date DEFAULT NULL,
+  `ese` int(11) DEFAULT NULL,
+  `mk_bulan` int(11) DEFAULT NULL,
   `eselon` text DEFAULT NULL,
   `jabatan` text DEFAULT NULL,
   `tipe_pegawai` text DEFAULT NULL,
@@ -61,7 +68,7 @@ CREATE TABLE `data_pegawai_lembur` (
   `unit_kerja_induk` text DEFAULT NULL,
   `tmt_pensiun` date DEFAULT NULL,
   `pendidikan` varchar(20) DEFAULT NULL,
-  `kode_pendidikan` varchar(20) DEFAULT NULL,
+  `kode_pendidikan` int(20) DEFAULT NULL,
   `nama_sekolah` text DEFAULT NULL,
   `nama_pendidikan` text DEFAULT NULL,
   `lulus` year (4) DEFAULT NULL,
@@ -105,16 +112,18 @@ CREATE TABLE `data_spj_lembur` (
   PRIMARY KEY  (id)
 );
 
-CREATE TABLE `data_standar_harga_lembur` (
+CREATE TABLE `data_sbu_lembur` (
   `id` int(11) NOT NULL auto_increment,
   `kode_standar_harga` text NOT NULL,
   `nama` text NOT NULL,
   `uraian` text DEFAULT NULL,
   `satuan` text NOT NULL,
   `harga` double NOT NULL,
-  `golongan` text DEFAULT NULL,
+  `id_golongan` text DEFAULT NULL COMMENT '1=golongan 1, 2=golongan 2, 3=golongan 3, 4=golongan 4, 5=no asn'
   `tahun` year DEFAULT '2023',
   `no_aturan` text NOT NULL,
+  `pph_21` int(11) DEFAULT NULL,
+  `jenis_hari` int(11) NOT NULL COMMENT '1=hari libur, 2=hari efektif',
   `update_at` datetime NOT NULL,
   `active` enum ('0', '1') DEFAULT '1' COMMENT '0=hapus, 1=aktif',
   PRIMARY KEY  (id)
