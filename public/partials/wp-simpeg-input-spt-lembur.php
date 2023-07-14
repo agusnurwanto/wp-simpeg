@@ -64,60 +64,68 @@ if(in_array("administrator", $user_meta->roles)){
                 </button>
             </div>
             <div class="modal-body">
-                <input type='hidden' id='id_data' name="id_data" placeholder=''>
-                <div class="form-group">
-                    <label>Pilih Tahun Anggaran</label>
-                    <select class="form-control" id="tahun_anggaran" onchange="get_skpd(this);">
-                    <?php echo $tahun; ?>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Pilih SKPD</label>
-                    <select class="form-control" id="id_skpd" onchange="get_pegawai(this);">
-                    </select>
-                </div>
-                <table class="table table-bordered" id="daftar_pegawai">
-                    <thead>
-                        <tr>
-                            <th class="text-center" style="width: 320px;">Nama Pegawai</th>
-                            <th class="text-center" style="width: 220px;">Waktu</th>
-                            <th class="text-center" style="width: 220px;">Total</th>
-                            <th class="text-center">Keterangan</th>
-                            <th class="text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-                <div class="form-group">
-                    <label>Keterangan Lembur</label>
-                    <textarea class="form-control" id="ket_lembur" onchange=""></textarea>
-                </div>
-                <!-- <div class="form-group hide">
-                    <label>Keterangan Verifikasi PPK</label>
-                    <select class="form-control" id="ket_ver_ppk" onchange="">
-                    </select>
-                </div>
-                <div class="form-group hide">
-                    <label>Keterangan Verifikasi Kepala</label>
-                    <select class="form-control" id="ket_ver_kepala" onchange="">
-                    </select>
-                </div>
-                <div class="form-group hide">
-                    <label>Status Verifikasi Bendahara</label>
-                    <input type="number" class="form-control" id="status_ver_bendahara" onchange="" />
-                </div>
-                <div class="form-check form-switch hide">
-                    <input class="form-check-input" value="1" type="checkbox" id="status_bendahara" onclick="set_keterangan(this);" <?php echo $disabled; ?>>
-                    <label class="form-check-label" for="status_bendahara">Disetujui</label>
-                </div>
-                <div class="form-group" style="display:none;">
-                    <label>Keterangan ditolak</label>
-                    <textarea class="form-control" id="keterangan_status_bendahara" <?php echo $disabled; ?>></textarea>
-                </div> -->
-                  <button type="submit" onclick="submitTambahDataFormSPTLembur();" class="btn btn-primary send_data">Kirim</button>
-                  <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">Tutup</button>
-            </form>
+                <form id="form-spt">
+                    <input type='hidden' id='id_data' name="id_data" placeholder=''>
+                    <div class="form-group">
+                        <label>Nomor SPT</label>
+                        <input type="text" class="form-control" id="nomor_spt" name="nomor_spt"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Pilih Tahun Anggaran</label>
+                        <select class="form-control" id="tahun_anggaran" name="tahun_anggaran" onchange="get_skpd(this);">
+                        <?php echo $tahun; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Pilih SKPD</label>
+                        <select class="form-control" id="id_skpd" name="id_skpd" onchange="get_pegawai(this);">
+                        </select>
+                    </div>
+                    <table class="table table-bordered" id="daftar_pegawai">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width: 320px;">Nama Pegawai</th>
+                                <th class="text-center" style="width: 220px;">Waktu</th>
+                                <th class="text-center" style="width: 220px;">Total</th>
+                                <th class="text-center">Keterangan</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <div class="form-group">
+                        <label>Keterangan Lembur</label>
+                        <textarea class="form-control" id="ket_lembur" name="ket_lembur"></textarea>
+                    </div>
+                    <!-- <div class="form-group hide">
+                        <label>Keterangan Verifikasi PPK</label>
+                        <select class="form-control" id="ket_ver_ppk" onchange="">
+                        </select>
+                    </div>
+                    <div class="form-group hide">
+                        <label>Keterangan Verifikasi Kepala</label>
+                        <select class="form-control" id="ket_ver_kepala" onchange="">
+                        </select>
+                    </div>
+                    <div class="form-group hide">
+                        <label>Status Verifikasi Bendahara</label>
+                        <input type="number" class="form-control" id="status_ver_bendahara" onchange="" />
+                    </div>
+                    <div class="form-check form-switch hide">
+                        <input class="form-check-input" value="1" type="checkbox" id="status_bendahara" onclick="set_keterangan(this);" <?php echo $disabled; ?>>
+                        <label class="form-check-label" for="status_bendahara">Disetujui</label>
+                    </div>
+                    <div class="form-group" style="display:none;">
+                        <label>Keterangan ditolak</label>
+                        <textarea class="form-control" id="keterangan_status_bendahara" <?php echo $disabled; ?>></textarea>
+                    </div> -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" onclick="submitTambahDataFormSPTLembur();" class="btn btn-primary send_data">Simpan</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">Tutup</button>
+            </div>
         </div>
     </div>
 </div>   
@@ -181,6 +189,7 @@ function get_pegawai(that) {
                     '<tr data-id="1">'+
                         '<td class="text-center">'+
                             '<select class="form-control" name="id_pegawai[1]" id="id_pegawai_1" onchange="get_uang_lembur(this);">'+response.html+'</select>'+
+                            '<input type="hidden" name="id_spt_detail[1]" id="id_spt_detail_1"/>'+
                             '<br>'+
                             '<br>'+
                             '<label style="display: block;">Jenis Hari'+
@@ -206,6 +215,8 @@ function get_pegawai(that) {
                         '<td class="text-center">'+
                             '<label>Uang Lembur<br><input type="text" disabled class="form-control text-right" name="uang_lembur[1]" id="uang_lembur_1"/></label>'+
                             '<label>Uang Makan<br><input type="text" disabled class="form-control text-right" name="uang_makan[1]" id="uang_makan_1"/></label>'+
+                            '<input type="hidden" name="id_standar_harga_lembur[1]" id="id_standar_harga_lembur_1"/>'+
+                            '<input type="hidden" name="id_standar_harga_makan[1]" id="id_standar_harga_makan_1"/>'+
                         '</td>'+
                         '<td class="text-center">'+
                             '<textarea class="form-control" name="keterangan[1]" id="keterangan_1"></textarea>'+
@@ -236,21 +247,25 @@ function get_pegawai(that) {
     });
 }
 
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
 //show tambah data
 function tambah_pegawai(that){
     var tr = jQuery(that).closest('tr');
     var id = +tr.attr('data-id');
     var newid = id + 1;
     var tr_html = tr.html();
-    tr_html = tr_html.replace('_'+id+'"', '_'+newid+'"');
-    tr_html = tr_html.replace('['+id+']', '['+newid+']');
+    tr_html = tr_html.replace(new RegExp(escapeRegExp('_'+id+'"'), 'g'), '_'+newid+'"');
+    tr_html = tr_html.replace(new RegExp(escapeRegExp('['+id+']'), 'g'), '['+newid+']');
     tr_html = '<tr data-id="'+newid+'">'+tr_html+'</tr>';
-    jQuery('#daftar_pegawai tbody').append(tr_html);
+    jQuery('#daftar_pegawai > tbody').append(tr_html);
 
-    jQuery('#daftar_pegawai tbody tr[data-id='+newid+'] .select2-container').remove();
+    jQuery('#daftar_pegawai > tbody > tr[data-id='+newid+'] .select2-container').remove();
     jQuery('#id_pegawai_'+newid).select2({'width': '100%'});
     
-    jQuery('#daftar_pegawai tbody tr').map(function(i, b){
+    jQuery('#daftar_pegawai > tbody > tr').map(function(i, b){
         if(i == 0){
             return;
         var html_hapus = ''+
@@ -479,78 +494,70 @@ function tambah_data_spt_lembur(){
 }
 
 function submitTambahDataFormSPTLembur(){
-    var id_data = jQuery('#id_data').val();
-    var id_ppk = jQuery('#id_ppk').val();
-    if(id_ppk == ''){
-        return alert('Pilih id_ppk Dulu!');
+    var nomor_spt = jQuery('#nomor_spt').val();
+    if(nomor_spt == ''){
+        return alert('Nomor SPT wajib diisi!');
+    }
+    var tahun_anggaran = jQuery('#tahun_anggaran').val();
+    if(tahun_anggaran == ''){
+        return alert('Pilih tahun anggaran dulu!');
     }
     var id_skpd = jQuery('#id_skpd').val();
     if(id_skpd == ''){
-        return alert('Pilih id_skpd Dulu!');
+        return alert('Pilih SKPD dulu!');
     }
-    var id_bendahara = jQuery('#id_bendahara').val();
-    if(id_bendahara == ''){
-        return alert('Pilih id_bendahara Dulu!');
+    var ket_lembur = jQuery('#ket_lembur').val();
+    if(ket_lembur == ''){
+        return alert('Keterangan lembur diisi dulu!');
     }
-    var uang_lembur = jQuery('#uang_lembur').val();
-    if(uang_lembur == ''){
-        return alert('Pilih uang_lembur Dulu!');
-    }
-    var uang_makan = jQuery('#uang_makan').val();
-    if(uang_makan == ''){
-        return alert('Pilih Uang Makan Dulu!');
-    }
-    var ket_ver_ppk = jQuery('#ket_ver_ppk').val();
-    if(ket_ver_ppk == ''){
-        return alert('Isi Keterangan Verifikasi PPK Dulu!');
-    }
-    var ket_ver_kepala = jQuery('#ket_ver_kepala').val();
-    if(ket_ver_kepala == ''){
-        return alert('Isi Keterangan Verifikasi Kepala Dulu!');
-    }
-    var status_ver_bendahara = jQuery('#status_ver_bendahara').val();
-    if(status_ver_bendahara == ''){
-        return alert('Pilih status_ver_bendahara Dulu!');
-    }
-    var status_bendahara = jQuery('#status_bendahara').val();
-    if(jQuery('#status_bendahara').is(':checked') == false){
-        status_bendahara = 0;
-    }
-    var keterangan_status_bendahara = jQuery('#keterangan_status_bendahara').val();
-
-    let tempData = new FormData();
-    tempData.append('action', 'tambah_data_spt_lembur');
-    tempData.append('api_key', '<?php echo get_option( SIMPEG_APIKEY ); ?>');
-    tempData.append('id_data', id_data);
-    tempData.append('waktu_mulai[1]', waktu_mulai);
-    tempData.append('waktu_akhir[1]', waktu_akhir);
-    tempData.append('uang_makan[1]', uang_makan);
-    tempData.append('uang_lembur[1]', uang_lembur);
-    tempData.append('ket_lembur[1]', ket_lembur);
-    tempData.append('ket_ver_ppk', ket_ver_ppk);
-    tempData.append('ket_ver_kepala', ket_ver_kepala);
-    tempData.append('status_ver_bendahara', status_ver_bendahara);
-    tempData.append('status_bendahara', status_bendahara);
-    tempData.append('keterangan_status_bendahara', keterangan_status_bendahara);
-    jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        method: 'post',
-        url: '<?php echo admin_url('admin-ajax.php'); ?>',
-        dataType: 'json',
-        data: tempData,
-        processData: false,
-        contentType: false,
-        cache: false,
-        success: function(res){
-            alert(res.message);
-            if(res.status == 'success'){
-                jQuery('#modalTambahDataSPTLembur').modal('hide');
-                get_data_spt_lembur();
-            }else{
+    if(confirm('Apakah anda yakin untuk menyimpan data ini?')){
+        jQuery("#wrap-loading").show();
+        let form = getFormData(jQuery("#form-spt"));
+        jQuery.ajax({
+            method:'post',
+            url:'<?php echo admin_url('admin-ajax.php'); ?>',
+            dataType: 'json',
+            data: {
+                'action': 'tambah_data_spt_lembur',
+                'api_key': jQuery('#api_key').val(),
+                'data': JSON.stringify(form)
+            },
+            success:function(response){
                 jQuery('#wrap-loading').hide();
+                alert(response.message);
+                if(response.status == 'success'){
+                    jQuery('#modalTambahDataSPTLembur').modal('hide');
+                    get_data_spt_lembur();
+                }
             }
-        }
+        });
+    }
+}
+
+function getFormData($form){
+    var disabled = $form.find('[disabled]');
+    disabled.map(function(i, b){
+        jQuery(b).attr('disabled', false);
     });
+    let unindexed_array = $form.serializeArray();
+    disabled.map(function(i, b){
+        jQuery(b).attr('disabled', true);
+    });
+    var data = {};
+    unindexed_array.map(function(b, i){
+        var nama_baru = b.name.split('[');
+        if(nama_baru.length > 1){
+            nama_baru = nama_baru[0];
+            if(!data[nama_baru]){
+                data[nama_baru] = [];
+            }
+            data[nama_baru].push(b.value);
+        }else{
+            data[b.name] = b.value;
+        }
+    })
+    console.log('data', data);
+    return data;
 }
 
 function get_uang_lembur(that){
@@ -563,6 +570,9 @@ function get_uang_lembur(that){
     var jenis_hari = jQuery('#jenis_hari_'+id).val();
     jQuery('#uang_lembur_'+id).val(0);
     jQuery('#uang_makan_'+id).val(0);
+    if(isNaN(jam)){
+        jam = 0;
+    }
     jQuery('#jumlah_jam_'+id).html(jam+' jam');
     jQuery('#sbu_lembur_'+id).html('-');
     jQuery('#sbu_makan_'+id).html('-');
@@ -590,6 +600,7 @@ function get_uang_lembur(that){
             });
             console.log('sbu_selected, sbu_makan_selected, golongan, jam, jenis_hari', sbu_selected, sbu_makan_selected, golongan, jam, jenis_hari);
             if(sbu_selected){
+                jQuery('#id_standar_harga_lembur_'+id).val(sbu_selected.id);
                 jQuery('#uang_lembur_'+id).val(sbu_selected.harga*jam);
                 jQuery('#sbu_lembur_'+id).html(sbu_selected.nama+' ('+sbu_selected.uraian+') | '+sbu_selected.harga+' | '+sbu_selected.satuan);
             }
@@ -597,6 +608,7 @@ function get_uang_lembur(that){
                 sbu_makan_selected
                 && jam >= 2
             ){
+                jQuery('#id_standar_harga_makan_'+id).val(sbu_makan_selected.id);
                 jQuery('#uang_makan_'+id).val(sbu_makan_selected.harga);
                 jQuery('#sbu_makan_'+id).html(sbu_selected.nama+' ('+sbu_selected.uraian+') | '+sbu_selected.harga+' | '+sbu_selected.satuan);
             }

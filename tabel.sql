@@ -84,6 +84,8 @@ CREATE TABLE `data_pegawai_lembur` (
 
 CREATE TABLE `data_spt_lembur` (
   `id` int(11) NOT NULL auto_increment,
+  `nomor_spt` text NOT NULL,
+  `tahun_anggaran` year DEFAULT 2023,
   `id_skpd` int(11) NOT NULL,
   `id_ppk` int(11) DEFAULT NULL,
   `id_bendahara` int(11) DEFAULT NULL,
@@ -92,12 +94,12 @@ CREATE TABLE `data_spt_lembur` (
   `ket_lembur` text DEFAULT NULL,
   `ket_ver_ppk` text DEFAULT NULL,
   `ket_ver_kepala` text DEFAULT NULL,
-  `status_ver_bendahara` enum ('0', '1') DEFAULT NULL COMMENT '0=ditolak, 1=disetujui',
+  `status_ver_bendahara` tinyint(4) DEFAULT NULL COMMENT '0=ditolak, 1=disetujui',
   `ket_ver_bendahara` text DEFAULT NULL,
   `user` text DEFAULT NULL,
-  `status` enum ('0', '1', '2', '3') DEFAULT NULL COMMENT '0=belum diverifikasi, 1=disetujui kasubag keuangan, 2=disetujui ppk, 3=selesai ', 
+  `status` tinyint(4) DEFAULT NULL COMMENT '0=belum diverifikasi, 1=disetujui kasubag keuangan, 2=disetujui ppk, 3=selesai', 
   `update_at` datetime NOT NULL,
-  `active` enum ('0', '1') DEFAULT '1' COMMENT '0=hapus, 1=aktif',
+  `active` tinyint(4) DEFAULT '1' COMMENT '0=hapus, 1=aktif',
   PRIMARY KEY  (id)
 );
 
@@ -108,7 +110,7 @@ CREATE TABLE `data_spj_lembur` (
   `foto_lembur` text DEFAULT NULL,
   `user` text DEFAULT NULL,
   `update_at` datetime NOT NULL,
-  `active` enum ('0', '1') DEFAULT '1' COMMENT '0=hapus, 1=aktif',
+  `active` tinyint(4) DEFAULT '1' COMMENT '0=hapus, 1=aktif',
   PRIMARY KEY  (id)
 );
 
@@ -126,7 +128,7 @@ CREATE TABLE `data_sbu_lembur` (
   `jenis_hari` int(11) NOT NULL COMMENT '1=hari libur, 2=hari efektif',
   `jenis_sbu` text DEFAULT NULL COMMENT 'uang_lembur, uang_makan',
   `update_at` datetime NOT NULL,
-  `active` enum ('0', '1') DEFAULT '1' COMMENT '0=hapus, 1=aktif',
+  `active` tinyint(4) DEFAULT '1' COMMENT '0=hapus, 1=aktif',
   PRIMARY KEY  (id)
 );
 
@@ -147,6 +149,6 @@ CREATE TABLE `data_spt_lembur_detail` (
   `keterangan_ppk` text DEFAULT NULL,
   `file_lampiran` text DEFAULT NULL,
   `update_at` datetime NOT NULL,
-  `active` enum ('0', '1') DEFAULT '1' COMMENT '0=hapus, 1=aktif',
+  `active` tinyint(4) DEFAULT '1' COMMENT '0=hapus, 1=aktif',
   PRIMARY KEY  (id)
 );

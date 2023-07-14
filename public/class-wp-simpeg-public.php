@@ -600,7 +600,6 @@ class Wp_Simpeg_Public {
 	                $params = $columns = $totalRecords = $data = array();
 	                $params = $_REQUEST;
 	                $columns = array( 
-
 					   0 => 'id_skpd',
 					   1 => 'nik',
 					   2 => 'nip',
@@ -643,7 +642,7 @@ class Wp_Simpeg_Public {
 	                // getting total number records without any search
 	                $sql_tot = "SELECT count(id) as jml FROM `data_pegawai_lembur`";
 	                $sql = "SELECT ".implode(', ', $columns)." FROM `data_pegawai_lembur`";
-	                $where_first = " WHERE 1=1 AND active = 1";
+	                $where_first = " WHERE 1=1 AND active=1";
 	                $sqlTot .= $sql_tot.$where_first;
 	                $sqlRec .= $sql.$where_first;
 	                if(isset($where) && $where != '') {
@@ -699,13 +698,20 @@ class Wp_Simpeg_Public {
 	    );
 	    if(!empty($_POST)){
 	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
-	            $data = $wpdb->get_row($wpdb->prepare('
+	            $ret['data'] = $wpdb->get_row($wpdb->prepare('
 	                 SELECT 
                         *
                     FROM data_spt_lembur
                     WHERE id=%d
+                    	AND active=1
 	            ', $_POST['id']), ARRAY_A);
-	            $ret['data'] = $data;
+	            $ret['data_detail'] = $wpdb->get_results($wpdb->prepare('
+	                 SELECT 
+                        *
+                    FROM data_spt_lembur_detail
+                    WHERE id_spt=%d
+                    	AND active=1
+	            ', $_POST['id']), ARRAY_A);
 	        }else{
 	            $ret['status']  = 'error';
 	            $ret['message'] = 'Api key tidak ditemukan!';
@@ -751,128 +757,177 @@ class Wp_Simpeg_Public {
 	    );
 	    if(!empty($_POST)){
 	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
-	            if($ret['status'] != 'error' && !empty($_POST['id_skpd'])){
-	                $id_skpd = $_POST['id_skpd'];
+	        	$data = json_decode(stripslashes($_POST['data']), true);
+	            if($ret['status'] != 'error' && !empty($data['nomor_spt'])){
+	                $nomor_spt = $data['nomor_spt'];
+	            }else{
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Isi nomor SPT dulu!';
+	            }
+	            if($ret['status'] != 'error' && !empty($data['tahun_anggaran'])){
+	                $tahun_anggaran = $data['tahun_anggaran'];
+	            }else{
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Pilih Tahun dulu!';
+	            }
+	            if($ret['status'] != 'error' && !empty($data['id_skpd'])){
+	                $id_skpd = $data['id_skpd'];
+	            }else{
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Pilih SKPD dulu!';
+	            }
+	            if($ret['status'] != 'error' && !empty($data['ket_lembur'])){
+	                $ket_lembur = $data['ket_lembur'];
+	            }else{
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Isi Keterangan Lembur dulu!';
+	            }
+	            if($ret['status'] != 'error' && !empty($data['id_ppk'])){
+	                $id_ppk = $data['id_ppk'];
 	            }
 	            // else{
 	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih Id SKPD Dulu!';
+	            //     $ret['message'] = 'Pilih Id PPK dulu!';
 	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['id_ppk'])){
-	                $id_ppk = $_POST['id_ppk'];
+	            if($ret['status'] != 'error' && !empty($data['id_bendahara'])){
+	                $id_bendahara = $data['id_bendahara'];
 	            }
 	            // else{
 	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih Id PPK Dulu!';
+	            //     $ret['message'] = 'Pilih Id Bendahara dulu!';
 	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['id_bendahara'])){
-	                $id_bendahara = $_POST['id_bendahara'];
+	            if($ret['status'] != 'error' && !empty($data['ket_ver_ppk'])){
+	                $ket_ver_ppk = $data['ket_ver_ppk'];
 	            }
 	            // else{
 	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih Id Bendahara Dulu!';
+	            //     $ret['message'] = 'Pilih Keterangan Verifikasi PPK dulu!';
 	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['uang_makan'])){
-	                $uang_makan = $_POST['uang_makan'];
+	            if($ret['status'] != 'error' && !empty($data['ket_ver_kepala'])){
+	                $ket_ver_kepala = $data['ket_ver_kepala'];
 	            }
 	            // else{
 	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih Uang Makan Dulu!';
+	            //     $ret['message'] = 'Pilih  Keterangan Verifikasi Kepala dulu!';
 	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['uang_lembur'])){
-	                $uang_lembur = $_POST['uang_lembur'];
+	            if($ret['status'] != 'error' && !empty($data['status_ver_bendahara'])){
+	                $status_ver_bendahara = $data['status_ver_bendahara'];
 	            }
 	            // else{
 	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih Uang Lembur Dulu!';
+	            //     $ret['message'] = 'Pilih Status Verifikasi Bendahara dulu!';
 	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['ket_lembur'])){
-	                $ket_lembur = $_POST['ket_lembur'];
+	            if($ret['status'] != 'error' && !empty($data['ket_ver_bendahara'])){
+	                $ket_ver_bendahara = $data['ket_ver_bendahara'];
 	            }
 	            // else{
 	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih Keterangan Lembur Dulu!';
+	            //     $ret['message'] = 'Pilih  Keterangan Verifikasi Bendahara dulu!';
 	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['ket_ver_ppk'])){
-	                $ket_ver_ppk = $_POST['ket_ver_ppk'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih Keterangan Verifikasi PPK Dulu!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['ket_ver_kepala'])){
-	                $ket_ver_kepala = $_POST['ket_ver_kepala'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih  Keterangan Verifikasi Kepala Dulu!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['status_ver_bendahara'])){
-	                $status_ver_bendahara = $_POST['status_ver_bendahara'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih Status Verifikasi Bendahara Dulu!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['ket_ver_bendahara'])){
-	                $ket_ver_bendahara = $_POST['ket_ver_bendahara'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih  Keterangan Verifikasi Bendahara Dulu!';
-	            // }
-	            $_POST['id'] = $id_skpd;
-	            $status_ver_bendahara = $_POST['status_ver_bendahara'];
-	            $ket_ver_bendahara = $_POST['ket_ver_bendahara'];
 	            if($ret['status'] != 'error'){
-	                if(empty($_POST['id_data'])){
+	            	// 0=belum diverifikasi, 1=disetujui kasubag keuangan, 2=disetujui ppk, 3=selesai
+	                if(empty($data['id_data'])){
 	                    $status = 0;
 	                }else{
-	                    $status = 1;
-	                    if($status_pagu == 0){
-	                        $status = 2;
-	                    }
+	                    $status = 3;
 	                }
-	                $data = array(
-	                    `id_skpd`=> $id_skpd, 
-			            `id_ppk`=> $id_ppk, 
-			            `id_bendahara`=> $id_bendahara, 
-			            `uang_makan`=> $uang_makan, 
-			            `uang_lembur`=> $uang_lembur, 
-			            `ket_lembur`=> $ket_lembur, 
-			            `ket_ver_ppk`=> $ket_ver_ppk, 
-			            `ket_ver_kepala`=> $ket_ver_kepala, 
-			            `status_ver_bendahara`=> $status_ver_bendahara,
-			            `ket_ver_bendahara`=> $ket_ver_bendahara, 
+	                $uang_makan = 0;
+	                $uang_lembur = 0;
+	                $data_opsi_detail = array();
+	                foreach($data['id_pegawai'] as $key => $pegawai){
+	                	$uang_lembur += $data['uang_lembur'][$key];
+	                	$uang_makan += $data['uang_makan'][$key];
+	                	$data_opsi_detail[] = array(
+	                		'id' => $data['id_spt_detail'][$key],
+	                		'id_spt' => '',
+							'id_pegawai' => $data['id_pegawai'][$key],
+							'id_standar_harga_lembur' => $data['id_standar_harga_lembur'][$key],
+							'id_standar_harga_makan' => $data['id_standar_harga_makan'][$key],
+							'waktu_mulai' => $data['waktu_mulai'][$key],
+							'waktu_akhir' => $data['waktu_selesai'][$key],
+							'waktu_mulai_ppk' => $data['waktu_mulai'][$key],
+							'waktu_akhir_ppk' => $data['waktu_selesai'][$key],
+							'waktu_mulai_hadir' => '',
+							'waktu_akhir_hadir' => '',
+							'tipe_hari' => $data['jenis_hari'][$key],
+							'keterangan' => $data['keterangan'][$key],
+							'keterangan_ppk' => $data['keterangan'][$key],
+							'file_lampiran' => '',
+							'update_at' => current_time('mysql'),
+							'active' => 1
+	                	);
+	                }
+	                $data_opsi = array(
+	                    'id_skpd'=> $id_skpd,
+	                    'tahun_anggaran'=> $tahun_anggaran,
+	                    'nomor_spt'=> $nomor_spt,
+			            'id_ppk'=> '', 
+			            'id_bendahara'=> '', 
+			            'uang_makan'=> $uang_makan, 
+			            'uang_lembur'=> $uang_lembur, 
+			            'ket_lembur'=> $ket_lembur, 
+			            'ket_ver_ppk'=> '', 
+			            'ket_ver_kepala'=> '', 
+			            'status_ver_bendahara'=> '',
+			            'ket_ver_bendahara'=> '', 
 	                    'status' => $status,
-	                    'update_at' => current_time('mysql')
+	                    'update_at' => current_time('mysql'),
+						'active' => 1
 	                );
-	                if(!empty($_POST['id_data'])){
-	                    $wpdb->update('data_spt_lembur', $data, array(
-	                        'id' => $_POST['id_data']
+	                if(!empty($id_ppk)){
+	                	$data_opsi['id_ppk'] = $id_ppk;
+	                	$data_opsi['ket_ver_ppk'] = $ket_ver_ppk;
+	                }
+	                if(!empty($id_bendahara)){
+	                	$data_opsi['id_bendahara'] = $id_bendahara;
+	                	$data_opsi['status_ver_bendahara'] = $status_ver_bendahara;
+	                	$data_opsi['ket_ver_bendahara'] = $ket_ver_bendahara;
+	                }
+	                if(!empty($ket_ver_kepala)){
+	                	$data_opsi['ket_ver_kepala'] = $ket_ver_kepala;
+	                }
+	                if(!empty($data['id_data'])){
+	                    $wpdb->update('data_spt_lembur', $data_opsi, array(
+	                        'id' => $data['id_data']
 	                    ));
 	                    $ret['message'] = 'Berhasil update data!';
 	                }else{
 	                    $cek_id = $wpdb->get_row($wpdb->prepare('
 	                        SELECT
 	                            id,
+	                            nomor_spt,
 	                            active
 	                        FROM data_spt_lembur
-	                        WHERE id_spt=%s
-	                    ', $id_spt), ARRAY_A);
+	                        WHERE nomor_spt=%s
+	                        	AND tahun_anggaran=%d
+	                    ', $nomor_spt, $tahun_anggaran), ARRAY_A);
 	                    if(empty($cek_id)){
-	                        $wpdb->insert('data_spt_lembur', $data);
+	                        $data['id_data'] = $wpdb->insert('data_spt_lembur', $data_opsi);
 	                    }else{
 	                        if($cek_id['active'] == 0){
-	                            $wpdb->update('data_spt_lembur', $data, array(
+	                        	$data['id_data'] = $cek_id['id'];
+	                            $wpdb->update('data_spt_lembur', $data_opsi, array(
 	                                'id' => $cek_id['id']
 	                            ));
 	                        }else{
 	                            $ret['status'] = 'error';
-	                            $ret['message'] = 'Gagal disimpan. Data SPT dengan id_spt="'.$id_spt.'" sudah ada!';
+	                            $ret['message'] = 'Gagal disimpan. Data SPT dengan nomor_spt="'.$cek_id['nomor_spt'].'" sudah ada!';
 	                        }
 	                    }
 	                }
+	            }
+	            if($ret['status'] != 'error'){
+	            	foreach($data_opsi_detail as $opsi){
+	            		$opsi['id_spt'] = $data['id_data'];
+	                    if(empty($opsi['id'])){
+	                    	unset($opsi['id']);
+	                        $data['id_data'] = $wpdb->insert('data_spt_lembur_detail', $opsi);
+	                    }else{
+                            $wpdb->update('data_spt_lembur_detail', $opsi, array(
+                                'id' => $opsi['id']
+                            ));
+                        }
+	            	}
 	            }
 	        }else{
 	            $ret['status']  = 'error';
@@ -923,7 +978,7 @@ class Wp_Simpeg_Public {
 	            // getting total number records without any search
 	            $sql_tot = "SELECT count(id) as jml FROM `data_spt_lembur`";
 	            $sql = "SELECT ".implode(', ', $columns)." FROM `data_spt_lembur`";
-	            $where_first = " WHERE 1=1 AND status != 3";
+	            $where_first = " WHERE 1=1 AND active=1";
 	            $sqlTot .= $sql_tot.$where_first;
 	            $sqlRec .= $sql.$where_first;
 	            if(isset($where) && $where != '') {
