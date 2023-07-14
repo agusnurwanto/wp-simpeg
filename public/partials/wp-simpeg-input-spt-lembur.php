@@ -185,10 +185,10 @@ function get_pegawai(that) {
                             '<input type="datetime-local" class="form-control" id="waktu_selesai[1]" onchange=""/>'+
                         '</td>'+
                         '<td>'+
-                            '<input type="text" disabled class="form-control" id="uang_makan[1]" onchange=""/>'+
+                            '<input type="text" disabled class="form-control" id="uang_makan[1]" onchange="get_uang_makan"/>'+
                         '</td>'+
                         '<td>'+
-                            '<input type="text" disabled class="form-control" id="uang_lembur[1]" onchange=""/>'+
+                            '<input type="text" disabled class="form-control" id="uang_lembur[1]" onchange="get_uang_lembur"/>'+
                         '</td>'+
                         '<td>'+
                             '<textarea class="form-control" id="keterangan[1]"></textarea>'+
