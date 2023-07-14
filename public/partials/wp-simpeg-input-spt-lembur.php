@@ -194,10 +194,6 @@ function get_pegawai(that) {
                         '<td class="text-center">'+
                             '<label>Waktu Mulai<br><input type="datetime-local" class="form-control" name="waktu_mulai[1]" id="waktu_mulai_1" onchange="get_uang_lembur(this);"/></label>'+
                             '<label>Waktu Selesai<br><input type="datetime-local" class="form-control" name="waktu_selesai[1]" id="waktu_selesai_1" onchange="get_uang_lembur(this);"/></label>'+
-                        '</td>'+
-                        '<td class="text-center">'+
-                            '<label>Uang Lembur<br><input type="text" disabled class="form-control text-right" name="uang_lembur[1]" id="uang_lembur_1"/></label>'+
-                            '<label>Uang Makan<br><input type="text" disabled class="form-control text-right" name="uang_makan[1]" id="uang_makan_1"/></label>'+
                             '<table class="table table-bordered" style="margin: 0;">'+
                                 '<tbody>'+
                                     '<tr>'+
@@ -206,6 +202,10 @@ function get_pegawai(that) {
                                     '</tr>'+
                                 '</tbody>'+
                             '</table>'+
+                        '</td>'+
+                        '<td class="text-center">'+
+                            '<label>Uang Lembur<br><input type="text" disabled class="form-control text-right" name="uang_lembur[1]" id="uang_lembur_1"/></label>'+
+                            '<label>Uang Makan<br><input type="text" disabled class="form-control text-right" name="uang_makan[1]" id="uang_makan_1"/></label>'+
                         '</td>'+
                         '<td class="text-center">'+
                             '<textarea class="form-control" name="keterangan[1]" id="keterangan_1"></textarea>'+

@@ -165,15 +165,39 @@ class Wp_Simpeg_Admin {
 			'no_key' => 1,
 			'post_status' => 'private'
 		));
+		$laporan_bulanan_lembur = $this->functions->generatePage(array(
+			'nama_page' => 'Laporan Bulanan Lembur',
+			'content' => '[laporan_bulanan_lembur]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
+		$laporan_spt_lembur = $this->functions->generatePage(array(
+			'nama_page' => 'Laporan Surat Perintah Tugas',
+			'content' => '[laporan_spt_lembur]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
 
 		$basic_options_container = Container::make( 'theme_options', __( 'SIMPEG Options' ) )
 			->set_page_menu_position( 4 )
 			->add_fields( array(
 	        	Field::make( 'html', 'crb_simpeg_html' )
 	        		->set_html( 'Settings SIMPEG'),
+	        Field::make( 'html', 'crb_simpeg_halaman_terkait_sbu_lembur' )
+	        	->set_html( '
+				<h5>HALAMAN TERKAIT</h5>
+            	<ol>
+            		<li><a target="_blank" href="'.$laporan_bulanan_lembur['url'].'">'.$laporan_bulanan_lembur['title'].'</a></li>
+            		<li><a target="_blank" href="'.$laporan_spt_lembur['url'].'">'.$laporan_spt_lembur['title'].'</a></li>
+            		<li><a target="_blank" href="'.$input_spt_lembur['url'].'">'.$input_spt_lembur['title'].'</a></li>
+            		<li><a target="_blank" href="'.$input_spj_lembur['url'].'">'.$input_spj_lembur['title'].'</a></li>
+            	</ol>
+	        	' ),
 	            Field::make( 'text', 'crb_apikey_simpeg', 'API KEY' )
 	            	->set_default_value($this->functions->generateRandomString())
-	            	->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi data.')
+	            	->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi data.'),
 	        ) );
 
 		Container::make( 'theme_options', __( 'Data Pegawai' ) )
@@ -191,8 +215,6 @@ class Wp_Simpeg_Admin {
 					<h5>HALAMAN TERKAIT</h5>
 	            	<ol>
 	            		<li><a target="_blank" href="'.$management_data_pegawai['url'].'">'.$management_data_pegawai['title'].'</a></li>
-	            		<li><a target="_blank" href="'.$input_spt_lembur['url'].'">'.$input_spt_lembur['title'].'</a></li>
-	            		<li><a target="_blank" href="'.$input_spj_lembur['url'].'">'.$input_spj_lembur['title'].'</a></li>
 	            	</ol>
 		        	' ),
 		        Field::make( 'html', 'crb_simpeg_pegawai_upload_html' )
