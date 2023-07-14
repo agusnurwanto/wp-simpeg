@@ -120,10 +120,11 @@ CREATE TABLE `data_sbu_lembur` (
   `satuan` text NOT NULL,
   `harga` double NOT NULL,
   `id_golongan` text DEFAULT NULL COMMENT '1=golongan 1, 2=golongan 2, 3=golongan 3, 4=golongan 4, 5=no asn'
-  `tahun` year DEFAULT '2023',
+  `tahun` year DEFAULT 2023,
   `no_aturan` text NOT NULL,
   `pph_21` int(11) DEFAULT NULL,
   `jenis_hari` int(11) NOT NULL COMMENT '1=hari libur, 2=hari efektif',
+  `jenis_sbu` text DEFAULT NULL COMMENT 'uang_lembur, uang_makan',
   `update_at` datetime NOT NULL,
   `active` enum ('0', '1') DEFAULT '1' COMMENT '0=hapus, 1=aktif',
   PRIMARY KEY  (id)

@@ -1,6 +1,6 @@
 <?php
 global $wpdb;
-$idtahun = $wpdb->get_results("select distinct tahun_anggaran from data_unit", ARRAY_A);
+$idtahun = $wpdb->get_results("select distinct tahun_anggaran from data_unit_lembur", ARRAY_A);
 $tahun = "<option value='-1'>Pilih Tahun</option>";
 foreach($idtahun as $val){
     $tahun .= "<option value='$val[tahun_anggaran]'>$val[tahun_anggaran]</option>";
@@ -25,40 +25,40 @@ if(in_array("administrator", $user_meta->roles)){
 <div class="cetak">
     <div style="padding: 10px;margin:0 0 3rem 0;">
         <input type="hidden" value="<?php echo get_option( SIMPEG_APIKEY ); ?>" id="api_key">
-    <h1 class="text-center" style="margin:3rem;">Input Data SPT</h1>
+        <h1 class="text-center" style="margin:3rem;">Input Data Surat Perintah Tugas (SPT)</h1>
         <div style="margin-bottom: 25px;">
             <button class="btn btn-primary" onclick="tambah_data_spt_lembur();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
         </div>
         <div class="wrap-table">
-        <table id="management_data_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
-            <thead>
-                <tr>
-                    <th class="text-center">Id SKPD</th>
-                    <th class="text-center">Id PPK</th>
-                    <th class="text-center">Id Bendahara</th>
-                    <th class="text-center">Uang Makan</th>
-                    <th class="text-center">Uang Lembur</th>
-                    <th class="text-center">Keterangan Lembur</th>
-                    <th class="text-center">Keterangan Verifikasi PPK</th>
-                    <th class="text-center">Keterangan Verifikasi Kepala</th>
-                    <th class="text-center">Status Verifikasi Bendahara</th>
-                    <th class="text-center">Keterangan Verifikasi Bendahara</th>
-                    <th class="text-center">Status</th>
-                    <th class="text-center" style="width: 150px;">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+            <table id="management_data_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th class="text-center">Id SKPD</th>
+                        <th class="text-center">Id PPK</th>
+                        <th class="text-center">Id Bendahara</th>
+                        <th class="text-center">Uang Makan</th>
+                        <th class="text-center">Uang Lembur</th>
+                        <th class="text-center">Keterangan Lembur</th>
+                        <th class="text-center">Keterangan Verifikasi PPK</th>
+                        <th class="text-center">Keterangan Verifikasi Kepala</th>
+                        <th class="text-center">Status Verifikasi Bendahara</th>
+                        <th class="text-center">Keterangan Verifikasi Bendahara</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center" style="width: 150px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         </div>
     </div>          
 </div>
 
-<div class="modal fade mt-4" id="modalTambahDataSPTLembur" tabindex="-1" role="dialog" aria-labelledby="modalTambahDataSPTLemburLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
+<div class="modal fade mt-4" id="modalTambahDataSPTLembur" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="min-width: 90vw;" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalTambahDataSPTLemburLabel">Input Data SPT</h5>
+                <h5 class="modal-title" id="modalTambahDataSPTLemburLabel">Tambah Data Surat Perintah Tugas (SPT)</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -79,13 +79,11 @@ if(in_array("administrator", $user_meta->roles)){
                 <table class="table table-bordered" id="daftar_pegawai">
                     <thead>
                         <tr>
-                            <th>Nama Pegawai</th>
-                            <th>Waktu Mulai</th>
-                            <th>Waktu Selesai</th>
-                            <th>Uang Makan</th>
-                            <th>Uang Lembur</th>
-                            <th>Keterangan</th>
-                            <th>Aksi</th>
+                            <th class="text-center" style="width: 320px;">Nama Pegawai</th>
+                            <th class="text-center" style="width: 220px;">Waktu</th>
+                            <th class="text-center" style="width: 220px;">Total</th>
+                            <th class="text-center">Keterangan</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -126,6 +124,9 @@ if(in_array("administrator", $user_meta->roles)){
 <script>    
 jQuery(document).ready(function(){
     get_data_spt_lembur();
+    jQuery('#id_skpd').select2({
+        'width': '100%'
+    });
 });
 
 function get_skpd(that) {
@@ -146,8 +147,9 @@ function get_skpd(that) {
         success:function(response){
             jQuery('#wrap-loading').hide();
             if(response.status == 'success'){
+                jQuery('#id_skpd').select2('destroy');
                 jQuery('#id_skpd').html(response.html);
-                // jQuery('#id_skpd').select2();
+                jQuery('#id_skpd').select2();
             }else{
                 alert(`GAGAL! \n${response.message}`);
             }
@@ -158,7 +160,8 @@ function get_skpd(that) {
 function get_pegawai(that) {
     var id_skpd = jQuery(that).val();
     if(id_skpd == ''){
-        return alert('Nama tidak boleh kosong!');
+        jQuery('#daftar_pegawai tbody').html('');
+        return;
     }
     jQuery("#wrap-loading").show();
     jQuery.ajax({
@@ -167,7 +170,8 @@ function get_pegawai(that) {
         data:{
             'action' : 'get_pegawai_simpeg',
             'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
-            'id_skpd': id_skpd
+            'id_skpd': id_skpd,
+            'tahun_anggaran': jQuery('#tahun_anggaran').val()
         },
         dataType: 'json',
         success:function(response){
@@ -175,30 +179,56 @@ function get_pegawai(that) {
             if(response.status == 'success'){
                 var html = ''+
                     '<tr data-id="1">'+
-                        '<td>'+
-                            '<select class="form-control" id="id_pegawai[1]" onchange="">'+response.html+'</select>'+
+                        '<td class="text-center">'+
+                            '<select class="form-control" name="id_pegawai[1]" id="id_pegawai_1" onchange="get_uang_lembur(this);">'+response.html+'</select>'+
+                            '<br>'+
+                            '<br>'+
+                            '<label style="display: block;">Jenis Hari'+
+                                '<br>'+
+                                '<select class="form-control" name="jenis_hari[1]" id="jenis_hari_1" onchange="get_uang_lembur(this);">'+
+                                    '<option value="2">Hari Kerja</option>'+
+                                    '<option value="1">Hari Libur</option>'+
+                                '</select>'+
+                            '</label>'+
                         '</td>'+
-                        '<td>'+
-                            '<input type="datetime-local" class="form-control" id="waktu_mulai[1]" onchange=""/>'+
+                        '<td class="text-center">'+
+                            '<label>Waktu Mulai<br><input type="datetime-local" class="form-control" name="waktu_mulai[1]" id="waktu_mulai_1" onchange="get_uang_lembur(this);"/></label>'+
+                            '<label>Waktu Selesai<br><input type="datetime-local" class="form-control" name="waktu_selesai[1]" id="waktu_selesai_1" onchange="get_uang_lembur(this);"/></label>'+
                         '</td>'+
-                        '<td>'+
-                            '<input type="datetime-local" class="form-control" id="waktu_selesai[1]" onchange=""/>'+
+                        '<td class="text-center">'+
+                            '<label>Uang Lembur<br><input type="text" disabled class="form-control text-right" name="uang_lembur[1]" id="uang_lembur_1"/></label>'+
+                            '<label>Uang Makan<br><input type="text" disabled class="form-control text-right" name="uang_makan[1]" id="uang_makan_1"/></label>'+
+                            '<table class="table table-bordered" style="margin: 0;">'+
+                                '<tbody>'+
+                                    '<tr>'+
+                                        '<td style="width: 115px;">Jumlah jam</td>'+
+                                        '<td id="jumlah_jam_1" class="text-center">0 jam</td>'+
+                                    '</tr>'+
+                                '</tbody>'+
+                            '</table>'+
                         '</td>'+
-                        '<td>'+
-                            '<input type="text" disabled class="form-control" id="uang_makan[1]" onchange=""/>'+
-                        '</td>'+
-                        '<td>'+
-                            '<input type="text" disabled class="form-control" id="uang_lembur[1]" onchange=""/>'+
-                        '</td>'+
-                        '<td>'+
-                            '<textarea class="form-control" id="keterangan[1]"></textarea>'+
+                        '<td class="text-center">'+
+                            '<textarea class="form-control" name="keterangan[1]" id="keterangan_1"></textarea>'+
+                            '<table class="table table-bordered" style="margin: 0;">'+
+                                '<tbody>'+
+                                    '<tr>'+
+                                        '<td style="width: 115px;">SBU uang lembur</td>'+
+                                        '<td id="sbu_lembur_1" class="text-center">-</td>'+
+                                    '</tr>'+
+                                    '<tr>'+
+                                        '<td>SBU uang makan</td>'+
+                                        '<td id="sbu_makan_1" class="text-center">-</td>'+
+                                    '</tr>'+
+                                '</tbody>'+
+                            '</table>'+
                         '</td>'+
                         '<td style="width: 75px;" class="text-center">'+
                             '<button class="btn btn-warning btn-sm" onclick="tambah_pegawai(this); return false;"><i class="dashicons dashicons-plus"></i></button>'+
                     '</td>'+
                     '</tr>';
                 jQuery('#daftar_pegawai tbody').html(html);
-                jQuery('#id_pegawai[1]').html(response.html); 
+                jQuery('#id_pegawai_1').html(response.html);
+                jQuery('#id_pegawai_1').select2({'width': '100%'});
             }else{
                 alert(`GAGAL! \n${response.message}`);
             }
@@ -212,9 +242,14 @@ function tambah_pegawai(that){
     var id = +tr.attr('data-id');
     var newid = id + 1;
     var tr_html = tr.html();
+    tr_html = tr_html.replace('_'+id+'"', '_'+newid+'"');
     tr_html = tr_html.replace('['+id+']', '['+newid+']');
     tr_html = '<tr data-id="'+newid+'">'+tr_html+'</tr>';
     jQuery('#daftar_pegawai tbody').append(tr_html);
+
+    jQuery('#daftar_pegawai tbody tr[data-id='+newid+'] .select2-container').remove();
+    jQuery('#id_pegawai_'+newid).select2({'width': '100%'});
+    
     jQuery('#daftar_pegawai tbody tr').map(function(i, b){
         if(i == 0){
             return;
@@ -514,6 +549,82 @@ function submitTambahDataFormSPTLembur(){
             }else{
                 jQuery('#wrap-loading').hide();
             }
+        }
+    });
+}
+
+function get_uang_lembur(that){
+    var id = jQuery(that).closest('tr').attr('data-id');
+    var golongan = jQuery('#id_pegawai_'+id+' option:selected').attr('golongan');
+    var waktu_mulai = jQuery('#waktu_mulai_'+id).val();
+    var waktu_selesai = jQuery('#waktu_selesai_'+id).val();
+    var jam = (new Date(waktu_selesai)).getTime() - (new Date(waktu_mulai)).getTime();
+    jam = Math.floor(jam / (1000 * 60 * 60));
+    var jenis_hari = jQuery('#jenis_hari_'+id).val();
+    jQuery('#uang_lembur_'+id).val(0);
+    jQuery('#uang_makan_'+id).val(0);
+    jQuery('#jumlah_jam_'+id).html(jam+' jam');
+    jQuery('#sbu_lembur_'+id).html('-');
+    jQuery('#sbu_makan_'+id).html('-');
+    if(
+        golongan
+        && jam >= 1
+    ){
+        get_sbu()
+        .then(function(sbu){
+            var sbu_selected = false;
+            var sbu_makan_selected = false;
+            sbu.map(function(b, i){
+                if(
+                    b.id_golongan == golongan
+                    && b.jenis_hari == jenis_hari
+                    && b.jenis_sbu == 'uang_lembur'
+                ){
+                    sbu_selected = b;
+                }else if(
+                    b.id_golongan == golongan
+                    && b.jenis_sbu == 'uang_makan'
+                ){
+                    sbu_makan_selected = b;
+                }
+            });
+            console.log('sbu_selected, sbu_makan_selected, golongan, jam, jenis_hari', sbu_selected, sbu_makan_selected, golongan, jam, jenis_hari);
+            if(sbu_selected){
+                jQuery('#uang_lembur_'+id).val(sbu_selected.harga*jam);
+                jQuery('#sbu_lembur_'+id).html(sbu_selected.nama+' ('+sbu_selected.uraian+') | '+sbu_selected.harga+' | '+sbu_selected.satuan);
+            }
+            if(
+                sbu_makan_selected
+                && jam >= 2
+            ){
+                jQuery('#uang_makan_'+id).val(sbu_makan_selected.harga);
+                jQuery('#sbu_makan_'+id).html(sbu_selected.nama+' ('+sbu_selected.uraian+') | '+sbu_selected.harga+' | '+sbu_selected.satuan);
+            }
+        });
+    }
+}
+
+function get_sbu(){
+    return new Promise(function(resolve, reject){
+        if(typeof data_sbu_global == 'undefined'){
+            jQuery('#wrap-loading').show();
+            jQuery.ajax({
+                method: 'post',
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                dataType: 'json',
+                data: {
+                    'action': 'get_data_sbu_lembur',
+                    'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
+                    'tahun_anggaran': jQuery('#tahun_anggaran').val()
+                },
+                success: function(res){
+                    data_sbu_global = res.data;
+                    jQuery('#wrap-loading').hide();
+                    return resolve(data_sbu_global);
+                }
+            });
+        }else{
+            return resolve(data_sbu_global);
         }
     });
 }

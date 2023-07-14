@@ -100,14 +100,14 @@ class Wp_Simpeg_Public {
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp-simpeg-public.js', array( 'jquery' ), $this->version, false );
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/wp-simpeg-public.css', array(), $this->version, 'all' );		
-		// wp_enqueue_script($this->plugin_name . 'bootstrap', plugin_dir_url(__FILE__) . 'js/bootstrap.bundle.min.js', array('jquery'), $this->version, false);
-		// wp_enqueue_script($this->plugin_name . 'select2', plugin_dir_url(__FILE__) . 'js/select2.min.js', array('jquery'), $this->version, false);
-		// wp_enqueue_script($this->plugin_name . 'datatables', plugin_dir_url(__FILE__) . 'js/jquery.dataTables.min.js', array('jquery'), $this->version, false);
-		// wp_enqueue_script($this->plugin_name . 'chart', plugin_dir_url(__FILE__) . 'js/chart.min.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name . 'bootstrap', plugin_dir_url(__FILE__) . 'js/bootstrap.bundle.min.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name . 'select2', plugin_dir_url(__FILE__) . 'js/select2.min.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name . 'datatables', plugin_dir_url(__FILE__) . 'js/datatables.min.js', array('jquery'), $this->version, false);
+		wp_enqueue_script($this->plugin_name . 'chart', plugin_dir_url(__FILE__) . 'js/chart.min.js', array('jquery'), $this->version, false);
 		wp_localize_script( $this->plugin_name, 'ajax', array(
 		    'url' => admin_url( 'admin-ajax.php' )
 		));
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp-satset-public.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp-simpeg-public.js', array( 'jquery' ), $this->version, false );
 	}
 
     public function management_data_pegawai_simpeg($atts){
@@ -180,18 +180,49 @@ class Wp_Simpeg_Public {
 	    );
 	    if(!empty($_POST)){
 	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
+	        	$tahun_anggaran = $_POST['tahun_anggaran'];
 	            $ret['data'] = $wpdb->get_results($wpdb->prepare('
 	                SELECT 
 	                    *
 	                FROM data_pegawai_lembur
 	                WHERE id_skpd=%d
 	                	AND active=1
-	            ', $_POST['id_skpd']), ARRAY_A);
+	                	AND tahun=%d
+	            ', $_POST['id_skpd'], $tahun_anggaran), ARRAY_A);
 	            $html = '<option value="">Pilih Pegawai</option>';
 	            foreach($ret['data'] as $pegawai){
-	            	$html .= '<option value="'.$pegawai['id'].'">'.$pegawai['gelar_depan'].' '.$pegawai['nama'].' '.$pegawai['gelar_belakang'].'</option>';
+	            	$html .= '<option golongan="'.$pegawai['kode_gol'].'" value="'.$pegawai['id'].'">'.$pegawai['gelar_depan'].' '.$pegawai['nama'].' '.$pegawai['gelar_belakang'].'</option>';
 	            }
 	            $ret['html'] = $html;
+	        }else{
+	            $ret['status']  = 'error';
+	            $ret['message'] = 'Api key tidak ditemukan!';
+	        }
+	    }else{
+	        $ret['status']  = 'error';
+	        $ret['message'] = 'Format Salah!';
+	    }
+
+	    die(json_encode($ret));
+	}
+
+	public function get_data_sbu_lembur(){
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil get data!',
+	        'data' => array()
+	    );
+	    if(!empty($_POST)){
+	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
+	        	$tahun_anggaran = $_POST['tahun_anggaran'];
+	            $ret['data'] = $wpdb->get_results($wpdb->prepare('
+	                SELECT 
+	                    *
+	                FROM data_sbu_lembur
+	                WHERE active=1
+	                	AND tahun=%d
+	            ', $tahun_anggaran), ARRAY_A);
 	        }else{
 	            $ret['status']  = 'error';
 	            $ret['message'] = 'Api key tidak ditemukan!';
@@ -856,16 +887,16 @@ class Wp_Simpeg_Public {
 	            $params = $columns = $totalRecords = $data = array();
 	            $params = $_REQUEST;
 	            $columns = array( 
-	               0 => `id_skpd`,
-	               1 => `id_ppk`,
-	               2 => `id_bendahara`,
-	               3 => `uang_makan`,
-	               4 => `uang_lembur`,
-	               5 => `ket_lembur`,
-	               6 => `ket_ver_ppk`,
-	               7 => `ket_ver_kepala`,
-	               8 => `status_ver_bendahara`, 
-	               9 => `ket_ver_bendahara`,
+	               0 => 'id_skpd',
+	               1 => 'id_ppk',
+	               2 => 'id_bendahara',
+	               3 => 'uang_makan',
+	               4 => 'uang_lembur',
+	               5 => 'ket_lembur',
+	               6 => 'ket_ver_ppk',
+	               7 => 'ket_ver_kepala',
+	               8 => 'status_ver_bendahara', 
+	               9 => 'ket_ver_bendahara',
 	              10 => 'id'
 	            );
 	            $where = $sqlTot = $sqlRec = "";
@@ -876,7 +907,7 @@ class Wp_Simpeg_Public {
 	            // }
 
 	            // getting total number records without any search
-	            $sql_tot = "SELECT count(p.id) as jml FROM `data_spt_lembur`";
+	            $sql_tot = "SELECT count(id) as jml FROM `data_spt_lembur`";
 	            $sql = "SELECT ".implode(', ', $columns)." FROM `data_spt_lembur`";
 	            $where_first = " WHERE 1=1 AND status != 3";
 	            $sqlTot .= $sql_tot.$where_first;
