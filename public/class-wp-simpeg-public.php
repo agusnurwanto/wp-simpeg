@@ -956,29 +956,39 @@ class Wp_Simpeg_Public {
 	            $params = $columns = $totalRecords = $data = array();
 	            $params = $_REQUEST;
 	            $columns = array( 
-	               0 => 'id_skpd',
-	               1 => 'id_ppk',
-	               2 => 'id_bendahara',
-	               3 => 'uang_makan',
-	               4 => 'uang_lembur',
-	               5 => 'ket_lembur',
-	               6 => 'ket_ver_ppk',
-	               7 => 'ket_ver_kepala',
-	               8 => 'status_ver_bendahara', 
-	               9 => 'ket_ver_bendahara',
-	              10 => 'id'
+	            	'u.nama_skpd',
+	            	's.nomor_spt',
+	            	's.jml_peg',
+	            	's.jml_jam',
+	            	's.uang_makan',
+	            	's.uang_lembur',
+	            	's.jml_pajak',
+	            	's.ket_lembur',
+	            	's.ket_ver_ppk',
+	            	's.status',
+	            	's.status_ver_bendahara', 
+	            	's.ket_ver_bendahara',
+	            	's.ket_ver_kepala',
+	              	's.id'
 	            );
 	            $where = $sqlTot = $sqlRec = "";
 
-	            // check search value exist
-	            // if( !empty($params['search']['value']) ) { 
-	            //     $where .=" OR  LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
-	            // }
+	            if( !empty($params['search']['value']) ) { 
+	                $where .=" OR u.nama_skpd LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
+	                $where .=" OR s.nomor_spt LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
+	                $where .=" OR s.ket_lembur LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
+	            }
 
 	            // getting total number records without any search
-	            $sql_tot = "SELECT count(id) as jml FROM `data_spt_lembur`";
-	            $sql = "SELECT ".implode(', ', $columns)." FROM `data_spt_lembur`";
-	            $where_first = " WHERE 1=1 AND active=1";
+	            $sql_tot = "SELECT count(id) as jml FROM `data_spt_lembur` s";
+	            $sql = "
+	            	SELECT 
+	            		".implode(', ', $columns)." 
+	            	FROM `data_spt_lembur` s
+	            	LEFT JOIN data_unit_lembur as u on s.id_skpd=u.id_skpd
+	            		AND s.tahun_anggaran=u.tahun_anggaran
+	            		AND s.active=u.active";
+	            $where_first = " WHERE 1=1 AND s.active=1";
 	            $sqlTot .= $sql_tot.$where_first;
 	            $sqlRec .= $sql.$where_first;
 	            if(isset($where) && $where != '') {

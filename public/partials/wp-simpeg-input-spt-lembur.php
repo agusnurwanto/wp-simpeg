@@ -33,18 +33,17 @@ if(in_array("administrator", $user_meta->roles)){
             <table id="management_data_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                 <thead>
                     <tr>
-                        <th class="text-center">Id SKPD</th>
-                        <th class="text-center">Id PPK</th>
-                        <th class="text-center">Id Bendahara</th>
+                        <th class="text-center">SKPD</th>
+                        <th class="text-center">Nomor SPT</th>
+                        <th class="text-center">Jumlah Pegawai</th>
+                        <th class="text-center">Jumlah Jam</th>
                         <th class="text-center">Uang Makan</th>
                         <th class="text-center">Uang Lembur</th>
+                        <th class="text-center">Total Pajak</th>
                         <th class="text-center">Keterangan Lembur</th>
-                        <th class="text-center">Keterangan Verifikasi PPK</th>
-                        <th class="text-center">Keterangan Verifikasi Kepala</th>
-                        <th class="text-center">Status Verifikasi Bendahara</th>
-                        <th class="text-center">Keterangan Verifikasi Bendahara</th>
+                        <th class="text-center">Keterangan Verifikasi</th>
                         <th class="text-center">Status</th>
-                        <th class="text-center" style="width: 150px;">Aksi</th>
+                        <th class="text-center" style="width: 35px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -253,7 +252,7 @@ function escapeRegExp(string) {
 
 //show tambah data
 function tambah_pegawai(that){
-    var tr = jQuery(that).closest('tr');
+    var tr = jQuery(that).closest('tbody').find('>tr').last();
     var id = +tr.attr('data-id');
     var newid = id + 1;
     var tr_html = tr.html();
@@ -261,22 +260,21 @@ function tambah_pegawai(that){
     tr_html = tr_html.replace(new RegExp(escapeRegExp('['+id+']'), 'g'), '['+newid+']');
     tr_html = '<tr data-id="'+newid+'">'+tr_html+'</tr>';
     jQuery('#daftar_pegawai > tbody').append(tr_html);
-
     jQuery('#daftar_pegawai > tbody > tr[data-id='+newid+'] .select2-container').remove();
-    jQuery('#id_pegawai_'+newid).select2({'width': '100%'});
-    
     jQuery('#daftar_pegawai > tbody > tr').map(function(i, b){
         if(i == 0){
             return;
-        var html_hapus = ''+
-            '<button class="btn btn-warning btn-sm" onclick="tambah_pegawai(this); return false;"><i class="dashicons dashicons-plus"></i></button>';
-    }else{
-        var html_hapus = ''+    
-            '<button class="btn btn-danger btn-sm" onclick="hapus_pegawai(this); return false;"><i class="dashicons dashicons-trash"></i></button>';
+            var html_hapus = ''+
+                '<button class="btn btn-warning btn-sm" onclick="tambah_pegawai(this); return false;"><i class="dashicons dashicons-plus"></i></button>';
+        }else{
+            var html_hapus = ''+    
+                '<button class="btn btn-danger btn-sm" onclick="hapus_pegawai(this); return false;"><i class="dashicons dashicons-trash"></i></button>';
         }
-
         jQuery(b).find('td').last().html(html_hapus);
     });
+    setTimeout(function(){
+        jQuery('#id_pegawai_'+newid).select2({'width': '100%'}); 
+    }, 500);
 }
 
 function hapus_pegawai(that){
@@ -311,20 +309,27 @@ function get_data_spt_lembur(){
             },
             lengthMenu: [[20, 50, 100, -1], [20, 50, 100, "All"]],
             order: [[0, 'asc']],
+            "aoColumnDefs": [
+                { "bSortable": false, "aTargets": [ 8, 10 ] }
+            ],
             "drawCallback": function( settings ){
                 jQuery("#wrap-loading").hide();
             },
             "columns": [
                 {
-                    "data": 'id_skpd',
+                    "data": 'nama_skpd',
                     className: "text-center"
                 },
                 {
-                    "data": 'id_ppk',
+                    "data": 'nomor_spt',
                     className: "text-center"
                 },
                 {
-                    "data": 'id_bendahara',
+                    "data": 'jml_peg',
+                    className: "text-center"
+                },
+                {
+                    "data": 'jml_jam',
                     className: "text-center"
                 },
                 {
@@ -336,17 +341,17 @@ function get_data_spt_lembur(){
                     className: "text-center"
                 },
                 {
+                    "data": 'jml_pajak',
+                    className: "text-center"
+                },
+                {
                     "data": 'ket_lembur',
                     className: "text-center"
                 },
                 {
-                    "data": 'ket_ver_ppk',
+                    "data": 'keterangan_verifikasi',
                     className: "text-center"
                 },
-                {
-                    "data": 'ket_ver_kepala',
-                    className: "text-center"
-                },                
                 {
                     "data": 'status',
                     className: "text-center"
@@ -401,32 +406,29 @@ function edit_data(_id){
         success: function(res){
             if(res.status == 'success'){
                 jQuery('#id_data').val(res.data.id).prop('disabled', false);
-                get_spt_lembur()
-                .then(function(){
-                    jQuery('#id_skpd').val(res.data.id_skpd).prop('disabled', false);
-                    jQuery('#id_ppk').val(res.data.id_ppk).prop('disabled', false);
-                    jQuery('#id_bendahara').val(res.data.id_bendahara).prop('disabled', false);
-                    jQuery('#uang_makan').val(res.data.uang_makan).prop('disabled', false);
-                    jQuery('#uang_lembur').val(res.data.uang_lembur).prop('disabled', false);
-                    jQuery('#ket_lembur').val(res.data.uang_lembur).prop('disabled', false);
-                    jQuery('#ket_ver_ppk').val(res.data.uang_lembur).prop('disabled', false);
-                    jQuery('#ket_ver_kepala').val(res.data.uang_lembur).prop('disabled', false);
-                    jQuery('#status_ver_bendahara').val(res.data.status_bendahara).prop('disabled', false);
-                    if(res.data.status_bendahara == 0){
-                        jQuery('#keterangan_status_bendahara').closest('.form-group').show().prop('disabled', false);
-                        jQuery('#status_bendahara').prop('checked', false);
-                    }else{
-                        jQuery('#keterangan_status_bendahara').closest('.form-group').hide().prop('disabled', false);
-                        jQuery('#status_bendahara').prop('checked', true);
-                    }
-                    jQuery('#status_bendahara').closest('.form-check').show().prop('disabled', false);
-                    jQuery('#modalTambahDataSPTLembur .send_data').show();
-                    jQuery('#modalTambahDataSPTLembur').modal('show');
-                })
+                jQuery('#id_skpd').val(res.data.id_skpd).prop('disabled', false);
+                jQuery('#uang_makan').val(res.data.uang_makan).prop('disabled', false);
+                jQuery('#uang_lembur').val(res.data.uang_lembur).prop('disabled', false);
+                jQuery('#ket_lembur').val(res.data.uang_lembur).prop('disabled', false);
+                // jQuery('#id_ppk').val(res.data.id_ppk).prop('disabled', false);
+                // jQuery('#id_bendahara').val(res.data.id_bendahara).prop('disabled', false);
+                // jQuery('#ket_ver_ppk').val(res.data.uang_lembur).prop('disabled', false);
+                // jQuery('#ket_ver_kepala').val(res.data.uang_lembur).prop('disabled', false);
+                // jQuery('#status_ver_bendahara').val(res.data.status_bendahara).prop('disabled', false);
+                // if(res.data.status_bendahara == 0){
+                //     jQuery('#keterangan_status_bendahara').closest('.form-group').show().prop('disabled', false);
+                //     jQuery('#status_bendahara').prop('checked', false);
+                // }else{
+                //     jQuery('#keterangan_status_bendahara').closest('.form-group').hide().prop('disabled', false);
+                //     jQuery('#status_bendahara').prop('checked', true);
+                // }
+                // jQuery('#status_bendahara').closest('.form-check').show().prop('disabled', false);
+                jQuery('#modalTambahDataSPTLembur .send_data').show();
+                jQuery('#modalTambahDataSPTLembur').modal('show');
             }else{
                 alert(res.message);
-                jQuery('#wrap-loading').hide();
             }
+            jQuery('#wrap-loading').hide();
         }
     });
 }
@@ -445,32 +447,29 @@ function detail_data(_id){
         success: function(res){
             if(res.status == 'success'){
                 jQuery('#id_data').val(res.data.id);
-                get_spt_lembur()
-                .then(function(){
-                    jQuery('#id_skpd').val(res.data.id_skpd).prop('disabled', true);
-                    jQuery('#id_ppk').val(res.data.id_ppk).prop('disabled', true);
-                    jQuery('#id_bendahara').val(res.data.id_bendahara).prop('disabled', true);
-                    jQuery('#uang_makan').val(res.data.uang_makan).prop('disabled', true);
-                    jQuery('#uang_lembur').val(res.data.uang_lembur).prop('disabled', true);
-                    jQuery('#ket_lembur').val(res.data.ket_lembur).prop('disabled', true);
-                    jQuery('#ket_ver_ppk').val(res.data.ket_ver_ppk).prop('disabled', true);
-                    jQuery('#ket_ver_kepala').val(res.data.uang_lembur).prop('disabled', true);
-                    jQuery('#status_ver_bendahara').val(res.data.status_bendahara).prop('disabled', true);
-                    if(res.data.status_bendahara == 0){
-                        jQuery('#keterangan_status_bendahara').closest('.form-group').show().prop('disabled', true);
-                        jQuery('#status_bendahara').prop('checked', true);
-                    }else{
-                        jQuery('#keterangan_status_bendahara').closest('.form-group').hide().prop('disabled', true);
-                        jQuery('#status_bendahara').prop('checked', true);
-                    }
-                    jQuery('#status_bendahara').closest('.form-check').show().prop('disabled', true);
-                    jQuery('#modalTambahDataSPTLembur .send_data').show();
-                    jQuery('#modalTambahDataSPTLembur').modal('show');
-                })
+                jQuery('#id_skpd').val(res.data.id_skpd).prop('disabled', true);
+                jQuery('#uang_makan').val(res.data.uang_makan).prop('disabled', true);
+                jQuery('#uang_lembur').val(res.data.uang_lembur).prop('disabled', true);
+                jQuery('#ket_lembur').val(res.data.ket_lembur).prop('disabled', true);
+                // jQuery('#id_ppk').val(res.data.id_ppk).prop('disabled', true);
+                // jQuery('#id_bendahara').val(res.data.id_bendahara).prop('disabled', true);
+                // jQuery('#ket_ver_ppk').val(res.data.ket_ver_ppk).prop('disabled', true);
+                // jQuery('#ket_ver_kepala').val(res.data.uang_lembur).prop('disabled', true);
+                // jQuery('#status_ver_bendahara').val(res.data.status_bendahara).prop('disabled', true);
+                // if(res.data.status_bendahara == 0){
+                //     jQuery('#keterangan_status_bendahara').closest('.form-group').show().prop('disabled', true);
+                //     jQuery('#status_bendahara').prop('checked', true);
+                // }else{
+                //     jQuery('#keterangan_status_bendahara').closest('.form-group').hide().prop('disabled', true);
+                //     jQuery('#status_bendahara').prop('checked', true);
+                // }
+                // jQuery('#status_bendahara').closest('.form-check').show().prop('disabled', true);
+                jQuery('#modalTambahDataSPTLembur .send_data').show();
+                jQuery('#modalTambahDataSPTLembur').modal('show');
             }else{
                 alert(res.message);
-                jQuery('#wrap-loading').hide();
             }
+            jQuery('#wrap-loading').hide();
         }
     });
 }
@@ -610,7 +609,7 @@ function get_uang_lembur(that){
             ){
                 jQuery('#id_standar_harga_makan_'+id).val(sbu_makan_selected.id);
                 jQuery('#uang_makan_'+id).val(sbu_makan_selected.harga);
-                jQuery('#sbu_makan_'+id).html(sbu_selected.nama+' ('+sbu_selected.uraian+') | '+sbu_selected.harga+' | '+sbu_selected.satuan);
+                jQuery('#sbu_makan_'+id).html(sbu_makan_selected.nama+' ('+sbu_makan_selected.uraian+') | '+sbu_makan_selected.harga+' | '+sbu_makan_selected.satuan);
             }
         });
     }
