@@ -586,109 +586,110 @@ class Wp_Simpeg_Public {
 	}
 
 	public function get_datatable_pegawai(){
-	        global $wpdb;
-	        $ret = array(
-	            'status' => 'success',
-	            'message' => 'Berhasil get data!',
-	            'data'  => array()
-	        );
+        global $wpdb;
+        $ret = array(
+            'status' => 'success',
+            'message' => 'Berhasil get data!',
+            'data'  => array()
+        );
 
-	        if(!empty($_POST)){
-	            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
-	                $user_id = um_user( 'ID' );
-	                $user_meta = get_userdata($user_id);
-	                $params = $columns = $totalRecords = $data = array();
-	                $params = $_REQUEST;
-	                $columns = array( 
-					   0 => 'id_skpd',
-					   1 => 'nik',
-					   2 => 'nip',
-					   3 => 'nama',
-					   4 => 'tempat_lahir',
-					   5 => 'tanggal_lahir',
-					   6 => 'status',
-					   7 => 'gol_ruang',
-					   8 => 'tmt_pangkat',
-					   9 => 'eselon',
-					   10 => 'jabatan',
-					   11 => 'tipe_pegawai',
-					   12 => 'tmt_jabatan',
-					   13 => 'agama',
-					   14 => 'alamat',
-					   15 => 'no_hp',
-					   16 => 'satuan_kerja',
-					   17 => 'unit_kerja_induk',
-					   18 => 'tmt_pensiun',
-					   19 => 'pendidikan',
-					   20 => 'kode_pendidikan',
-					   21 => 'nama_sekolah',
-					   22 => 'nama_pendidikan',
-					   23 => 'lulus',
-					   24 => 'karpeg',
-					   25 => 'karis_karsu',
-					   26 => 'nilai_prestasi',
-					   27 => 'email',
-					   28 => 'tahun',
-	                   29 => 'id'
-	                );
-	                $where = $sqlTot = $sqlRec = "";
+        if(!empty($_POST)){
+            if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
+                $user_id = um_user( 'ID' );
+                $user_meta = get_userdata($user_id);
+                $params = $columns = $totalRecords = $data = array();
+                $params = $_REQUEST;
+                $columns = array( 
+				   0 => 'id_skpd',
+				   1 => 'nik',
+				   2 => 'nip',
+				   3 => 'nama',
+				   4 => 'tempat_lahir',
+				   5 => 'tanggal_lahir',
+				   6 => 'status',
+				   7 => 'gol_ruang',
+				   8 => 'tmt_pangkat',
+				   9 => 'eselon',
+				   10 => 'jabatan',
+				   11 => 'tipe_pegawai',
+				   12 => 'tmt_jabatan',
+				   13 => 'agama',
+				   14 => 'alamat',
+				   15 => 'no_hp',
+				   16 => 'satuan_kerja',
+				   17 => 'unit_kerja_induk',
+				   18 => 'tmt_pensiun',
+				   19 => 'pendidikan',
+				   20 => 'kode_pendidikan',
+				   21 => 'nama_sekolah',
+				   22 => 'nama_pendidikan',
+				   23 => 'lulus',
+				   24 => 'karpeg',
+				   25 => 'karis_karsu',
+				   26 => 'nilai_prestasi',
+				   27 => 'email',
+				   28 => 'tahun',
+                   29 => 'id'
+                );
+                $where = $sqlTot = $sqlRec = "";
 
-	                // check search value exist
-	                if( !empty($params['search']['value']) ) {
-	                    $where .=" AND ( id_pegawai LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");  
-	                    $where .=" OR total LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
-	                }
+                // check search value exist
+                if( !empty($params['search']['value']) ) {
+                    $where .=" AND ( id_pegawai LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");  
+                    $where .=" OR total LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
+                }
 
-	                // getting total number records without any search
-	                $sql_tot = "SELECT count(id) as jml FROM `data_pegawai_lembur`";
-	                $sql = "SELECT ".implode(', ', $columns)." FROM `data_pegawai_lembur`";
-	                $where_first = " WHERE 1=1 AND active=1";
-	                $sqlTot .= $sql_tot.$where_first;
-	                $sqlRec .= $sql.$where_first;
-	                if(isset($where) && $where != '') {
-	                    $sqlTot .= $where;
-	                    $sqlRec .= $where;
-	                }
+                // getting total number records without any search
+                $sql_tot = "SELECT count(id) as jml FROM `data_pegawai_lembur`";
+                $sql = "SELECT ".implode(', ', $columns)." FROM `data_pegawai_lembur`";
+                $where_first = " WHERE 1=1 AND active=1";
+                $sqlTot .= $sql_tot.$where_first;
+                $sqlRec .= $sql.$where_first;
+                if(isset($where) && $where != '') {
+                    $sqlTot .= $where;
+                    $sqlRec .= $where;
+                }
 
-	                $limit = '';
-	                if($params['length'] != -1){
-	                    $limit = "  LIMIT ".$wpdb->prepare('%d', $params['start'])." ,".$wpdb->prepare('%d', $params['length']);
-	                }
-	                $sqlRec .=  " ORDER BY ". $columns[$params['order'][0]['column']]."   ".$params['order'][0]['dir'].$limit;
+                $limit = '';
+                if($params['length'] != -1){
+                    $limit = "  LIMIT ".$wpdb->prepare('%d', $params['start'])." ,".$wpdb->prepare('%d', $params['length']);
+                }
+                $sqlRec .=  " ORDER BY ". $columns[$params['order'][0]['column']]."   ".$params['order'][0]['dir'].$limit;
 
-	                $queryTot = $wpdb->get_results($sqlTot, ARRAY_A);
-	                $totalRecords = $queryTot[0]['jml'];
-	                $queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
+                $queryTot = $wpdb->get_results($sqlTot, ARRAY_A);
+                $totalRecords = $queryTot[0]['jml'];
+                $queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
 
-	                foreach($queryRecords as $recKey => $recVal){
-	                    $btn = '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
-	                    $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-trash"></i></a>';
-	                    $queryRecords[$recKey]['aksi'] = $btn;
-	                }
+                foreach($queryRecords as $recKey => $recVal){
+                    $btn = '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
+                    $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-trash"></i></a>';
+                    $queryRecords[$recKey]['aksi'] = $btn;
+                }
 
-	                $json_data = array(
-	                    "draw"            => intval( $params['draw'] ),   
-	                    "recordsTotal"    => intval( $totalRecords ),  
-	                    "recordsFiltered" => intval($totalRecords),
-	                    "data"            => $queryRecords,
-	                    "sql"             => $sqlRec
-	                );
+                $json_data = array(
+                    "draw"            => intval( $params['draw'] ),   
+                    "recordsTotal"    => intval( $totalRecords ),  
+                    "recordsFiltered" => intval($totalRecords),
+                    "data"            => $queryRecords,
+                    "sql"             => $sqlRec
+                );
 
-	                die(json_encode($json_data));
-	            }else{
-	                $return = array(
-	                    'status' => 'error',
-	                    'message'   => 'Api Key tidak sesuai!'
-	                );
-	            }
-	        }else{
-	            $return = array(
-	                'status' => 'error',
-	                'message'   => 'Format tidak sesuai!'
-	            );
-	        }
-	        die(json_encode($return));
-	    }
+                die(json_encode($json_data));
+            }else{
+                $return = array(
+                    'status' => 'error',
+                    'message'   => 'Api Key tidak sesuai!'
+                );
+            }
+        }else{
+            $return = array(
+                'status' => 'error',
+                'message'   => 'Format tidak sesuai!'
+            );
+        }
+        die(json_encode($return));
+    }
+
 	public function get_data_spt_lembur_by_id(){
 	    global $wpdb;
 	    $ret = array(
@@ -733,7 +734,7 @@ class Wp_Simpeg_Public {
 	    );
 	    if(!empty($_POST)){
 	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
-	            $ret['data'] = $wpdb->update('data_spt_lembur', array('status' => 3), array(
+	            $ret['data'] = $wpdb->update('data_spt_lembur', array('active' => 0), array(
 	                'id' => $_POST['id']
 	            ));
 	        }else{
@@ -753,6 +754,7 @@ class Wp_Simpeg_Public {
 	    $ret = array(
 	        'status' => 'success',
 	        'message' => 'Berhasil simpan data!',
+	        'error' => array(),
 	        'data' => array()
 	    );
 	    if(!empty($_POST)){
@@ -782,6 +784,27 @@ class Wp_Simpeg_Public {
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Isi Keterangan Lembur dulu!';
 	            }
+	            if($ret['status'] != 'error' && !empty($data['jml_jam'])){
+	                $jml_jam = $data['jml_jam'];
+	            }
+	            // else{
+	            //     $ret['status'] = 'error';
+	            //     $ret['message'] = 'Isi Keterangan Lembur dulu!';
+	            // }
+	            if($ret['status'] != 'error' && !empty($data['jml_peg'])){
+	                $jml_peg = $data['jml_peg'];
+	            }
+	            // else{
+	            //     $ret['status'] = 'error';
+	            //     $ret['message'] = 'Isi Keterangan Lembur dulu!';
+	            // }
+	            if($ret['status'] != 'error' && !empty($data['jml_pajak'])){
+	                $jml_pajak = $data['jml_pajak'];
+	            }
+	            // else{
+	            //     $ret['status'] = 'error';
+	            //     $ret['message'] = 'Isi Keterangan Lembur dulu!';
+	            // }
 	            if($ret['status'] != 'error' && !empty($data['id_ppk'])){
 	                $id_ppk = $data['id_ppk'];
 	            }
@@ -833,8 +856,13 @@ class Wp_Simpeg_Public {
 	                }
 	                $uang_makan = 0;
 	                $uang_lembur = 0;
+	                $jml_jam = 0;
+	                $jml_peg = array();
+	                $jml_pajak = 0;
 	                $data_opsi_detail = array();
 	                foreach($data['id_pegawai'] as $key => $pegawai){
+	                	$jml_peg[$data['id_pegawai'][$key]] = '';
+	                	$jml_jam += $data['jml_jam_lembur'][$key];
 	                	$uang_lembur += $data['uang_lembur'][$key];
 	                	$uang_makan += $data['uang_makan'][$key];
 	                	$data_opsi_detail[] = array(
@@ -866,6 +894,9 @@ class Wp_Simpeg_Public {
 			            'uang_makan'=> $uang_makan, 
 			            'uang_lembur'=> $uang_lembur, 
 			            'ket_lembur'=> $ket_lembur, 
+			            'jml_jam'=> $jml_jam, 
+			            'jml_peg'=> count($jml_peg), 
+			            'jml_pajak'=> $jml_pajak, 
 			            'ket_ver_ppk'=> '', 
 			            'ket_ver_kepala'=> '', 
 			            'status_ver_bendahara'=> '',
@@ -902,7 +933,10 @@ class Wp_Simpeg_Public {
 	                        	AND tahun_anggaran=%d
 	                    ', $nomor_spt, $tahun_anggaran), ARRAY_A);
 	                    if(empty($cek_id)){
-	                        $data['id_data'] = $wpdb->insert('data_spt_lembur', $data_opsi);
+	                        $cek = $wpdb->insert('data_spt_lembur', $data_opsi);
+	                        if(!empty($cek)){
+	                        	$data['id_data'] = $wpdb->insert_id;
+	                        }
 	                    }else{
 	                        if($cek_id['active'] == 0){
 	                        	$data['id_data'] = $cek_id['id'];
@@ -917,15 +951,20 @@ class Wp_Simpeg_Public {
 	                }
 	            }
 	            if($ret['status'] != 'error'){
+                    $wpdb->update('data_spt_lembur_detail', array('active' => 0), array(
+                        'id_spt' => $data['id_data']
+                    ));
 	            	foreach($data_opsi_detail as $opsi){
 	            		$opsi['id_spt'] = $data['id_data'];
 	                    if(empty($opsi['id'])){
-	                    	unset($opsi['id']);
-	                        $data['id_data'] = $wpdb->insert('data_spt_lembur_detail', $opsi);
+	                        $wpdb->insert('data_spt_lembur_detail', $opsi);
 	                    }else{
                             $wpdb->update('data_spt_lembur_detail', $opsi, array(
                                 'id' => $opsi['id']
                             ));
+                        }
+                        if(!empty($wpdb->last_error)){
+                        	$ret['error'][] = $wpdb->last_error;
                         }
 	            	}
 	            }
@@ -996,22 +1035,22 @@ class Wp_Simpeg_Public {
 	                $sqlRec .= $where;
 	            }
 
-	            $limit = '';
-	            if($params['length'] != -1){
-	                $limit = "  LIMIT ".$wpdb->prepare('%d', $params['start'])." ,".$wpdb->prepare('%d', $params['length']);
-	            }
-	            $sqlRec .=  " ORDER BY ". $columns[$params['order'][0]['column']]."   ".str_replace("'", '', $wpdb->prepare('%s', $params['order'][0]['dir'])).$limit;
+                $limit = '';
+                if($params['length'] != -1){
+                    $limit = "  LIMIT ".$wpdb->prepare('%d', $params['start'])." ,".$wpdb->prepare('%d', $params['length']);
+                }
+                $sqlRec .=  " ORDER BY ". $columns[$params['order'][0]['column']]."   ".str_replace("'", '', $wpdb->prepare('%s', $params['order'][0]['dir'])).$limit;
 
-	            $queryTot = $wpdb->get_results($sqlTot, ARRAY_A);
-	            $totalRecords = $queryTot[0]['jml'];
-	            $queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
+                $queryTot = $wpdb->get_results($sqlTot, ARRAY_A);
+                $totalRecords = $queryTot[0]['jml'];
+                $queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
 
-	            foreach($queryRecords as $recKey => $recVal){
-	                $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
-	                if ($recVal['status'] != 1) {
-	                    $btn .= '<a style="margin-left: 10px;" class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
-	                    $btn .= '<a style="margin-left: 10px;" class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-trash"></i></a>';
-	                }
+                foreach($queryRecords as $recKey => $recVal){
+                    $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
+                    if ($recVal['status'] != 1) {
+                        $btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
+                        $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-trash"></i></a>';
+                    }
 	                $queryRecords[$recKey]['aksi'] = $btn;
 	                if($recVal['status'] == 0){
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Belum dicek</span>';
@@ -1529,7 +1568,7 @@ public function get_datatable_sbu_lembur(){
 
                 foreach($queryRecords as $recKey => $recVal){
                     $btn = '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
-                    $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-trash"></i></a>';
+                    $btn .= '<a style="margin-left: 10px;" class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-trash"></i></a>';
                     $queryRecords[$recKey]['aksi'] = $btn;
                 }
 

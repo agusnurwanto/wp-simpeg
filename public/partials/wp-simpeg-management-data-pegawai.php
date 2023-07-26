@@ -68,7 +68,7 @@
             <div class="modal-body">
                 <input type='hidden' id='id_data' name="id_data" placeholder=''>
                 <div class="form-group">
-                    <label for='id_skpd' style='display:inline-block'>Id nip</label>
+                    <label for='id_skpd' style='display:inline-block'>Id SKPD</label>
                     <input type="text" id='id_skpd' name="id_skpd" class="form-control" placeholder=''/>
                 </div>
                 <div class="form-group">
