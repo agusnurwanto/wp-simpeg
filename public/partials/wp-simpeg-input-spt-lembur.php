@@ -223,7 +223,7 @@ function html_pegawai(opsi){
                     '</tbody>'+
                 '</table>'+
             '</td>'+
-            '<td style="width: 75px;" class="text-center">'+
+            '<td style="width: 75px;" class="text-center aksi-pegawai">'+
                 '<button class="tambah-pegawai btn btn-warning btn-sm" onclick="tambah_pegawai(this); return false;"><i class="dashicons dashicons-plus"></i></button>'+
         '</td>'+
         '</tr>';
@@ -436,6 +436,8 @@ function edit_data(_id){
                 jQuery('#id_data').val(res.data.id).prop('disabled', false);
                 jQuery('#nomor_spt').val(res.data.nomor_spt).prop('disabled', false);
                 jQuery('#tahun_anggaran').val(res.data.tahun_anggaran).prop('disabled', false);
+                jQuery('#daftar_pegawai > tbody').html('');
+                
                 get_skpd(true)
                 .then(function(){
                     jQuery('#id_skpd').val(res.data.id_skpd).trigger('change').prop('disabled', false);
@@ -443,7 +445,7 @@ function edit_data(_id){
                     .then(function(){
                         res.data_detail.map(function(b, i){
                             if(i >= 1){
-                                jQuery('tr[data-id="'+i+'"] .tambah-pegawai').click();
+                                jQuery('tr[data-id="1"] .tambah-pegawai').click();
                             }
                         });
                         setTimeout(function(){
@@ -498,7 +500,7 @@ function detail_data(_id){
         },
         success: function(res){
             if(res.status == 'success'){
-                jQuery('#id_data').val(res.data.id).prop('disabled', true);
+                jQuery('#id_data').val(res.data.id).prop('disabled', false);
                 jQuery('#nomor_spt').val(res.data.nomor_spt).prop('disabled', true);
                 jQuery('#tahun_anggaran').val(res.data.tahun_anggaran).prop('disabled', true);
                 get_skpd(true)
@@ -508,7 +510,7 @@ function detail_data(_id){
                     .then(function(){
                         res.data_detail.map(function(b, i){
                             if(i >= 1){
-                                jQuery('tr[data-id="'+i+'"] .tambah-pegawai').click();
+                                jQuery('tr[data-id="1"] .tambah-pegawai').click();
                             }
                         });
                         setTimeout(function(){
@@ -536,7 +538,8 @@ function detail_data(_id){
                             //     jQuery('#status_bendahara').prop('checked', true);
                             // }
                             // jQuery('#status_bendahara').closest('.form-check').show().prop('disabled', true);
-                            jQuery('#modalTambahDataSPTLembur .send_data').show();
+                            jQuery('.aksi-pegawai .btn').hide();
+                            jQuery('#modalTambahDataSPTLembur .send_data').hide();
                             jQuery('#modalTambahDataSPTLembur').modal('show');
                             jQuery('#wrap-loading').hide();
                         }, 1000);
@@ -555,7 +558,7 @@ function tambah_data_spt_lembur(){
     jQuery('#id_data').val('').prop('disabled', false);
     jQuery('#nomor_spt').val('').prop('disabled', false);
     jQuery('#tahun_anggaran').val('-1').trigger('change').prop('disabled', false);
-    jQuery('#id_skpd').val('').prop('disabled', false);
+    jQuery('#id_skpd').val('').trigger('change').prop('disabled', false);
     jQuery('#ket_lembur').val('').prop('disabled', false);
 
     jQuery('#id_ppk').val('').prop('disabled', false);
@@ -583,30 +586,6 @@ function submitTambahDataFormSPTLembur(){
     var id_skpd = jQuery('#id_skpd').val();
     if(id_skpd == ''){
         return alert('Pilih SKPD dulu!');
-    }
-    var id_pegawai = jQuery('#id_pegawai').val();
-    if(id_pegawai == ''){
-        return alert('Pilih SKPD dulu!');
-    }
-    var id_spt_detail = jQuery('#id_spt_detail').val();
-    // if(id_spt_detail == ''){
-    //     return alert('Pilih SKPD dulu!');
-    // }
-    var tipe_hari = jQuery('#tipe_hari').val();
-    // if(tipe_hari == ''){
-    //     return alert('Pilih SKPD dulu!');
-    // }
-    var waktu_mulai = jQuery('#waktu_mulai').val();
-    // if(waktu_mulai == ''){
-    //     return alert('Pilih SKPD dulu!');
-    // }
-    var waktu_akhir = jQuery('#waktu_akhir').val();
-    // if(waktu_akhir == ''){
-    //     return alert('Pilih SKPD dulu!');
-    // }
-    var ket_lembur = jQuery('#ket_lembur').val();
-    if(ket_lembur == ''){
-        return alert('Keterangan lembur diisi dulu!');
     }
     var jml_jam = jQuery('#jml_jam').val();
     // if(jml_jam == ''){
