@@ -179,13 +179,20 @@ class Wp_Simpeg_Admin {
 			'no_key' => 1,
 			'post_status' => 'private'
 		));
+		$url_sql_migrate = $this->functions->generatePage(array(
+			'nama_page' => 'Monitoring SQL migrate WP-SIMPEG',
+			'content' => '[monitoring_sql_migrate_wp_simpeg]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
 
 		$basic_options_container = Container::make( 'theme_options', __( 'SIMPEG Options' ) )
 			->set_page_menu_position( 4 )
 			->add_fields( array(
 	        	Field::make( 'html', 'crb_simpeg_html' )
 	        		->set_html( 'Settings SIMPEG'),
-	        Field::make( 'html', 'crb_simpeg_halaman_terkait_sbu_lembur' )
+	        Field::make( 'html', 'crb_simpeg_halaman_terkait' )
 	        	->set_html( '
 				<h5>HALAMAN TERKAIT</h5>
             	<ol>
@@ -198,6 +205,9 @@ class Wp_Simpeg_Admin {
 	            Field::make( 'text', 'crb_apikey_simpeg', 'API KEY' )
 	            	->set_default_value($this->functions->generateRandomString())
 	            	->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi data.'),
+	            Field::make( 'html', 'crb_sql_migrate_simpeg' )
+	            	->set_html( '<a target="_blank" href="'.$url_sql_migrate['url'].'" class="button button-primary button-large">'.$url_sql_migrate['title'].'</a>' )
+	            	->set_help_text('Status SQL migrate WP-SIMPEG jika ada update struktur database.'),
 	        ) );
 
 		Container::make( 'theme_options', __( 'Data Pegawai' ) )
@@ -400,6 +410,18 @@ public function import_excel_sbu_lembur(){
 			$ret['message'] = 'Format Salah!';
 		}
 		die(json_encode($ret));
+	}
+
+	function wp_simpeg_admin_notice(){
+        $versi = get_option('_wp_simpeg_db_version');
+        if($versi !== $this->version){
+        	$url_sql_migrate = $this->generatePage('Monitoring SQL migrate WP-SIMPEG', false, '[monitoring_sql_migrate_wp_simpeg]');
+        	echo '
+        		<div class="notice notice-warning is-dismissible">
+	        		<p>Versi database WP-SIMPEG tidak sesuai! harap dimutakhirkan. Versi saat ini=<b>'.$this->version.'</b> dan versi WP-SIMPEG kamu=<b>'.$versi.'</b>. Silahkan update di halaman <a href="'.$url_sql_migrate.'" class="button button-primary button-large">SQL Migrate WP-SIMPEG</a></p>
+	         	</div>
+	         ';
+        }
 	}
 
 }

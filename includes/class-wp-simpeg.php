@@ -165,6 +165,7 @@ class Wp_Simpeg {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'init', $plugin_admin, 'simpeg_create_posttype' );
 		$this->loader->add_action('carbon_fields_register_fields', $plugin_admin, 'crb_simpeg_options');
+		$this->loader->add_action('admin_notices',  $plugin_admin, 'wp_simpeg_admin_notice');
 
 		$this->loader->add_action('wp_ajax_import_excel_simpeg_pegawai',  $plugin_admin, 'import_excel_simpeg_pegawai');
 		$this->loader->add_action('wp_ajax_import_excel_sbu_lembur',  $plugin_admin, 'import_excel_sbu_lembur');
@@ -210,6 +211,7 @@ class Wp_Simpeg {
 		$this->loader->add_action('wp_ajax_get_pegawai_simpeg', $plugin_public, 'get_pegawai_simpeg');
 		$this->loader->add_action('wp_ajax_get_data_sbu_lembur', $plugin_public, 'get_data_sbu_lembur');
 
+		$this->loader->add_action('wp_ajax_run_sql_migrate_wp_simpeg', $plugin_public, 'run_sql_migrate_wp_simpeg');
 
 		add_shortcode('management_data_pegawai_simpeg', array($plugin_public, 'management_data_pegawai_simpeg'));
 		add_shortcode('management_data_sbu_lembur', array($plugin_public, 'management_data_sbu_lembur'));
@@ -217,6 +219,7 @@ class Wp_Simpeg {
 		add_shortcode('laporan_spt_lembur', array($plugin_public, 'laporan_spt_lembur'));
 		add_shortcode('input_spt_lembur', array($plugin_public, 'input_spt_lembur'));
 		add_shortcode('input_spj_lembur', array($plugin_public, 'input_spj_lembur'));
+		add_shortcode('monitoring_sql_migrate_wp_simpeg', array($plugin_public, 'monitoring_sql_migrate_wp_simpeg'));
 
 	}
 
