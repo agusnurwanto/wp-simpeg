@@ -110,6 +110,13 @@ class Wp_Simpeg_Public {
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp-simpeg-public.js', array( 'jquery' ), $this->version, false );
 	}
 
+    public function monitoring_sql_migrate_wp_simpeg($atts){
+        if(!empty($_GET) && !empty($_GET['post'])){
+            return '';
+        }
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-sql-migrate.php';
+    }
+
     public function management_data_pegawai_simpeg($atts){
         if(!empty($_GET) && !empty($_GET['post'])){
             return '';
@@ -1599,5 +1606,67 @@ public function get_datatable_sbu_lembur(){
             );
         }
         die(json_encode($return));
-    } 
+    }
+
+	public function run_sql_migrate_wp_simpeg(){
+		global $wpdb;
+		$ret = array(
+			'status'	=> 'success',
+			'message'	=> 'Berhasil menjalankan SQL migrate!'
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
+				$file = basename($_POST['file']);
+				$ret['value'] = $file.' (tgl: '.date('Y-m-d H:i:s').')';
+				if($file == 'tabel.sql'){
+					$path = SIMPEG_PLUGIN_PATH.'/'.$file;
+				}else{
+					$path = SIMPEG_PLUGIN_PATH.'/sql-migrate/'.$file;
+				}
+				if(file_exists($path)){
+					$sql = file_get_contents($path);
+					$ret['sql'] = $sql;
+					if($file == 'tabel.sql'){
+						require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+						$wpdb->hide_errors();
+						$rows_affected = dbDelta($sql);
+						if(empty($rows_affected)){
+							$ret['status'] = 'error';
+							$ret['message'] = $wpdb->last_error;
+						}else{
+							$ret['message'] = implode(' | ', $rows_affected);
+						}
+					}else{
+						$wpdb->hide_errors();
+						$res = $wpdb->query($sql);
+						if(empty($res)){
+							$ret['status'] = 'error';
+							$ret['message'] = $wpdb->last_error;
+						}else{
+							$ret['message'] = $res;
+						}
+					}
+					if($ret['status'] == 'success'){
+						$ret['version'] = $this->version;
+						update_option('_last_update_sql_migrate_wp_simpeg', $ret['value']);
+						update_option('_wp_simpeg_db_version', $this->version);
+					}
+				}else{
+					$ret['status'] = 'error';
+					$ret['message'] = 'File '.$file.' tidak ditemukan!';
+				}
+			}else{
+				$ret = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		}else{
+			$ret = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
+	}
 }
