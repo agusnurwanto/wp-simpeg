@@ -1055,8 +1055,12 @@ class Wp_Simpeg_Public {
 	                if($recVal['status'] == 0){
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Belum dicek</span>';
 	                }elseif ($recVal['status'] == 1) {
-	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diterima</span>';
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi Kasubag Keuangan</span>';
 	                }elseif ($recVal['status'] == 2) {
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi PPK</span>';
+	                }elseif ($recVal['status'] == 3) {
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi Kepala</span>';
+	                }elseif ($recVal['status'] == 4) {
 	                    $pesan = '';
 	                    if ($recVal['status_ver_bendahara'] == 0){
 	                        $pesan .= '<br>Keterangan Verifikasi: '.$recVal['ket_ver_bendahara']; 
@@ -1064,30 +1068,31 @@ class Wp_Simpeg_Public {
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Ditolak</span>'.$pesan;
 	                }
 	            }
+	     
+            $json_data = array(
+                "draw"            => intval( $params['draw'] ),   
+                "recordsTotal"    => intval( $totalRecords ),  
+                "recordsFiltered" => intval($totalRecords),
+                "data"            => $queryRecords,
+                "sql"             => $sqlRec
+            );
 
-	            $json_data = array(
-	                "draw"            => intval( $params['draw'] ),   
-	                "recordsTotal"    => intval( $totalRecords ),  
-	                "recordsFiltered" => intval($totalRecords),
-	                "data"            => $queryRecords,
-	                "sql"             => $sqlRec
-	            );
+            die(json_encode($json_data));
+        }else{
+            $return = array(
+                'status' => 'error',
+                'message'   => 'Api Key tidak sesuai!'
+            );
+        }
+    }else{
+        $return = array(
+            'status' => 'error',
+            'message'   => 'Format tidak sesuai!'
+        );
+    }
+    die(json_encode($return));
+} 
 
-	            die(json_encode($json_data));
-	        }else{
-	            $return = array(
-	                'status' => 'error',
-	                'message'   => 'Api Key tidak sesuai!'
-	            );
-	        }
-	    }else{
-	        $return = array(
-	            'status' => 'error',
-	            'message'   => 'Format tidak sesuai!'
-	        );
-	    }
-	    die(json_encode($return));
-	} 
 public function get_data_spj_by_id(){
         global $wpdb;
         $ret = array(
