@@ -286,7 +286,7 @@ function tambah_pegawai(that){
         html: global_response_pegawai.html
     });
     jQuery('#daftar_pegawai > tbody').append(tr_html);
-    jQuery('#id_pegawai_'+newid).select2({'width': '100%'}); 
+    jQuery('#id_pegawai_'+newid).select2({'width': '100%'});
     jQuery('#daftar_pegawai > tbody > tr').map(function(i, b){
         if(i == 0){
             return;

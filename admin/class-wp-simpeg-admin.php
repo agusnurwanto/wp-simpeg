@@ -187,6 +187,12 @@ class Wp_Simpeg_Admin {
 			'post_status' => 'private'
 		));
 
+		$api_key = get_option(SIMPEG_APIKEY);
+		if(empty($api_key)){
+			$api_key = $this->functions->generateRandomString();
+			update_option(SIMPEG_APIKEY, $api_key);
+		}
+
 		$basic_options_container = Container::make( 'theme_options', __( 'SIMPEG Options' ) )
 			->set_page_menu_position( 4 )
 			->add_fields( array(
@@ -203,7 +209,7 @@ class Wp_Simpeg_Admin {
             	</ol>
 	        	' ),
 	            Field::make( 'text', 'crb_apikey_simpeg', 'API KEY' )
-	            	->set_default_value($this->functions->generateRandomString())
+	            	->set_default_value($api_key)
 	            	->set_help_text('Wajib diisi. API KEY digunakan untuk integrasi data.'),
 	            Field::make( 'html', 'crb_sql_migrate_simpeg' )
 	            	->set_html( '<a target="_blank" href="'.$url_sql_migrate['url'].'" class="button button-primary button-large">'.$url_sql_migrate['title'].'</a>' )
