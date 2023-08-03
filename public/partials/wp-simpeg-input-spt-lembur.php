@@ -203,7 +203,17 @@ function html_pegawai(opsi){
             '</td>'+
             '<td class="text-center">'+
                 '<label>Uang Lembur<br><input type="text" disabled class="form-control text-right" name="uang_lembur['+opsi.id+']" id="uang_lembur_'+opsi.id+'"/></label>'+
-                '<label>Uang Makan<br><input type="text" disabled class="form-control text-right" name="uang_makan['+opsi.id+']" id="uang_makan_'+opsi.id+'"/></label>'+
+                '<label><input type="checkbox" value="1" name="uang_makan_set['+opsi.id+']" id="uang_makan_set_'+opsi.id+'" onchange="get_uang_lembur(this);" checked> Uang Makan</label><br>'
+                +'<input type="text" disabled class="form-control text-right" name="uang_makan['+opsi.id+']" id="uang_makan_'+opsi.id+'"/>'+
+                '<table class="table table-bordered" style="margin: 0;">'+
+                    '<tbody>'+
+                        '<tr>'+
+                            '<td style="width: 115px;">Pajak</td>'+
+                            '<td id="pajak_'+opsi.id+'" class="text-center">0</td>'+
+                        '</tr>'+
+                    '</tbody>'+
+                '</table>'+
+                '<input type="hidden" name="jml_pajak['+opsi.id+']" id="jml_pajak_'+opsi.id+'"/>'+
                 '<input type="hidden" name="jml_jam_lembur['+opsi.id+']" id="jml_jam_lembur_'+opsi.id+'"/>'+
                 '<input type="hidden" name="id_standar_harga_lembur['+opsi.id+']" id="id_standar_harga_lembur_'+opsi.id+'"/>'+
                 '<input type="hidden" name="id_standar_harga_makan['+opsi.id+']" id="id_standar_harga_makan_'+opsi.id+'"/>'+
@@ -225,6 +235,7 @@ function html_pegawai(opsi){
             '</td>'+
             '<td style="width: 75px;" class="text-center aksi-pegawai">'+
                 '<button class="tambah-pegawai btn btn-warning btn-sm" onclick="tambah_pegawai(this); return false;"><i class="dashicons dashicons-plus"></i></button>'+
+                '<button class="copy-pegawai btn btn-info btn-sm" onclick="tambah_pegawai(this, 1); return false;"><i class="dashicons dashicons-book"></i></button>'+
         '</td>'+
         '</tr>';
     return html;
@@ -277,7 +288,7 @@ function escapeRegExp(string) {
 }
 
 //show tambah data
-function tambah_pegawai(that){
+function tambah_pegawai(that, copy=false){
     var tr = jQuery(that).closest('tbody').find('>tr').last();
     var id = +tr.attr('data-id');
     var newid = id + 1;
@@ -286,15 +297,24 @@ function tambah_pegawai(that){
         html: global_response_pegawai.html
     });
     jQuery('#daftar_pegawai > tbody').append(tr_html);
-    jQuery('#id_pegawai_'+newid).select2({'width': '100%'}); 
+    jQuery('#id_pegawai_'+newid).select2({'width': '100%'});
+    if(copy){
+        jQuery('#id_pegawai_'+newid).val(jQuery('#id_pegawai_'+id).val()).trigger('change');
+        jQuery('#jenis_hari_'+newid).val(jQuery('#jenis_hari_'+id).val()).trigger('change');
+        jQuery('#waktu_mulai_'+newid).val(jQuery('#waktu_mulai_'+id).val()).trigger('change');
+        jQuery('#waktu_selesai_'+newid).val(jQuery('#waktu_selesai_'+id).val()).trigger('change');
+        jQuery('#uang_makan_set_'+newid).prop('checked', jQuery('#uang_makan_set_'+id).is(':checked')).trigger('change');
+    }
     jQuery('#daftar_pegawai > tbody > tr').map(function(i, b){
         if(i == 0){
             return;
             var html_hapus = ''+
-                '<button class="btn btn-warning btn-sm" onclick="tambah_pegawai(this); return false;"><i class="dashicons dashicons-plus"></i></button>';
+                '<button class="btn btn-warning btn-sm" onclick="tambah_pegawai(this); return false;"><i class="dashicons dashicons-plus"></i></button>'+
+                '<button class="copy-pegawai btn btn-info btn-sm" onclick="tambah_pegawai(this, 1); return false;"><i class="dashicons dashicons-book"></i></button>';
         }else{
             var html_hapus = ''+    
-                '<button class="btn btn-danger btn-sm" onclick="hapus_pegawai(this); return false;"><i class="dashicons dashicons-trash"></i></button>';
+                '<button class="btn btn-danger btn-sm" onclick="hapus_pegawai(this); return false;"><i class="dashicons dashicons-trash"></i></button>'+
+                '<button class="copy-pegawai btn btn-info btn-sm" onclick="tambah_pegawai(this, 1); return false;"><i class="dashicons dashicons-book"></i></button>';
         }
         jQuery(b).find('td').last().html(html_hapus);
     });
@@ -672,6 +692,8 @@ function get_uang_lembur(that){
     }
     jQuery('#jumlah_jam_'+id).html(jam+' jam');
     jQuery('#jml_jam_lembur_'+id).val(jam);
+    jQuery('#pajak_'+id).html('-');
+    jQuery('#jml_pajak_'+id).val(0);
     jQuery('#sbu_lembur_'+id).html('-');
     jQuery('#sbu_makan_'+id).html('-');
     if(
@@ -697,19 +719,37 @@ function get_uang_lembur(that){
                 }
             });
             console.log('sbu_selected, sbu_makan_selected, golongan, jam, jenis_hari', sbu_selected, sbu_makan_selected, golongan, jam, jenis_hari);
+            var jml_pajak = 0;
             if(sbu_selected){
+                var uang_lembur = sbu_selected.harga*jam;
                 jQuery('#id_standar_harga_lembur_'+id).val(sbu_selected.id);
-                jQuery('#uang_lembur_'+id).val(sbu_selected.harga*jam);
+                jQuery('#uang_lembur_'+id).val(uang_lembur);
                 jQuery('#sbu_lembur_'+id).html(sbu_selected.nama+' ('+sbu_selected.uraian+') | '+sbu_selected.harga+' | '+sbu_selected.satuan);
+                if(
+                    sbu_selected.pph_21
+                    && sbu_selected.pph_21 > 0
+                ){
+                    jQuery('#pajak_'+id).html(sbu_selected.pph_21 + '%');
+                    jml_pajak += (uang_lembur*sbu_selected.pph_21)/100;
+                }
             }
             if(
                 sbu_makan_selected
                 && jam >= 2
+                && jQuery('#uang_makan_set_'+id).is(':checked')
             ){
                 jQuery('#id_standar_harga_makan_'+id).val(sbu_makan_selected.id);
                 jQuery('#uang_makan_'+id).val(sbu_makan_selected.harga);
                 jQuery('#sbu_makan_'+id).html(sbu_makan_selected.nama+' ('+sbu_makan_selected.uraian+') | '+sbu_makan_selected.harga+' | '+sbu_makan_selected.satuan);
+                if(
+                    sbu_makan_selected.pph_21
+                    && sbu_makan_selected.pph_21 > 0
+                ){
+                    jml_pajak += (sbu_makan_selected.harga*sbu_makan_selected.pph_21)/100;
+                }
             }
+
+            jQuery('#jml_pajak_'+id).val(jml_pajak);
         });
     }
 }

@@ -30,7 +30,11 @@ class Wp_Simpeg_Activator {
 	 * @since    1.0.0
 	 */
 	public static function activate() {
-
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        $path = SIMPEG_PLUGIN_PATH.'/tabel.sql';
+        $sql = file_get_contents($path);
+        dbDelta($sql);
+        update_option('_wp_simpeg_db_version', WP_SIMPEG_VERSION);
 	}
 
 }
