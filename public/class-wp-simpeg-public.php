@@ -1669,4 +1669,8 @@ public function get_datatable_sbu_lembur(){
 		}
 		die(json_encode($ret));
 	}
+
+	function rupiah($total){
+		return number_format($total, 0, ',', '.');
+	}
 }

@@ -94,6 +94,7 @@ $lap_bulanan_pegawai = $wpdb->get_results($wpdb->prepare('
         s.nomor_spt,
         s.tahun_anggaran,
         s.id_skpd,
+        s.jml_jam,
         p.gelar_depan,
         p.nama,
         p.gelar_belakang,
@@ -114,47 +115,88 @@ $lap_bulanan_pegawai = $wpdb->get_results($wpdb->prepare('
 $data_all = array();
 foreach($lap_bulanan_pegawai as $peg){
     if(empty($data_all[$peg['id_pegawai']])){
-        $data_all[$peg['id_pegawai']] = $peg;
+        $data_all[$peg['id_pegawai']] = array();
     }
+    $data_all[$peg['id_pegawai']][] = $peg;
 }
 
 $nomor = 0;
 $body = '';
-foreach($data_all as $peg){
+foreach($data_all as $peg_all){
     $nomor++;
+    $peg_nama = '';
+    $peg_gol = '';
+    $peg_jam_kerja = 0;
+    $peg_jam_libur = 0;
     $uang_lembur_hari_kerja = 0;
-    if(
-        !empty($sbu_lembur['uang_lembur'])
-        && !empty($sbu_lembur['uang_lembur'][2])
-        && !empty($sbu_lembur['uang_lembur'][2][$peg['kode_gol']])
-    ){
-        $uang_lembur_hari_kerja = $sbu_lembur['uang_lembur'][2][$peg['kode_gol']]['harga'];
-    }
     $uang_lembur_hari_libur = 0;
-    if(
-        !empty($sbu_lembur['uang_lembur'])
-        && !empty($sbu_lembur['uang_lembur'][1])
-        && !empty($sbu_lembur['uang_lembur'][1][$peg['kode_gol']])
-    ){
-        $uang_lembur_hari_libur = $sbu_lembur['uang_lembur'][1][$peg['kode_gol']]['harga'];
+    $uang_makan_lembur = 0;
+    $total_uang_lembur_hari_kerja = 0;
+    $total_uang_lembur_hari_libur = 0;
+    $total_uang_makan_lembur = 0;
+    $penerimaan_kotor = 0;
+    $penerimaan_bersih= 0;
+    $total_pajak= 0;
+    $jumlah_hari_kerja= 0;
+    $jumlah_hari_libur= 0;
+    foreach($peg_all as $peg){
+        $peg_nama = $peg['gelar_depan'].' '.$peg['nama'].' '.$peg['gelar_belakang'];
+        $peg_gol = $peg['gol_ruang'];
+        if(
+            !empty($sbu_lembur['uang_lembur'])
+            && !empty($sbu_lembur['uang_lembur'][1])
+            && !empty($sbu_lembur['uang_lembur'][1][$peg['kode_gol']])
+        ){
+            $uang_lembur_hari_kerja = $sbu_lembur['uang_lembur'][1][$peg['kode_gol']]['harga'];
+        }
+        if(
+            !empty($sbu_lembur['uang_lembur'])
+            && !empty($sbu_lembur['uang_lembur'][2])
+            && !empty($sbu_lembur['uang_lembur'][2][$peg['kode_gol']])
+        ){
+            $uang_lembur_hari_libur = $sbu_lembur['uang_lembur'][2][$peg['kode_gol']]['harga'];
+        }
+        if(
+            !empty($sbu_lembur['uang_makan'])
+            && !empty($sbu_lembur['uang_makan'])
+            && !empty($sbu_lembur['uang_makan'][$peg['kode_gol']])
+        ){
+            $uang_makan_lembur = $sbu_lembur['uang_makan'][$peg['kode_gol']]['harga'];
+        }
+
+        // dikasih kondisi jika jam lembur dapat uang makan
+        if(!empty($peg['id_standar_harga_makan'])){
+            $total_uang_makan_lembur += $uang_makan_lembur;
+        }
+
+        if($peg['tipe_hari'] == 1){
+            $total_uang_lembur_hari_kerja += $peg['jml_jam']*$uang_lembur_hari_kerja;
+            $peg_jam_kerja += $peg['jml_jam'];
+        }else if($peg['tipe_hari'] == 2){
+            $total_uang_lembur_hari_libur += $peg['jml_jam']*$uang_lembur_hari_libur;
+            $peg_jam_libur += $peg['jml_jam'];
+        }
+
     }
+    $penerimaan_kotor = $total_uang_lembur_hari_kerja + $total_uang_lembur_hari_libur + $total_uang_makan_lembur;
+    $penerimaan_bersih = $penerimaan_kotor - $total_pajak;
     $body .= '
         <tr>
             <td class="text-center">'.$nomor.'</td>
-            <td>'.$peg['gelar_depan'].' '.$peg['nama'].' '.$peg['gelar_belakang'].'</td>
-            <td class="text-center">'.$peg['gol_ruang'].'</td>
-            <td class="text-right">'.number_format($uang_lembur_hari_kerja, 0, ',', '.').'</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td class="text-right">'.number_format($uang_lembur_hari_libur, 0, ',', '.').'</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>'.$peg_nama.'</td>
+            <td class="text-center">'.$peg_gol.'</td>
+            <td class="text-right">'.$this->rupiah($uang_lembur_hari_libur).'</td>
+            <td class="text-center">'.$this->rupiah($jumlah_hari_kerja).'</td>
+            <td class="text-center">'.$this->rupiah($peg_jam_kerja).'</td>
+            <td class="text-right">'.$this->rupiah($total_uang_lembur_hari_kerja).'</td>
+            <td class="text-right">'.$this->rupiah($uang_lembur_hari_kerja).'</td>
+            <td class="text-center">'.$this->rupiah($jumlah_hari_libur).'</td>
+            <td class="text-center">'.$this->rupiah($peg_jam_libur).'</td>
+            <td class="text-right">'.$this->rupiah($total_uang_lembur_hari_libur).'</td>
+            <td class="text-right">'.$this->rupiah($total_uang_makan_lembur).'</td>
+            <td class="text-right">'.$this->rupiah($penerimaan_kotor).'</td>
+            <td class="text-right">'.$this->rupiah($total_pajak).'</td>
+            <td class="text-right">'.$this->rupiah($penerimaan_bersih).'</td>
         </tr>
     ';
 }
@@ -190,8 +232,8 @@ foreach($data_all as $peg){
                 <td class="atas kanan bawah kiri text-center text_blok" style="vertical-align: middle;" rowspan="2">No</td>
                 <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;" rowspan="2">Nama</td>
                 <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;" rowspan="3">Golongan</td>
-                <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;" colspan="4">Hari Libur</td>
                 <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;" colspan="4">Hari Kerja</td>
+                <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;" colspan="4">Hari Libur</td>
                 <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;"rowspan="2">Uang Makan</td>
                 <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;"rowspan="2">Penerimaan Kotor</td>
                 <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;"rowspan="2">Pajak</td>
