@@ -81,9 +81,32 @@ if(in_array("administrator", $user_meta->roles)){
                         <select class="form-control" id="id_skpd" name="id_skpd" onchange="get_pegawai();">
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label>Keterangan Lembur</label>
+                        <textarea class="form-control" id="ket_lembur" name="ket_lembur"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 35%;">Tanggal Mulai</th>
+                                    <th class="text-center" style="width: 35%;">Tanggal Selesai</th>
+                                    <th class="text-center">Jumlah</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="waktu_spt">
+                                    <td><input type="date" class="text-center form-control time-start" name="waktu_mulai_spt" id="waktu_mulai_spt" onchange="cek_time(this);" /></td>
+                                    <td><input type="date" class="text-center form-control time-end" name="waktu_selesai_spt" id="waktu_selesai_spt" onchange="cek_time(this);" /></td>
+                                    <th class="text-center" id="jml_hari_spt"></th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     <table class="table table-bordered" id="daftar_pegawai">
                         <thead>
                             <tr>
+                                <th class="text-center" style="width: 32px;">No</th>
                                 <th class="text-center" style="width: 320px;">Nama Pegawai</th>
                                 <th class="text-center" style="width: 220px;">Waktu</th>
                                 <th class="text-center" style="width: 220px;">Total</th>
@@ -94,10 +117,6 @@ if(in_array("administrator", $user_meta->roles)){
                         <tbody>
                         </tbody>
                     </table>
-                    <div class="form-group">
-                        <label>Keterangan Lembur</label>
-                        <textarea class="form-control" id="ket_lembur" name="ket_lembur"></textarea>
-                    </div>
                     <!-- <div class="form-group hide">
                         <label>Keterangan Verifikasi PPK</label>
                         <select class="form-control" id="ket_ver_ppk" onchange="">
@@ -147,6 +166,16 @@ function get_skpd(no_loading=false) {
         if(!no_loading){
             jQuery("#wrap-loading").show();
         }
+
+        var today = new Date();
+        today = today.toJSON().split('T')[0].split('-');
+        jQuery('#waktu_mulai_spt').val(tahun+'-'+today[1]+'-'+today[2]).trigger('change');
+        jQuery('#waktu_selesai_spt').val(tahun+'-'+today[1]+'-'+today[2]).trigger('change');
+
+        jQuery('#waktu_mulai_spt').attr('min', tahun+'-01-01');
+        jQuery('#waktu_mulai_spt').attr('max', tahun+'-12-31');
+        jQuery('#waktu_selesai_spt').attr('min', tahun+'-01-01');
+        jQuery('#waktu_selesai_spt').attr('max', tahun+'-12-31');
         jQuery.ajax({
             url: '<?php echo admin_url('admin-ajax.php'); ?>',
             type:'post',
@@ -173,9 +202,87 @@ function get_skpd(no_loading=false) {
     });
 }
 
+function cek_time(that){
+    var is_start = jQuery(that).hasClass('time-start');
+    var tr = jQuery(that).closest('tr');
+    var start_asli = tr.find('.time-start').val();
+    var start = new Date(start_asli);
+    var end_asli = tr.find('.time-end').val();
+    var end = new Date(end_asli);
+    var diffTime = end - start;
+    if(isNaN(diffTime)){
+        return;
+    }
+    console.log('diffTime', diffTime, is_start, start_asli, end_asli);
+    if(diffTime < 0){
+        if(is_start){
+            end_asli = start_asli;
+            tr.find('.time-end').val(start_asli).trigger('change');
+        }else{
+            start_asli = end_asli;
+            tr.find('.time-start').val(end_asli).trigger('change');
+        }
+    }
+
+    if(tr.hasClass('waktu_spt')){
+        start = new Date(start_asli);
+        end = new Date(end_asli);
+        diffTime = end - start;
+        var jml_hari = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        jQuery('#jml_hari_spt').html(jml_hari+' Hari');
+        jQuery('#daftar_pegawai .time-start').map(function(i, b){
+            var tr_peg = jQuery(b).closest('tr');
+            var start_peg_asli = tr_peg.find('.time-start').val();
+            var end_peg_asli = tr_peg.find('.time-end').val();
+            if(start_peg_asli == ''){
+                start_peg_asli = '0000-01-01T00:00';
+            }
+            var start_peg = new Date(start_peg_asli);
+
+            if(end_peg_asli == ''){
+                end_peg_asli = '0000-01-01T23:00';
+            }
+            var end_peg = new Date(end_peg_asli);
+
+            console.log('start_peg_asli, end_peg_asli, start_asli, end_asli', start_peg_asli, end_peg_asli, start_asli, end_asli);
+
+            // jika start pegawai lebih dulu dari start SPT
+            if(start_peg < start){
+                var new_val = start_asli+'T'+start_peg_asli.split('T')[1];
+                tr_peg.find('.time-start').val(new_val).trigger('change');
+                console.log('start_peg < start new_val start_peg', new_val);
+            }else if(start_peg > end){
+                var new_val = end_asli+'T'+start_peg_asli.split('T')[1];
+                tr_peg.find('.time-start').val(new_val).trigger('change');
+                console.log('start_peg > end new_val start_peg', new_val);
+            }
+
+            // jika end pegawai lebih lama dari end SPT
+            if(end_peg > end){
+                var new_val = end_asli+'T'+end_peg_asli.split('T')[1];
+                tr_peg.find('.time-end').val(new_val).trigger('change');
+                console.log('end_peg > end new_val end_peg', new_val);
+            }else if(end_peg < start){
+                var new_val = start_asli+'T'+end_peg_asli.split('T')[1];
+                tr_peg.find('.time-end').val(new_val).trigger('change');
+                console.log('end_peg < start new_val end_peg', new_val);
+            }
+        });
+
+        jQuery('#daftar_pegawai .time-start').attr('min', start_asli+'T00:00');
+        jQuery('#daftar_pegawai .time-start').attr('max', end_asli+'T23:59');
+
+        jQuery('#daftar_pegawai .time-end').attr('min', start_asli+'T00:00');
+        jQuery('#daftar_pegawai .time-end').attr('max', end_asli+'T23:59');
+    }
+}
+
 function html_pegawai(opsi){
+    var start_asli = jQuery('#waktu_mulai_spt').val()+'T00:00';
+    var end_asli = jQuery('#waktu_selesai_spt').val()+'T23:59';
     var html = ''+
         '<tr data-id="'+opsi.id+'">'+
+            '<td class="text-center">'+opsi.id+'</td>'+
             '<td class="text-center">'+
                 '<select class="form-control" name="id_pegawai['+opsi.id+']" id="id_pegawai_'+opsi.id+'" onchange="get_uang_lembur(this);">'+opsi.html+'</select>'+
                 '<input type="hidden" name="id_spt_detail['+opsi.id+']" id="id_spt_detail_'+opsi.id+'"/>'+
@@ -190,8 +297,8 @@ function html_pegawai(opsi){
                 '</label>'+
             '</td>'+
             '<td class="text-center">'+
-                '<label>Waktu Mulai<br><input type="datetime-local" class="form-control" name="waktu_mulai['+opsi.id+']" id="waktu_mulai_'+opsi.id+'" onchange="get_uang_lembur(this);"/></label>'+
-                '<label>Waktu Selesai<br><input type="datetime-local" class="form-control" name="waktu_selesai['+opsi.id+']" id="waktu_selesai_'+opsi.id+'" onchange="get_uang_lembur(this);"/></label>'+
+                '<label>Waktu Mulai<br><input type="datetime-local" class="form-control time-start" name="waktu_mulai['+opsi.id+']" id="waktu_mulai_'+opsi.id+'" onchange="cek_time(this); get_uang_lembur(this);" min="'+start_asli+'" max="'+end_asli+'" value="'+start_asli+'"/></label>'+
+                '<label>Waktu Selesai<br><input type="datetime-local" class="form-control time-end" name="waktu_selesai['+opsi.id+']" id="waktu_selesai_'+opsi.id+'" onchange="cek_time(this); get_uang_lembur(this);" min="'+start_asli+'" max="'+end_asli+'" value="'+start_asli+'"/></label>'+
                 '<table class="table table-bordered" style="margin: 0;">'+
                     '<tbody>'+
                         '<tr>'+
@@ -299,11 +406,12 @@ function tambah_pegawai(that, copy=false){
     jQuery('#daftar_pegawai > tbody').append(tr_html);
     jQuery('#id_pegawai_'+newid).select2({'width': '100%'});
     if(copy){
-        jQuery('#id_pegawai_'+newid).val(jQuery('#id_pegawai_'+id).val()).trigger('change');
-        jQuery('#jenis_hari_'+newid).val(jQuery('#jenis_hari_'+id).val()).trigger('change');
-        jQuery('#waktu_mulai_'+newid).val(jQuery('#waktu_mulai_'+id).val()).trigger('change');
-        jQuery('#waktu_selesai_'+newid).val(jQuery('#waktu_selesai_'+id).val()).trigger('change');
-        jQuery('#uang_makan_set_'+newid).prop('checked', jQuery('#uang_makan_set_'+id).is(':checked')).trigger('change');
+        var current_tr_id = jQuery(that).closest('tr').attr('data-id');
+        jQuery('#id_pegawai_'+newid).val(jQuery('#id_pegawai_'+current_tr_id).val()).trigger('change');
+        jQuery('#jenis_hari_'+newid).val(jQuery('#jenis_hari_'+current_tr_id).val()).trigger('change');
+        jQuery('#waktu_mulai_'+newid).val(jQuery('#waktu_mulai_'+current_tr_id).val()).trigger('change');
+        jQuery('#waktu_selesai_'+newid).val(jQuery('#waktu_selesai_'+current_tr_id).val()).trigger('change');
+        jQuery('#uang_makan_set_'+newid).prop('checked', jQuery('#uang_makan_set_'+current_tr_id).is(':checked')).trigger('change');
     }
     jQuery('#daftar_pegawai > tbody > tr').map(function(i, b){
         if(i == 0){
@@ -589,7 +697,7 @@ function tambah_data_spt_lembur(){
     jQuery('#keterangan_status_bendahara').closest('.form-group').hide().prop('disabled', false);
     jQuery('#status_bendahara').prop('checked', false);
     jQuery('#keterangan_status_bendahara').val('').prop('disabled', false);
-
+    jQuery('#tahun_anggaran').val('<?php echo date('Y'); ?>').trigger('change');
     jQuery('#modalTambahDataSPTLembur .send_data').show();
     jQuery('#modalTambahDataSPTLembur').modal('show');
 }
@@ -607,26 +715,67 @@ function submitTambahDataFormSPTLembur(){
     if(id_skpd == ''){
         return alert('Pilih SKPD dulu!');
     }
-    var jml_jam = jQuery('#jml_jam').val();
-    // if(jml_jam == ''){
-    //     return alert('Keterangan lembur diisi dulu!');
-    // }
-    var jml_peg = jQuery('#jml_peg').val();
-    // if(jml_peg == ''){
-    //     return alert('Keterangan lembur diisi dulu!');
-    // }
-    var jml_pajak = jQuery('#jml_pajak').val();
-    // if(jml_pajak == ''){
-    //     return alert('Keterangan lembur diisi dulu!');
-    // }
     var ket_lembur = jQuery('#ket_lembur').val();
-    // if(ket_lembur == ''){
-    //     return alert('Keterangan lembur diisi dulu!');
-    // }
-    var ket_ver_ppk = jQuery('#ket_ver_ppk').val();
-    // if(ket_ver_ppk == ''){
-    //     return alert('Keterangan lembur diisi dulu!');
-    // }
+    if(ket_lembur == ''){
+        return alert('Keterangan lembur diisi dulu!');
+    }
+    var waktu_mulai_spt = jQuery('#waktu_mulai_spt').val();
+    if(waktu_mulai_spt == ''){
+        return alert('Tanggal Mulai SPT diisi dulu!');
+    }
+    var waktu_selesai_spt = jQuery('#waktu_selesai_spt').val();
+    if(waktu_selesai_spt == ''){
+        return alert('Tanggal Selesai SPT diisi dulu!');
+    }
+    var pegawai_all = {};
+    var error = [];
+    jQuery('#daftar_pegawai tbody tr').map(function(i, b){
+        var id = jQuery(b).attr('data-id');
+        var id_pegawai = jQuery('#id_pegawai_'+id).val();
+        if(id_pegawai == ''){
+            error.push('Nama pegawai no '+id+' diisi dulu!');
+        }
+        var waktu_mulai = jQuery('#waktu_mulai_'+id).val();
+        if(waktu_mulai == ''){
+            error.push('Waktu mulai no '+id+' diisi dulu!');
+        }
+        var waktu_selesai = jQuery('#waktu_selesai_'+id).val();
+        if(waktu_selesai == ''){
+            error.push('Waktu selesai no '+id+' diisi dulu!');
+        }
+        var key = id_pegawai;
+        if(!pegawai_all[key]){
+            pegawai_all[key] = [];
+        }
+        var waktu_mulai_time = new Date(waktu_mulai);
+        var waktu_selesai_time = new Date(waktu_selesai);
+        pegawai_all[key].map(function(b, i){
+            var start_peg = new Date(b.waktu_mulai);
+            var end_peg = new Date(b.waktu_selesai);
+            if(
+                waktu_mulai_time >= start_peg
+                && waktu_mulai_time <= end_peg
+            ){
+                error.push('Waktu mulai pegawai no '+id+' tidak boleh di dalam waktu lembur pegawai no '+b.nomor+'!');
+            }
+            if(
+                waktu_selesai_time <= end_peg
+                && waktu_selesai_time >= start_peg
+            ){
+                error.push('Waktu selesai pegawai no '+id+' tidak boleh di dalam waktu lembur pegawai no '+b.nomor+'!');
+            }
+        });
+        pegawai_all[key].push({
+            id_pegawai: id_pegawai,
+            nomor: id,
+            waktu_mulai: waktu_mulai,
+            waktu_selesai: waktu_selesai
+        });
+    });
+    if(error.length >= 1){
+        console.log('error', error);
+        return alert('Kesalahan input pegawai! ( '+error.join(', ')+' )');
+    }
     if(confirm('Apakah anda yakin untuk menyimpan data ini?')){
         jQuery("#wrap-loading").show();
         let form = getFormData(jQuery("#form-spt"));
