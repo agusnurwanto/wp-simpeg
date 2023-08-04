@@ -396,7 +396,7 @@ function get_pegawai(no_loading=false) {
                             html: global_response_pegawai[id_skpd].html
                         });
                         jQuery('#daftar_pegawai tbody').html(html);
-                        jQuery('#id_pegawai_1').html(response.html);
+                        jQuery('#id_pegawai_1').html(global_response_pegawai[id_skpd].html);
                         jQuery('#id_pegawai_1').select2({'width': '100%'});
                         return resolve();
                     }else{
@@ -410,7 +410,7 @@ function get_pegawai(no_loading=false) {
                 html: global_response_pegawai[id_skpd].html
             });
             jQuery('#daftar_pegawai tbody').html(html);
-            jQuery('#id_pegawai_1').html(response.html);
+            jQuery('#id_pegawai_1').html(global_response_pegawai[id_skpd].html);
             jQuery('#id_pegawai_1').select2({'width': '100%'});
             return resolve();
         }
@@ -980,11 +980,11 @@ function get_sbu(no_loading = false){
                     'tahun_anggaran': tahun
                 },
                 success: function(res){
-                    data_sbu_global = res.data;
+                    data_sbu_global[tahun] = res.data;
                     if(!no_loading){
                         jQuery('#wrap-loading').hide();
                     }
-                    return resolve(data_sbu_global);
+                    return resolve(data_sbu_global[tahun]);
                 }
             });
         }else{

@@ -1095,6 +1095,9 @@ class Wp_Simpeg_Public {
 	                }elseif ($recVal['status'] == 3) {
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi Kepala</span>';
 	                }elseif ($recVal['status'] == 4) {
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Selesai</span>';
+	                // status ditolak masih dalam pengembangan
+	                }elseif ($recVal['status'] == 5) {
 	                    $pesan = '';
 	                    if ($recVal['status_ver_bendahara'] == 0){
 	                        $pesan .= '<br>Keterangan Verifikasi: '.$recVal['ket_ver_bendahara']; 
