@@ -794,27 +794,20 @@ class Wp_Simpeg_Public {
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Isi Keterangan Lembur dulu!';
 	            }
-	            if($ret['status'] != 'error' && !empty($data['jml_jam'])){
-	                $jml_jam = $data['jml_jam'];
+	            if($ret['status'] != 'error' && !empty($data['waktu_mulai_spt'])){
+	                $waktu_mulai_spt = $data['waktu_mulai_spt'];
 	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Isi Keterangan Lembur dulu!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($data['jml_peg'])){
-	                $jml_peg = $data['jml_peg'];
+	            else{
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Isi waktu mulai SPT dulu!';
 	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Isi Keterangan Lembur dulu!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($data['jml_pajak'])){
-	                $jml_pajak = $data['jml_pajak'];
+	            if($ret['status'] != 'error' && !empty($data['waktu_selesai_spt'])){
+	                $waktu_selesai_spt = $data['waktu_selesai_spt'];
 	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Isi Keterangan Lembur dulu!';
-	            // }
+	            else{
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Isi waktu selesai SPT dulu!';
+	            }
 	            if($ret['status'] != 'error' && !empty($data['id_ppk'])){
 	                $id_ppk = $data['id_ppk'];
 	            }
@@ -857,6 +850,27 @@ class Wp_Simpeg_Public {
 	            //     $ret['status'] = 'error';
 	            //     $ret['message'] = 'Pilih  Keterangan Verifikasi Bendahara dulu!';
 	            // }
+
+	            if($ret['status'] != 'error' && !empty($data['id_pegawai'])){
+	            	$pesan = array();
+	            	foreach($data['id_pegawai'] as $key => $pegawai){
+	            		if(empty($data['id_pegawai'][$key])){
+	            			$ret['status'] = 'error';
+	            			$pesan[] = 'Nama pegawai no '.$key.' diisi dulu!';
+	            		}
+	            		if(empty($data['waktu_mulai'][$key])){
+	            			$ret['status'] = 'error';
+	            			$pesan[] = 'Waktu mulai pegawai no '.$key.' diisi dulu!';
+	            		}
+	            		if(empty($data['waktu_selesai'][$key])){
+	            			$ret['status'] = 'error';
+	            			$pesan[] = 'Waktu selesai pegawai no '.$key.' diisi dulu!';
+	            		}
+	            	}
+	            	if($ret['status'] == 'error'){
+	            		$ret['message'] = implode(', ', $pesan);
+	            	}
+	            }
 	            if($ret['status'] != 'error'){
 	            	// 0=belum diverifikasi, 1=disetujui kasubag keuangan, 2=disetujui ppk, 3=selesai
 	                if(empty($data['id_data'])){
@@ -873,6 +887,7 @@ class Wp_Simpeg_Public {
 	                foreach($data['id_pegawai'] as $key => $pegawai){
 	                	$jml_peg[$data['id_pegawai'][$key]] = '';
 	                	$jml_jam += $data['jml_jam_lembur'][$key];
+	                	$jml_pajak += $data['jml_pajak'][$key];
 	                	$uang_lembur += $data['uang_lembur'][$key];
 	                	$uang_makan += $data['uang_makan'][$key];
 	                	$data_opsi_detail[] = array(
@@ -881,6 +896,11 @@ class Wp_Simpeg_Public {
 							'id_pegawai' => $data['id_pegawai'][$key],
 							'id_standar_harga_lembur' => $data['id_standar_harga_lembur'][$key],
 							'id_standar_harga_makan' => $data['id_standar_harga_makan'][$key],
+							'uang_lembur' => $data['uang_lembur'][$key],
+							'uang_makan' => $data['uang_makan'][$key],
+							'jml_hari' => $data['jml_hari_lembur'][$key],
+							'jml_jam' => $data['jml_jam_lembur'][$key],
+							'jml_pajak' => $data['jml_pajak'][$key],
 							'waktu_mulai' => $data['waktu_mulai'][$key],
 							'waktu_akhir' => $data['waktu_selesai'][$key],
 							'waktu_mulai_ppk' => $data['waktu_mulai'][$key],
@@ -899,11 +919,15 @@ class Wp_Simpeg_Public {
 	                    'id_skpd'=> $id_skpd,
 	                    'tahun_anggaran'=> $tahun_anggaran,
 	                    'nomor_spt'=> $nomor_spt,
+	                    'waktu_mulai_spt'=> $data['waktu_mulai_spt'],
+	                    'waktu_selesai_spt'=> $data['waktu_selesai_spt'],
+	                    'nomor_spt'=> $nomor_spt,
 			            'id_ppk'=> '', 
 			            'id_bendahara'=> '', 
 			            'uang_makan'=> $uang_makan, 
 			            'uang_lembur'=> $uang_lembur, 
 			            'ket_lembur'=> $ket_lembur, 
+			            'jml_hari'=> $data['jml_hari'], 
 			            'jml_jam'=> $jml_jam, 
 			            'jml_peg'=> count($jml_peg), 
 			            'jml_pajak'=> $jml_pajak, 
