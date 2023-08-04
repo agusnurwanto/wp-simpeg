@@ -405,7 +405,6 @@ function get_pegawai(no_loading=false) {
                 }
             });
         }else{
-            window.global_response_pegawai[id_skpd] = response;
             var html = html_pegawai({
                 id: 1, 
                 html: global_response_pegawai[id_skpd].html
