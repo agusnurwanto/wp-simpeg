@@ -221,6 +221,7 @@ class Wp_Simpeg {
 		add_shortcode('input_spt_lembur', array($plugin_public, 'input_spt_lembur'));
 		add_shortcode('input_spj_lembur', array($plugin_public, 'input_spj_lembur'));
 		add_shortcode('monitoring_sql_migrate_wp_simpeg', array($plugin_public, 'monitoring_sql_migrate_wp_simpeg'));
+		add_shortcode('menu_spt_lembur',  array($plugin_public, 'menu_spt_lembur'));
 
 	}
 

@@ -82,7 +82,11 @@ if(in_array("administrator", $user_meta->roles)){
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Keterangan Lembur</label>
+                        <label>Dasar Lembur</label>
+                        <textarea class="form-control" id="dasar_lembur" name="dasar_lembur"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Peruntukan Lembur</label>
                         <textarea class="form-control" id="ket_lembur" name="ket_lembur"></textarea>
                     </div>
                     <div class="form-group">
@@ -597,6 +601,7 @@ function edit_data(_id){
                 jQuery('#tahun_anggaran').val(res.data.tahun_anggaran).prop('disabled', false);
                 jQuery('#daftar_pegawai > tbody').html('');
                 jQuery('#ket_lembur').val(res.data.ket_lembur).prop('disabled', false);
+                jQuery('#dasar_lembur').val(res.data.dasar_lembur).prop('disabled', false);
                 jQuery('#ket_ver_ppk').val(res.data.ket_ver_ppk).prop('disabled', false);
                 
                 get_sbu(true)
@@ -675,6 +680,7 @@ function detail_data(_id){
                 jQuery('#nomor_spt').val(res.data.nomor_spt).prop('disabled', true);
                 jQuery('#tahun_anggaran').val(res.data.tahun_anggaran).prop('disabled', true);
                 jQuery('#ket_lembur').val(res.data.ket_lembur).prop('disabled', true);
+                jQuery('#dasar_lembur').val(res.data.dasar_lembur).prop('disabled', true);
                 jQuery('#ket_ver_ppk').val(res.data.ket_ver_ppk).prop('disabled', true);
 
                 get_sbu(true)
@@ -742,6 +748,7 @@ function tambah_data_spt_lembur(){
     jQuery('#tahun_anggaran').val('<?php echo date('Y'); ?>').trigger('change').prop('disabled', false);
     jQuery('#id_skpd').val('').trigger('change').prop('disabled', false);
     jQuery('#ket_lembur').val('').prop('disabled', false);
+    jQuery('#dasar_lembur').val('').prop('disabled', false);
     jQuery('#id_ppk').val('').prop('disabled', false);
     jQuery('#id_bendahara').val('').prop('disabled', false);
     jQuery('#ket_ver_ppk').val('').prop('disabled', false);
@@ -771,7 +778,11 @@ function submitTambahDataFormSPTLembur(){
     }
     var ket_lembur = jQuery('#ket_lembur').val();
     if(ket_lembur == ''){
-        return alert('Keterangan lembur diisi dulu!');
+        return alert('Peruntukan lembur diisi dulu!');
+    }
+    var dasar_lembur = jQuery('#dasar_lembur').val();
+    if(dasar_lembur == ''){
+        return alert('Dasar lembur diisi dulu!');
     }
     var waktu_mulai_spt = jQuery('#waktu_mulai_spt').val();
     if(waktu_mulai_spt == ''){

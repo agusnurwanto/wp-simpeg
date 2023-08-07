@@ -466,12 +466,12 @@ public function import_excel_sbu_lembur(){
 			if(empty($email)){
 				$email = $username.'@simpeglocal.com';
 			}
-			if(empty($user['gol_ruang'])){
-				$user['gol_ruang'] = 'Non ASN';
+			if(empty($user['user_role'])){
+				continue;
 			}
-			$role = get_role($user['gol_ruang']);
+			$role = get_role($user['user_role']);
 			if(empty($role)){
-				add_role( $user['gol_ruang'], $user['gol_ruang'], array( 
+				add_role( $user['user_role'], $user['user_role'], array( 
 					'read' => true,
 					'edit_posts' => false,
 					'delete_posts' => false
@@ -484,7 +484,7 @@ public function import_excel_sbu_lembur(){
 				'user_email' => $email,
 				'first_name' => $user['nama'],
 				'display_name' => $user['nama'],
-				'role' => $user['gol_ruang']
+				'role' => $user['user_role']
 			);
 			if(empty($insert_user)){
 				$insert_user = wp_insert_user($option);

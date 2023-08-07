@@ -788,11 +788,17 @@ class Wp_Simpeg_Public {
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Pilih SKPD dulu!';
 	            }
+	            if($ret['status'] != 'error' && !empty($data['dasar_lembur'])){
+	                $dasar_lembur = $data['dasar_lembur'];
+	            }else{
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Isi dasar Lembur dulu!';
+	            }
 	            if($ret['status'] != 'error' && !empty($data['ket_lembur'])){
 	                $ket_lembur = $data['ket_lembur'];
 	            }else{
 	                $ret['status'] = 'error';
-	                $ret['message'] = 'Isi Keterangan Lembur dulu!';
+	                $ret['message'] = 'Isi peruntukan Lembur dulu!';
 	            }
 	            if($ret['status'] != 'error' && !empty($data['waktu_mulai_spt'])){
 	                $waktu_mulai_spt = $data['waktu_mulai_spt'];
@@ -926,6 +932,7 @@ class Wp_Simpeg_Public {
 			            'id_bendahara'=> '', 
 			            'uang_makan'=> $uang_makan, 
 			            'uang_lembur'=> $uang_lembur, 
+			            'dasar_lembur'=> $dasar_lembur, 
 			            'ket_lembur'=> $ket_lembur, 
 			            'jml_hari'=> $data['jml_hari'], 
 			            'jml_jam'=> $jml_jam, 
@@ -1081,9 +1088,13 @@ class Wp_Simpeg_Public {
 
                 foreach($queryRecords as $recKey => $recVal){
                     $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
-                    if ($recVal['status'] != 1) {
+
+                    // jika sudah selesai maka hilangkan tombol edit dan hapus
+                    if ($recVal['status'] != 4) {
                         $btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
-                        $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-trash"></i></a>';
+	                    if ($recVal['status'] == 0) {
+	                        $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-trash"></i></a>';
+	                    }
                     }
 	                $queryRecords[$recKey]['aksi'] = $btn;
 	                if($recVal['status'] == 0){
@@ -1702,5 +1713,35 @@ public function get_datatable_sbu_lembur(){
 
 	function rupiah($total){
 		return number_format($total, 0, ',', '.');
+	}
+
+	function menu_spt_lembur(){
+		global $wpdb;
+		$user_id = um_user( 'ID' );
+		$user_meta = get_userdata($user_id);
+		if(empty($user_meta->roles)){
+			echo 'User ini tidak dapat akses sama sekali :)';
+		}else if(
+			in_array("kepala", $user_meta->roles)
+			|| in_array("ppk", $user_meta->roles)
+			|| in_array("kasubah_keuangan", $user_meta->roles)
+			|| in_array("pptk", $user_meta->roles)
+		){
+			$id_user_sipd = get_user_meta($user_id, 'id_user_sipd');
+			if(!empty($id_user_sipd)){
+				$input_spt_lembur = $this->functions->generatePage(array(
+					'nama_page' => 'Input SPT Lembur',
+					'content' => '[input_spt_lembur]',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				echo '
+				<ul class="aksi-lembur text-center">
+					<li><a href="'.$input_spt_lembur['url'].'" target="_blank" class="btn btn-info">SPT Lembur</a></li>
+				</ul>';
+			}else{
+				echo 'User ID pegawai tidak ditemukan!';
+			}
+		}
 	}
 }
