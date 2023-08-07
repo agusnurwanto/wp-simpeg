@@ -1087,6 +1087,10 @@ class Wp_Simpeg_Public {
                 $queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
 
                 $is_admin = in_array("administrator", $user_meta->roles);
+                $is_pptk = in_array("pptk", $user_meta->roles);
+                $is_kasubag = in_array("kasubag_keuangan", $user_meta->roles);
+                $is_ppk = in_array("ppk", $user_meta->roles);
+                $is_kepala = in_array("kepala", $user_meta->roles);
                 foreach($queryRecords as $recKey => $recVal){
                     $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
 	                if(
@@ -1094,18 +1098,19 @@ class Wp_Simpeg_Public {
 	                	|| $is_admin
 	                ){
                     	$btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
-                        $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-trash"></i></a>';
-	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Belum dicek</span>';
+                        $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Hapus Data"><i class="dashicons dashicons-trash"></i></a>';
+                        $btn .= '<a class="btn btn-sm btn-primary" onclick="submit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Submit Data"><i class="dashicons dashicons-migrate"></i></a>';
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit</span>';
 	                }
 
 	                if($recVal['status'] == 1) {
-                    	$btn .= '<a class="btn btn-sm btn-warning" onclick="verifikasi_kasubag_keuangan(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kasubag Keuangan"><i class="dashicons dashicons-yes"></i></a>';
+                    	$btn .= '<a class="btn btn-sm btn-success" onclick="verifikasi_kasubag_keuangan(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kasubag Keuangan"><i class="dashicons dashicons-yes"></i></a>';
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi Kasubag Keuangan</span>';
 	                }elseif($recVal['status'] == 2) {
-                    	$btn .= '<a class="btn btn-sm btn-warning" onclick="verifikasi_ppk(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi PPK"><i class="dashicons dashicons-yes"></i></a>';
+                    	$btn .= '<a class="btn btn-sm btn-success" onclick="verifikasi_ppk(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi PPK"><i class="dashicons dashicons-yes"></i></a>';
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi PPK</span>';
 	                }elseif($recVal['status'] == 3) {
-                    	$btn .= '<a class="btn btn-sm btn-warning" onclick="verifikasi_kepala(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kepala"><i class="dashicons dashicons-yes"></i></a>';
+                    	$btn .= '<a class="btn btn-sm btn-success" onclick="verifikasi_kepala(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kepala"><i class="dashicons dashicons-yes"></i></a>';
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi Kepala</span>';
 	                }elseif($recVal['status'] == 4) {
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Selesai</span>';
@@ -1770,6 +1775,19 @@ public function get_datatable_sbu_lembur(){
 					$id_spt = $data['id_data'];
 					$type_verifikasi = $data['type_verifikasi'];
 					if(
+						$type_verifikasi == 'pptk'
+						&& (
+							in_array("pptk", $user_meta->roles)
+							||in_array("administrator", $user_meta->roles)
+						)
+					){
+						$wpdb->update('data_spt_lembur', array(
+							'status' => 1
+						), array(
+							'id' => $id_spt
+						));
+						$ret['message'] == 'Berhasil submit data SPT!';
+					}else if(
 						$type_verifikasi == 'kasubag_keuangan'
 						&& (
 							in_array("kasubag_keuangan", $user_meta->roles)

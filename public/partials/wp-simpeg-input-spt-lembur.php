@@ -237,6 +237,32 @@ function set_keterangan(that){
     }
 }
 
+function submit_data(id_spt){
+    if(confirm('Apakah anda yakin untuk mengirim data ini ke proses selanjutnya?')){
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            method: 'post',
+            url: '<?php echo admin_url('admin-ajax.php'); ?>',
+            dataType: 'json',
+            data:{
+                'action': 'verifikasi_spt_lembur',
+                'api_key': jQuery('#api_key').val(),
+                'data': JSON.stringify({
+                    id_data: id_spt,
+                    type_verifikasi: 'pptk'
+                })
+            },
+            success: function(res){
+                jQuery('#wrap-loading').hide();
+                alert(res.message);
+                if(res.status == 'success'){
+                    get_data_spt_lembur();
+                }
+            }
+        });
+    }
+}
+
 function verifikasi_kasubag_keuangan(id_spt){
     jQuery('#wrap-loading').show();
     jQuery.ajax({
