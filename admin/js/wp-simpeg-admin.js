@@ -198,3 +198,26 @@ function import_excel_sbu_lembur(){
         });
     }
 }
+
+function generate_user_simpeg(){
+    if(confirm("Apakah anda yakin untuk menggenerate user dati tabel data_pegawai_lembur!")){
+        jQuery('#wrap-loading').show();
+        relayAjax({
+            url: ajaxurl,
+            type: "post",
+            data: {
+                "action": "generate_user_simpeg",
+                "pass": prompt('Masukan password default untuk User yang akan dibuat')
+            },
+            dataType: "json",
+            success: function(data){
+                jQuery('#wrap-loading').hide();
+                return alert(data.message);
+            },
+            error: function(e) {
+                console.log(e);
+                return alert(data.message);
+            }
+        });
+    }
+}

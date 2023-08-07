@@ -169,6 +169,7 @@ class Wp_Simpeg {
 
 		$this->loader->add_action('wp_ajax_import_excel_simpeg_pegawai',  $plugin_admin, 'import_excel_simpeg_pegawai');
 		$this->loader->add_action('wp_ajax_import_excel_sbu_lembur',  $plugin_admin, 'import_excel_sbu_lembur');
+		$this->loader->add_action('wp_ajax_generate_user_simpeg',  $plugin_admin, 'generate_user_simpeg');
 
 		add_shortcode('nama_kepala', array($plugin_admin, 'nama_kepala'));
 	}
