@@ -1086,35 +1086,39 @@ class Wp_Simpeg_Public {
                 $totalRecords = $queryTot[0]['jml'];
                 $queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
 
+                $is_admin = in_array("administrator", $user_meta->roles);
                 foreach($queryRecords as $recKey => $recVal){
                     $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
-
-                    // jika sudah selesai maka hilangkan tombol edit dan hapus
-                    if ($recVal['status'] != 4) {
-                        $btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
-	                    if ($recVal['status'] == 0) {
-	                        $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-trash"></i></a>';
-	                    }
-                    }
-	                $queryRecords[$recKey]['aksi'] = $btn;
-	                if($recVal['status'] == 0){
+	                if(
+	                	$recVal['status'] == 0
+	                	|| $is_admin
+	                ){
+                    	$btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
+                        $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-trash"></i></a>';
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Belum dicek</span>';
-	                }elseif ($recVal['status'] == 1) {
+	                }
+
+	                if($recVal['status'] == 1) {
+                    	$btn .= '<a class="btn btn-sm btn-warning" onclick="verifikasi_kasubag_keuangan(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kasubag Keuangan"><i class="dashicons dashicons-yes"></i></a>';
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi Kasubag Keuangan</span>';
-	                }elseif ($recVal['status'] == 2) {
+	                }elseif($recVal['status'] == 2) {
+                    	$btn .= '<a class="btn btn-sm btn-warning" onclick="verifikasi_ppk(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi PPK"><i class="dashicons dashicons-yes"></i></a>';
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi PPK</span>';
-	                }elseif ($recVal['status'] == 3) {
+	                }elseif($recVal['status'] == 3) {
+                    	$btn .= '<a class="btn btn-sm btn-warning" onclick="verifikasi_kepala(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kepala"><i class="dashicons dashicons-yes"></i></a>';
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi Kepala</span>';
-	                }elseif ($recVal['status'] == 4) {
+	                }elseif($recVal['status'] == 4) {
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Selesai</span>';
 	                // status ditolak masih dalam pengembangan
-	                }elseif ($recVal['status'] == 5) {
+	                }elseif($recVal['status'] == 5) {
 	                    $pesan = '';
 	                    if ($recVal['status_ver_bendahara'] == 0){
 	                        $pesan .= '<br>Keterangan Verifikasi: '.$recVal['ket_ver_bendahara']; 
 	                    }
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Ditolak</span>'.$pesan;
 	                }
+
+	                $queryRecords[$recKey]['aksi'] = $btn;
 	            }
 	     
             $json_data = array(
@@ -1724,7 +1728,7 @@ public function get_datatable_sbu_lembur(){
 		}else if(
 			in_array("kepala", $user_meta->roles)
 			|| in_array("ppk", $user_meta->roles)
-			|| in_array("kasubah_keuangan", $user_meta->roles)
+			|| in_array("kasubag_keuangan", $user_meta->roles)
 			|| in_array("pptk", $user_meta->roles)
 		){
 			$id_user_sipd = get_user_meta($user_id, 'id_user_sipd');
@@ -1743,5 +1747,66 @@ public function get_datatable_sbu_lembur(){
 				echo 'User ID pegawai tidak ditemukan!';
 			}
 		}
+	}
+
+	function verifikasi_spt_lembur(){
+		global $wpdb;
+		$ret = array(
+			'status'	=> 'success',
+			'message'	=> 'Berhasil verifikasi SPT!'
+		);
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
+				$user_id = um_user( 'ID' );
+				$user_meta = get_userdata($user_id);
+				$data = json_decode(stripslashes($_POST['data']), true);
+				if(empty($data['type_verifikasi'])){
+					$ret['status'] = 'error';
+					$ret['message'] = 'Tipe verifikasi tidak boleh kosong!';
+				}else if(empty($data['id_data'])){
+					$ret['status'] = 'error';
+					$ret['message'] = 'ID SPT tidak boleh kosong!';
+				}else{
+					$id_spt = $data['id_data'];
+					$type_verifikasi = $data['type_verifikasi'];
+					if(
+						$type_verifikasi == 'kasubag_keuangan'
+						&& (
+							in_array("kasubag_keuangan", $user_meta->roles)
+							||in_array("administrator", $user_meta->roles)
+						)
+					){
+						$status_ver = 0;
+						$status_spt = 0;
+						if(!empty($data['status_bendahara'])){
+							$status_ver = 1;
+							$status_spt = 2; // status SPT menjadi verifikasi PPK
+						}
+						$options = array(
+							'status' => $status_spt,
+							'status_ver_bendahara' => $status_ver,
+							'ket_ver_bendahara' => $data['keterangan_status_bendahara']
+						);
+						$wpdb->update('data_spt_lembur', $options, array(
+							'id' => $id_spt
+						));
+					}else{
+						$ret['status'] == 'error';
+						$ret['message'] == 'Sistem tidak dapat melakukan verifikasi, hubungi admin!';
+					}
+				}
+			}else{
+				$ret = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		}else{
+			$ret = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($ret));
 	}
 }

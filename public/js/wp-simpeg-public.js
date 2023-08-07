@@ -1,32 +1,38 @@
-(function( $ ) {
-	'use strict';
+function formatRupiah(angka, prefix){
+	var cek_minus = false;
+	if(!angka || angka == '' || angka == 0){
+		angka = '0';
+	}else if(angka < 0){
+		angka = angka*-1;
+		cek_minus = true;
+	}
+	try {
+		if(typeof angka == 'number'){
+			angka = Math.round(angka*100)/100;
+			angka += '';
+			angka = angka.replace(/\./g, ',').toString();
+		}
+		angka += '';
+		number_string = angka;
+	}catch(e){
+		console.log('angka', e, angka);
+		var number_string = '0';
+	}
+	var split = number_string.split(','),
+	sisa = split[0].length % 3,
+	rupiah = split[0].substr(0, sisa),
+	ribuan = split[0].substr(sisa).match(/\d{3}/gi);
 
-	/**
-	 * All of the code for your public-facing JavaScript source
-	 * should reside in this file.
-	 *
-	 * Note: It has been assumed you will write jQuery code here, so the
-	 * $ function reference has been prepared for usage within the scope
-	 * of this function.
-	 *
-	 * This enables you to define handlers, for when the DOM is ready:
-	 *
-	 * $(function() {
-	 *
-	 * });
-	 *
-	 * When the window is loaded:
-	 *
-	 * $( window ).load(function() {
-	 *
-	 * });
-	 *
-	 * ...and/or other possibilities.
-	 *
-	 * Ideally, it is not considered best practise to attach more than a
-	 * single DOM-ready or window-load handler for a particular page.
-	 * Although scripts in the WordPress core, Plugins and Themes may be
-	 * practising this, we should strive to set a better example in our own work.
-	 */
+	// tambahkan titik jika yang di input sudah menjadi angka ribuan
+	if(ribuan){
+		separator = sisa ? '.' : '';
+		rupiah += separator + ribuan.join('.');
+	}
 
-})( jQuery );
+	rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+	if(cek_minus){
+		return '-'+(prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : ''));
+	}else{
+		return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+	}
+}
