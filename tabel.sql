@@ -42,6 +42,7 @@ CREATE TABLE `data_unit_lembur` (
 CREATE TABLE `data_pegawai_lembur` (
   `id` int(11) NOT NULL auto_increment,
   `id_skpd` int(11) NOT NULL,
+  `user_role` varchar(50) DEFAULT NULL,
   `nip` varchar(50) DEFAULT NULL,
   `nik` varchar(50) DEFAULT NULL,
   `gelar_depan` text DEFAULT NULL,
@@ -97,6 +98,7 @@ CREATE TABLE `data_spt_lembur` (
   `uang_makan` double DEFAULT NULL,
   `uang_lembur` double DEFAULT NULL,
   `jml_pajak` double DEFAULT NULL,
+  `dasar_lembur` text DEFAULT NULL,
   `ket_lembur` text DEFAULT NULL,
   `ket_ver_ppk` text DEFAULT NULL,
   `ket_ver_kepala` text DEFAULT NULL,

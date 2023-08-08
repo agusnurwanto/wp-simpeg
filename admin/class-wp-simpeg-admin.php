@@ -214,6 +214,9 @@ class Wp_Simpeg_Admin {
 	            Field::make( 'html', 'crb_sql_migrate_simpeg' )
 	            	->set_html( '<a target="_blank" href="'.$url_sql_migrate['url'].'" class="button button-primary button-large">'.$url_sql_migrate['title'].'</a>' )
 	            	->set_help_text('Status SQL migrate WP-SIMPEG jika ada update struktur database.'),
+	            Field::make( 'html', 'crb_gen_user_simpeg' )
+	            	->set_html( '<a target="_blank" onclick="generate_user_simpeg(); return false;" href="#" class="button button-primary button-large">Generate User SIMPEG</a>' )
+	            	->set_help_text('Generate user dari tabel <b>data_pegawai_lembur</b>.')
 	        ) );
 
 		Container::make( 'theme_options', __( 'Data Pegawai' ) )
@@ -436,4 +439,83 @@ public function import_excel_sbu_lembur(){
         }
 	}
 
+	function generate_user_simpeg($user = array()){
+		$ret = array(
+			'status' => 'success',
+			'message' => 'Berhasil generate user',
+			'data' => array(
+				'insert' => array(),
+				'update' => array()
+			)
+		);
+		global $wpdb;
+		$user_all = $wpdb->get_results("
+			SELECT 
+				p.*,
+				u.nama_skpd 
+			from data_pegawai_lembur p
+			inner join data_unit_lembur u on u.id_skpd=p.id_skpd
+				and u.active=p.active 
+				and u.tahun_anggaran=p.tahun 
+			where p.active=1
+			group by p.nik, p.nip
+		", ARRAY_A);
+		foreach($user_all as $user){
+			$username = $user['nip'];
+			if(empty($username)){
+				$username = $user['nik'];
+			}
+			$email = $user['email'];
+			if(empty($email)){
+				$email = $username.'@simpeglocal.com';
+			}
+			if(empty($user['user_role'])){
+				continue;
+			}
+			$role = get_role($user['user_role']);
+			if(empty($role)){
+				add_role( $user['user_role'], $user['user_role'], array( 
+					'read' => true,
+					'edit_posts' => false,
+					'delete_posts' => false
+				) );
+			}
+			$insert_user = username_exists($username);
+			$options = array(
+				'user_login' => $username,
+				'user_pass' => $_POST['pass'],
+				'user_email' => $email,
+				'first_name' => $user['nama'],
+				'display_name' => $user['nama'],
+				'role' => $user['user_role']
+			);
+			if(empty($insert_user)){
+				$insert_user = wp_insert_user($options);
+				$ret['data']['insert'][] = $options;
+			}else{
+				$options['ID'] = $insert_user;
+				// wp_update_user($options);
+				$ret['data']['update'][] = $options;
+			}
+
+			$skpd = $wpdb->get_var("
+				SELECT 
+					nama_skpd 
+				from data_unit_lembur 
+				where id_skpd=".$user['id_skpd']." 
+					AND active=1
+			");
+			$meta = array(
+			    '_crb_nama_skpd' => $skpd,
+			    '_id_sub_skpd' => $user['id_skpd'],
+			    '_nip' => $user['nip'],
+			    'id_pegawai_lembur' => $user['id'],
+			    'description' => 'User dibuat dari autogenerate sistem'
+			);
+		    foreach( $meta as $key => $val ) {
+		      	update_user_meta( $insert_user, $key, $val ); 
+		    }
+		}
+		die(json_encode($ret));
+	}
 }
