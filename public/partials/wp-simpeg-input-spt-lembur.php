@@ -199,7 +199,7 @@ jQuery(document).ready(function(){
 });
 
 function submitVerifikasiLembur(that){
-    if(jQuery('#status_bendahara').is(':checked')){
+    if(!jQuery('#status_bendahara').is(':checked')){
         var ket = jQuery('#keterangan_status_bendahara').val();
         if(ket == ''){
             return alert('Keterangan harus diisi jika status ditolak');

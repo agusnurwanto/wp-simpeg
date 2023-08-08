@@ -1842,15 +1842,24 @@ public function get_datatable_sbu_lembur(){
 						if(!empty($data['status_bendahara'])){
 							$status_ver = 1;
 							$status_spt = 2; // status SPT menjadi verifikasi PPK
+						}else{
+							if(empty($data['keterangan_status_bendahara'])){
+								$ret['status'] = 'error';
+								$ret['message'] = 'Keterangan harus diisi jika status ditolak';
+							}else{
+								$ret['message'] = 'Berhasil tidak menyetujui pengajuan SPT!';
+							}
 						}
-						$options = array(
-							'status' => $status_spt,
-							'status_ver_bendahara' => $status_ver,
-							'ket_ver_bendahara' => $data['keterangan_status_bendahara']
-						);
-						$wpdb->update('data_spt_lembur', $options, array(
-							'id' => $id_spt
-						));
+						if($ret['status'] != 'error'){
+							$options = array(
+								'status' => $status_spt,
+								'status_ver_bendahara' => $status_ver,
+								'ket_ver_bendahara' => $data['keterangan_status_bendahara']
+							);
+							$wpdb->update('data_spt_lembur', $options, array(
+								'id' => $id_spt
+							));
+						}
 					}else{
 						$ret['status'] == 'error';
 						$ret['message'] == 'Sistem tidak dapat melakukan verifikasi, hubungi admin!';

@@ -117,7 +117,7 @@ foreach($laporan_spt as $peg){
         </div>
     </div>
 </div>
-<div class="cetak container-fluid" style="margin-top: 20px;">
+<div class="cetak container-fluid" style="margin: 20px 0; overflow: auto;">
     <h5 class="text-center">Lampiran Surat Perintah Tugas<br>Nomor : <?php echo $spt['nomor_spt']; ?></h5>
     <table class="table table-bordered" style="width: 1200px; margin: auto;">
         <thead>
