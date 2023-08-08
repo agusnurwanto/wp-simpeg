@@ -1736,8 +1736,8 @@ public function get_datatable_sbu_lembur(){
 			|| in_array("kasubag_keuangan", $user_meta->roles)
 			|| in_array("pptk", $user_meta->roles)
 		){
-			$id_user_sipd = get_user_meta($user_id, 'id_user_sipd');
-			if(!empty($id_user_sipd)){
+			$id_pegawai_lembur = get_user_meta($user_id, 'id_pegawai_lembur');
+			if(!empty($id_pegawai_lembur)){
 				$input_spt_lembur = $this->functions->generatePage(array(
 					'nama_page' => 'Input SPT Lembur',
 					'content' => '[input_spt_lembur]',

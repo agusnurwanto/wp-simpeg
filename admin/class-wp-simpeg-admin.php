@@ -458,10 +458,13 @@ public function import_excel_sbu_lembur(){
 				and u.active=p.active 
 				and u.tahun_anggaran=p.tahun 
 			where p.active=1
-			group by p.nik
+			group by p.nik, p.nip
 		", ARRAY_A);
 		foreach($user_all as $user){
-			$username = $user['nik'];
+			$username = $user['nip'];
+			if(empty($username)){
+				$username = $user['nik'];
+			}
 			$email = $user['email'];
 			if(empty($email)){
 				$email = $username.'@simpeglocal.com';
@@ -478,7 +481,7 @@ public function import_excel_sbu_lembur(){
 				) );
 			}
 			$insert_user = username_exists($username);
-			$option = array(
+			$options = array(
 				'user_login' => $username,
 				'user_pass' => $_POST['pass'],
 				'user_email' => $email,
@@ -487,12 +490,12 @@ public function import_excel_sbu_lembur(){
 				'role' => $user['user_role']
 			);
 			if(empty($insert_user)){
-				$insert_user = wp_insert_user($option);
-				$ret['data']['insert'] = $options;
+				$insert_user = wp_insert_user($options);
+				$ret['data']['insert'][] = $options;
 			}else{
 				$options['ID'] = $insert_user;
-				// wp_update_user($option);
-				$ret['data']['update'] = $options;
+				// wp_update_user($options);
+				$ret['data']['update'][] = $options;
 			}
 
 			$skpd = $wpdb->get_var("
