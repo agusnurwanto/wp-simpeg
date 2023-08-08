@@ -269,6 +269,7 @@ class Wp_Simpeg_Admin {
             	->set_html( '<a onclick="import_excel_sbu_lembur(); return false" href="javascript:void(0);" class="button button-primary">Import WP</a>' )
 	        ) );
 
+		/*
 		$user_all = get_users();
 		$users = array();
 		foreach ($user_all as $k => $v) {
@@ -280,6 +281,7 @@ class Wp_Simpeg_Admin {
 	        ->add_options( $users ),
 	        Field::make( 'html', 'simpeg_instansi', __( '' ) )
 	    ) );
+	    */
 	}
 
 	function nama_kepala(){
@@ -288,23 +290,23 @@ class Wp_Simpeg_Admin {
 		return $kepala->display_name;
 	}
 
-public function import_excel_simpeg_pegawai(){
-	global $wpdb;
-	$ret = array(
-		'status'	=> 'success',
-		'message'	=> 'Berhasil import excel!'
-	);
+	public function import_excel_simpeg_pegawai(){
+		global $wpdb;
+		$ret = array(
+			'status'	=> 'success',
+			'message'	=> 'Berhasil import excel!'
+		);
 		if (!empty($_POST)) {
 			$ret['data'] = array(
 				'insert' => 0, 
 				'update' => 0,
 				'error' => array()
-		);
+			);
 			foreach ($_POST['data'] as $k => $data) {
 				$newData = array();
 				foreach($data as $kk => $vv){
 					$newData[trim(preg_replace('/\s+/', ' ', $kk))] = trim(preg_replace('/\s+/', ' ', $vv));
-			}
+				}
 				$data_db = array(
 					'id_skpd' => $newData['id_skpd'],
 				    'nik' => $newData['nik'],
@@ -335,7 +337,7 @@ public function import_excel_simpeg_pegawai(){
 				    'nilai_prestasi' => $newData['nilai_prestasi'],
 				    'email' => $newData['email'],
 				    'tahun' => $newData['tahun']
-			);
+				);
 				$wpdb->last_error = "";
 				$cek_id = $wpdb->get_var($wpdb->prepare("
 					SELECT 
@@ -364,23 +366,23 @@ public function import_excel_simpeg_pegawai(){
 		die(json_encode($ret));
 	}
 
-public function import_excel_sbu_lembur(){
-	global $wpdb;
-	$ret = array(
-		'status'	=> 'success',
-		'message'	=> 'Berhasil import excel!'
-	);
+	public function import_excel_sbu_lembur(){
+		global $wpdb;
+		$ret = array(
+			'status'	=> 'success',
+			'message'	=> 'Berhasil import excel!'
+		);
 		if (!empty($_POST)) {
 			$ret['data'] = array(
 				'insert' => 0, 
 				'update' => 0,
 				'error' => array()
-		);
+			);
 			foreach ($_POST['data'] as $k => $data) {
 				$newData = array();
 				foreach($data as $kk => $vv){
 					$newData[trim(preg_replace('/\s+/', ' ', $kk))] = trim(preg_replace('/\s+/', ' ', $vv));
-			}
+				}
 				$data_db = array(
 					'kode_standar_harga' => $newData ['kode_standar_harga'],
 					'nama' => $newData ['nama'],
@@ -392,7 +394,7 @@ public function import_excel_sbu_lembur(){
 					'no_aturan' => $newData ['no_aturan'],
 					'pph_21' => $newData ['pph_21'],
 					'jenis_hari' => $newData ['jenis_hari']
-			);
+				);
 				$wpdb->last_error = "";
 				$cek_id = $wpdb->get_var($wpdb->prepare("
 					SELECT 
@@ -472,30 +474,44 @@ public function import_excel_sbu_lembur(){
 			if(empty($user['user_role'])){
 				continue;
 			}
-			$role = get_role($user['user_role']);
-			if(empty($role)){
-				add_role( $user['user_role'], $user['user_role'], array( 
-					'read' => true,
-					'edit_posts' => false,
-					'delete_posts' => false
-				) );
+			$all_roles = explode('|', $user['user_role']);
+			foreach($all_roles as $user_role){
+				$role = get_role($user_role);
+				if(empty($role)){
+					add_role( $user_role, $user_role, array( 
+						'read' => true,
+						'edit_posts' => false,
+						'delete_posts' => false
+					) );
+				}
 			}
-			$insert_user = username_exists($username);
+			$id_user = username_exists($username);
 			$options = array(
 				'user_login' => $username,
 				'user_pass' => $_POST['pass'],
 				'user_email' => $email,
 				'first_name' => $user['nama'],
 				'display_name' => $user['nama'],
-				'role' => $user['user_role']
+				'role' => $all_roles[0]
 			);
-			if(empty($insert_user)){
-				$insert_user = wp_insert_user($options);
+			if(empty($id_user)){
+				$id_user = wp_insert_user($options);
 				$ret['data']['insert'][] = $options;
 			}else{
-				$options['ID'] = $insert_user;
+				$options['ID'] = $id_user;
 				// wp_update_user($options);
 				$ret['data']['update'][] = $options;
+			}
+
+			$user_meta = get_userdata( $id_user );
+			foreach($all_roles as $user_role){
+				if(
+					empty($user_meta->roles) 
+					|| !in_array($user_role, $user_meta->roles)
+				){
+					$theUser = new WP_User($id_user);
+		 			$theUser->add_role( $user_role );
+				}
 			}
 
 			$skpd = $wpdb->get_var("
@@ -513,9 +529,18 @@ public function import_excel_sbu_lembur(){
 			    'description' => 'User dibuat dari autogenerate sistem'
 			);
 		    foreach( $meta as $key => $val ) {
-		      	update_user_meta( $insert_user, $key, $val ); 
+		      	update_user_meta( $id_user, $key, $val ); 
 		    }
 		}
 		die(json_encode($ret));
+	}
+
+	function get_user_roles_by_user_id( $user_id ) {
+	    $user = get_userdata( $user_id );
+	    return empty( $user ) ? array() : $user->roles;
+	}
+
+	function is_user_in_role( $user_id, $role  ) {
+	    return in_array( $role, get_user_roles_by_user_id( $user_id ) );
 	}
 }

@@ -1091,6 +1091,15 @@ class Wp_Simpeg_Public {
                 $is_kasubag = in_array("kasubag_keuangan", $user_meta->roles);
                 $is_ppk = in_array("ppk", $user_meta->roles);
                 $is_kepala = in_array("kepala", $user_meta->roles);
+
+				$laporan_spt_lembur = $this->functions->generatePage(array(
+					'nama_page' => 'Laporan Surat Perintah Tugas',
+					'content' => '[laporan_spt_lembur]',
+					'show_header' => 1,
+					'no_key' => 1,
+					'post_status' => 'private'
+				));
+
                 foreach($queryRecords as $recKey => $recVal){
                     $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
 	                if(
@@ -1123,6 +1132,7 @@ class Wp_Simpeg_Public {
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Ditolak</span>'.$pesan;
 	                }
 
+                    $btn .= '<a class="btn btn-sm btn-primary" target="_blank" href="'.$laporan_spt_lembur['url'].'?id_spt='.$recVal['id'].'" title="Print SPT"><i class="dashicons dashicons-printer"></i></a>';
 	                $queryRecords[$recKey]['aksi'] = $btn;
 	            }
 	     
