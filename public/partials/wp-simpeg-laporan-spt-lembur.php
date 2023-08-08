@@ -26,7 +26,11 @@ if(empty($spt)){
 }
 
 if($spt['waktu_mulai_spt'] == $spt['waktu_selesai_spt']){
-    $waktu_spt = $this->tanggalan($spt['waktu_mulai_spt']);
+    if(empty($spt['waktu_mulai_spt'])){
+        $waktu_spt = '-';    
+    }else{
+        $waktu_spt = $this->tanggalan($spt['waktu_mulai_spt']);
+    }
 }else{
     $waktu_spt = $this->tanggalan($spt['waktu_mulai_spt']).' sampai '.$this->tanggalan($spt['waktu_selesai_spt']);
 }
@@ -39,6 +43,7 @@ $laporan_spt = $wpdb->get_results($wpdb->prepare('
         p.gelar_belakang,
         p.kode_gol,
         p.nip,
+        p.jabatan,
         p.gol_ruang
     from data_spt_lembur_detail d
     INNER JOIN data_spt_lembur s on d.id_spt = s.id
@@ -46,7 +51,7 @@ $laporan_spt = $wpdb->get_results($wpdb->prepare('
     INNER JOIN data_pegawai_lembur p on d.id_pegawai = p.id
         AND p.active=d.active
         AND p.tahun=s.tahun_anggaran
-    WHERE s.id
+    WHERE s.id=%d
     order by p.nama ASC
 ', $input['id_spt']), ARRAY_A);
 $nomor = 0;
@@ -64,7 +69,7 @@ foreach($laporan_spt as $peg){
             <td class="text-center">'.$golongan_pegawai.'</td>
             <td>'.$peg['jabatan'].'</td>
             <td class="text-center">'.str_replace('T', ' ', $peg['waktu_mulai']).'</td>
-            <td class="text-center">'.str_replace('T', ' ', $peg['waktu_selesai']).'</td>
+            <td class="text-center">'.str_replace('T', ' ', $peg['waktu_akhir']).'</td>
             <td class="text-center">'.$peg['jml_jam'].' Jam</td>
         </tr>
     ';

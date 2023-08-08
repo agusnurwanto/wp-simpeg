@@ -1744,6 +1744,9 @@ public function get_datatable_sbu_lembur(){
 	}
 
 	public function get_bulan($bulan) {
+		if(!empty($bulan)){
+			$bulan = (int) $bulan;
+		}
 		if(empty($bulan)){
 			$bulan = date('m');
 		}
@@ -1761,7 +1764,7 @@ public function get_datatable_sbu_lembur(){
 			"November", 
 			"Desember"
 		);
-		return $nama_bulan[((int) $bulan)-1];
+		return $nama_bulan[$bulan-1];
 	}
 
 	function menu_spt_lembur(){
