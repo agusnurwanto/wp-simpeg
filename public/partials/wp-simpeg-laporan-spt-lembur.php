@@ -90,7 +90,7 @@ foreach($laporan_spt as $peg){
                             <tr>
                                 <td style="width: 100px;">DASAR</td>
                                 <td style="width: 30px;" class="text-center">:</td>
-                                <td><?php //echo $spt['dasar']; ?></td>
+                                <td><?php echo $spt['dasar_lembur']; ?></td>
                             </tr>
                             <tr>
                                 <td colspan="3" class="text-center">MEMERINTAHKAN</td>

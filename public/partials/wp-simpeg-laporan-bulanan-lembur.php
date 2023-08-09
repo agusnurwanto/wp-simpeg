@@ -36,7 +36,7 @@ $tahun = $wpdb->get_results('
 $select_tahun = "<option value=''>Pilih Tahun</option>";
 foreach($tahun as $tahun_value){
     $select = $tahun_value['tahun_anggaran'] == $input['tahun'] ? 'selected' : '';
-    $select_tahun .= "<option value='".$tahun_value['tahun_anggaran']."' ".$select.">Tahun Anggaran ".$tahun_value['tahun_anggaran']."</option>";
+    $select_tahun .= "<option value='".$tahun_value['tahun_anggaran']."' ".$select.">".$tahun_value['tahun_anggaran']."</option>";
 }
 
 $skpd = $wpdb->get_results($wpdb->prepare('
@@ -172,18 +172,13 @@ foreach($data_all as $peg_all){
         if($peg['tipe_hari'] == 2){
             $total_uang_lembur_hari_kerja += $peg['jml_jam']*$uang_lembur_hari_kerja;
             $peg_jam_kerja += $peg['jml_jam'];
+            $jumlah_hari_kerja += $peg['jml_hari'];
         }else if($peg['tipe_hari'] == 1){
             $total_uang_lembur_hari_libur += $peg['jml_jam']*$uang_lembur_hari_libur;
             $peg_jam_libur += $peg['jml_jam'];
+            $jumlah_hari_libur += $peg['jml_hari'];
         }
-
-        // if($sbu['id_golongan'] == 3){
-        //     $penerimaan_kotor/$sbu['pph_21'];
-        // }else if($sbu['id_golongan'] == 4){
-        //     $penerimaan_kotor += $peg['jml_pajak']/$sbu['pph_21'];
-        //     $total_pajak += $peg['jml_pajak'];
-        // }
-
+        $total_pajak += $peg['jml_pajak'];
     }
     $penerimaan_kotor = $total_uang_lembur_hari_kerja + $total_uang_lembur_hari_libur + $total_uang_makan_lembur;
     $penerimaan_bersih = $penerimaan_kotor - $total_pajak;
@@ -236,25 +231,42 @@ foreach($data_all as $peg_all){
     <table class="table table-bordered">
         <thead>
             <tr>
-                <td class="atas kanan bawah kiri text-center text_blok" style="vertical-align: middle;" rowspan="2">No</td>
-                <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;" rowspan="2">Nama</td>
-                <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;" rowspan="3">Golongan</td>
-                <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;" colspan="4">Hari Kerja</td>
-                <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;" colspan="4">Hari Libur</td>
-                <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;"rowspan="2">Uang Makan</td>
-                <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;"rowspan="2">Penerimaan Kotor</td>
-                <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;"rowspan="2">Pajak</td>
-                <td class="atas kanan bawah text-center text_blok" style="vertical-align: middle;"rowspan="2">Penerimaan Bersih</td>
+                <th class="atas kanan bawah kiri text-center" style="vertical-align: middle;" rowspan="2">No</th>
+                <th class="atas kanan bawah text-center" style="vertical-align: middle;" rowspan="2">Nama</th>
+                <th class="atas kanan bawah text-center" style="vertical-align: middle;" rowspan="2">Golongan</th>
+                <th class="atas kanan bawah text-center" style="vertical-align: middle;" colspan="4">Hari Kerja</th>
+                <th class="atas kanan bawah text-center" style="vertical-align: middle;" colspan="4">Hari Libur</th>
+                <th class="atas kanan bawah text-center" style="vertical-align: middle;"rowspan="2">Uang Makan</th>
+                <th class="atas kanan bawah text-center" style="vertical-align: middle;"rowspan="2">Penerimaan Kotor</th>
+                <th class="atas kanan bawah text-center" style="vertical-align: middle;"rowspan="2">Pajak</th>
+                <th class="atas kanan bawah text-center" style="vertical-align: middle;"rowspan="2">Penerimaan Bersih</th>
             </tr>
             <tr>
-                <td class="kanan bawah text-center text_blok" rowspan="2">Harga Satuan</td>
-                <td class="kanan bawah text-center text_blok" rowspan="2">Hari</td>
-                <td class="kanan bawah text-center text_blok" rowspan="2">Jam</td>
-                <td class="kanan bawah text-center text_blok" rowspan="2">Total</td>
-                <td class="kanan bawah text-center text_blok" rowspan="2">Harga Satuan</td>
-                <td class="kanan bawah text-center text_blok" rowspan="2">Hari</td>
-                <td class="kanan bawah text-center text_blok" rowspan="2">Jam</td>
-                <td class="kanan bawah text-center text_blok" rowspan="2">Total</td>
+                <th class="kanan bawah text-center">Harga Satuan</th>
+                <th class="kanan bawah text-center">Hari</th>
+                <th class="kanan bawah text-center">Jam</th>
+                <th class="kanan bawah text-center">Total</th>
+                <th class="kanan bawah text-center">Harga Satuan</th>
+                <th class="kanan bawah text-center">Hari</th>
+                <th class="kanan bawah text-center">Jam</th>
+                <th class="kanan bawah text-center">Total</th>
+            </tr>
+            <tr>
+                <th class="text-center">1</th>
+                <th class="text-center">2</th>
+                <th class="text-center">3</th>
+                <th class="text-center">4</th>
+                <th class="text-center">5</th>
+                <th class="text-center">6</th>
+                <th class="text-center">7=4x6</th>
+                <th class="text-center">8</th>
+                <th class="text-center">9</th>
+                <th class="text-center">10</th>
+                <th class="text-center">11=8x10</th>
+                <th class="text-center">12</th>
+                <th class="text-center">13=7+11+12</th>
+                <th class="text-center">14</th>
+                <th class="text-center">15=13-14</th>
             </tr>
         </thead>
         <tbody>
@@ -264,7 +276,7 @@ foreach($data_all as $peg_all){
 </div>
 <script type="text/javascript">
     jQuery('document').ready(function(){
-        jQuery('select').select2();
+        jQuery('#skpd').select2();
     });
     function sumbitBulanTahun(){
         var tahun = jQuery('#tahun').val();
