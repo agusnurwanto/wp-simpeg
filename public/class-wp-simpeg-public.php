@@ -81,10 +81,10 @@ class Wp_Simpeg_Public {
 
 	}
 
-	function prefix_add_footer_styles() {
+	public function prefix_add_footer_styles() {
 		wp_enqueue_style($this->plugin_name . 'bootstrap', plugin_dir_url(__FILE__) . 'css/bootstrap.min.css', array(), $this->version, 'all');
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/wp-simpeg-public.css', array(), $this->version, 'all' );
-	};
+	}
 
 
 	/**
@@ -1016,6 +1016,8 @@ class Wp_Simpeg_Public {
 	            	's.status',
 	            	's.status_ver_bendahara', 
 	            	's.ket_ver_bendahara',
+	            	's.status_ver_bendahara_spj', 
+	            	's.ket_ver_bendahara_spj',
 	            	's.ket_ver_kepala',
 	              	's.id'
 	            );
@@ -1078,7 +1080,7 @@ class Wp_Simpeg_Public {
                         $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Hapus Data"><i class="dashicons dashicons-trash"></i></a>';
                         $btn .= '<a class="btn btn-sm btn-primary" onclick="submit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Submit Data"><i class="dashicons dashicons-migrate"></i></a>';
 
-	                    if ($recVal['status_ver_bendahara'] == 0){
+	                    if ($recVal['status_ver_bendahara'] == '0'){
 	                        $pesan = '<br><b>Keterangan:</b> '.$recVal['ket_ver_bendahara']; 
 	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">SPT Ditolak</span>'.$pesan;
 	                    }else{
@@ -1096,7 +1098,7 @@ class Wp_Simpeg_Public {
                     	$btn .= '<a class="btn btn-sm btn-success" onclick="verifikasi_kepala(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kepala"><i class="dashicons dashicons-yes"></i></a>';
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi Kepala</span>';
 	                }elseif($recVal['status'] == 4) {
-	                    if ($recVal['status_ver_bendahara_spj'] == 0){
+	                    if ($recVal['status_ver_bendahara_spj'] == '0'){
 	                        $pesan = '<br><b>Keterangan:</b> '.$recVal['ket_ver_bendahara_spj']; 
 	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">SPJ Ditolak</span>'.$pesan;
 	                    }else{
