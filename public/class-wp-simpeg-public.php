@@ -770,92 +770,53 @@ class Wp_Simpeg_Public {
 	    if(!empty($_POST)){
 	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
 	        	$data = json_decode(stripslashes($_POST['data']), true);
-	            if($ret['status'] != 'error' && !empty($data['nomor_spt'])){
-	                $nomor_spt = $data['nomor_spt'];
-	            }else{
+	            if($ret['status'] != 'error' && empty($data['nomor_spt'])){
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Isi nomor SPT dulu!';
 	            }
-	            if($ret['status'] != 'error' && !empty($data['tahun_anggaran'])){
-	                $tahun_anggaran = $data['tahun_anggaran'];
-	            }else{
+	            if($ret['status'] != 'error' && empty($data['tahun_anggaran'])){
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Pilih Tahun dulu!';
 	            }
-	            if($ret['status'] != 'error' && !empty($data['id_skpd'])){
-	                $id_skpd = $data['id_skpd'];
-	            }else{
+	            if($ret['status'] != 'error' && empty($data['id_skpd'])){
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Pilih SKPD dulu!';
 	            }
-	            if($ret['status'] != 'error' && !empty($data['dasar_lembur'])){
-	                $dasar_lembur = $data['dasar_lembur'];
-	            }else{
+	            if($ret['status'] != 'error' && empty($data['dasar_lembur'])){
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Isi dasar Lembur dulu!';
 	            }
-	            if($ret['status'] != 'error' && !empty($data['ket_lembur'])){
-	                $ket_lembur = $data['ket_lembur'];
-	            }else{
+	            if($ret['status'] != 'error' && empty($data['ket_lembur'])){
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Isi peruntukan Lembur dulu!';
 	            }
-	            if($ret['status'] != 'error' && !empty($data['waktu_mulai_spt'])){
-	                $waktu_mulai_spt = $data['waktu_mulai_spt'];
-	            }
-	            else{
+	            if($ret['status'] != 'error' && empty($data['waktu_mulai_spt'])){
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Isi waktu mulai SPT dulu!';
 	            }
-	            if($ret['status'] != 'error' && !empty($data['waktu_selesai_spt'])){
-	                $waktu_selesai_spt = $data['waktu_selesai_spt'];
-	            }
-	            else{
+	            if($ret['status'] != 'error' && empty($data['waktu_selesai_spt'])){
 	                $ret['status'] = 'error';
 	                $ret['message'] = 'Isi waktu selesai SPT dulu!';
 	            }
-	            if($ret['status'] != 'error' && !empty($data['id_ppk'])){
-	                $id_ppk = $data['id_ppk'];
+	            $ket_ver_ppk = '';
+	            $ket_ver_kepala = '';
+	            $tipe_verifikasi = '';
+	            if($ret['status'] != 'error' && !empty($data['tipe_verifikasi'])){
+	            	$tipe_verifikasi = $data['tipe_verifikasi'];
+	            	if($tipe_verifikasi == 'ppk'){
+	                	$ket_ver_ppk = $data['ket_ver_ppk'];
+	                	if(empty($ket_ver_ppk)){
+	                		$ret['status'] = 'error';
+	                		$ret['message'] = 'Keterangan verifikasi PPK SKPD diisi dulu!';
+	                	}
+	            	}else if($tipe_verifikasi == 'kepala'){
+	                	$ket_ver_kepala = $data['ket_ver_kepala'];
+	                	if(empty($ket_ver_kepala)){
+	                		$ret['status'] = 'error';
+	                		$ret['message'] = 'Keterangan verifikasi kepala SKPD diisi dulu!';
+	                	}
+	            	}
 	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih Id PPK dulu!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($data['id_bendahara'])){
-	                $id_bendahara = $data['id_bendahara'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih Id Bendahara dulu!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($data['ket_ver_ppk'])){
-	                $ket_ver_ppk = $data['ket_ver_ppk'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih Keterangan Verifikasi PPK dulu!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($data['ket_ver_kepala'])){
-	                $ket_ver_kepala = $data['ket_ver_kepala'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih  Keterangan Verifikasi Kepala dulu!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($data['status_ver_bendahara'])){
-	                $status_ver_bendahara = $data['status_ver_bendahara'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih Status Verifikasi Bendahara dulu!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($data['ket_ver_bendahara'])){
-	                $ket_ver_bendahara = $data['ket_ver_bendahara'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Pilih  Keterangan Verifikasi Bendahara dulu!';
-	            // }
 
 	            if($ret['status'] != 'error' && !empty($data['id_pegawai'])){
 	            	$pesan = array();
@@ -878,12 +839,15 @@ class Wp_Simpeg_Public {
 	            	}
 	            }
 	            if($ret['status'] != 'error'){
-	            	// 0=belum diverifikasi, 1=disetujui kasubag keuangan, 2=disetujui ppk, 3=selesai
-	                if(empty($data['id_data'])){
-	                    $status = 0;
-	                }else{
-	                    $status = 3;
-	                }
+	                $nomor_spt = $data['nomor_spt'];
+	                $tahun_anggaran = $data['tahun_anggaran'];
+	                $id_skpd = $data['id_skpd'];
+	                $dasar_lembur = $data['dasar_lembur'];
+	                $ket_lembur = $data['ket_lembur'];
+	                $waktu_mulai_spt = $data['waktu_mulai_spt'];
+	                $waktu_selesai_spt = $data['waktu_selesai_spt'];
+		            $user_id = um_user( 'ID' );
+		            $user_meta = get_userdata($user_id);
 	                $uang_makan = 0;
 	                $uang_lembur = 0;
 	                $jml_jam = 0;
@@ -928,8 +892,6 @@ class Wp_Simpeg_Public {
 	                    'waktu_mulai_spt'=> $data['waktu_mulai_spt'],
 	                    'waktu_selesai_spt'=> $data['waktu_selesai_spt'],
 	                    'nomor_spt'=> $nomor_spt,
-			            'id_ppk'=> '', 
-			            'id_bendahara'=> '', 
 			            'uang_makan'=> $uang_makan, 
 			            'uang_lembur'=> $uang_lembur, 
 			            'dasar_lembur'=> $dasar_lembur, 
@@ -937,33 +899,36 @@ class Wp_Simpeg_Public {
 			            'jml_hari'=> $data['jml_hari'], 
 			            'jml_jam'=> $jml_jam, 
 			            'jml_peg'=> count($jml_peg), 
-			            'jml_pajak'=> $jml_pajak, 
-			            'ket_ver_ppk'=> '', 
-			            'ket_ver_kepala'=> '', 
-			            'status_ver_bendahara'=> '',
-			            'ket_ver_bendahara'=> '', 
-	                    'status' => $status,
+			            'jml_pajak'=> $jml_pajak,
+	                    'user' => $user_meta->display_name,
 	                    'update_at' => current_time('mysql'),
 						'active' => 1
 	                );
-	                if(!empty($id_ppk)){
-	                	$data_opsi['id_ppk'] = $id_ppk;
+	                if($tipe_verifikasi == 'ppk'){
+	                	$ret_ver = $this->verifikasi_spt_lembur(true);
+	                	if($ret_ver['status'] == 'error'){
+	                		die(json_encode($ret_ver));
+	                	}
 	                	$data_opsi['ket_ver_ppk'] = $ket_ver_ppk;
 	                }
-	                if(!empty($id_bendahara)){
-	                	$data_opsi['id_bendahara'] = $id_bendahara;
-	                	$data_opsi['status_ver_bendahara'] = $status_ver_bendahara;
-	                	$data_opsi['ket_ver_bendahara'] = $ket_ver_bendahara;
-	                }
-	                if(!empty($ket_ver_kepala)){
+	                if($tipe_verifikasi == 'kepala'){
+	                	$ret_ver = $this->verifikasi_spt_lembur(true);
+	                	if($ret_ver['status'] == 'error'){
+	                		die(json_encode($ret_ver));
+	                	}
 	                	$data_opsi['ket_ver_kepala'] = $ket_ver_kepala;
 	                }
 	                if(!empty($data['id_data'])){
 	                    $wpdb->update('data_spt_lembur', $data_opsi, array(
 	                        'id' => $data['id_data']
 	                    ));
-	                    $ret['message'] = 'Berhasil update data!';
+	                    if(empty($tipe_verifikasi)){
+	                    	$ret['message'] = 'Berhasil update data!';
+	                    }else{
+	                		$ret = $ret_ver;
+	                    }
 	                }else{
+	                	$data_opsi['status'] = 0;
 	                    $cek_id = $wpdb->get_row($wpdb->prepare('
 	                        SELECT
 	                            id,
@@ -1122,9 +1087,13 @@ class Wp_Simpeg_Public {
                     	$btn .= '<a class="btn btn-sm btn-success" onclick="verifikasi_kepala(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kepala"><i class="dashicons dashicons-yes"></i></a>';
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi Kepala</span>';
 	                }elseif($recVal['status'] == 4) {
-	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Selesai</span>';
-	                // status ditolak masih dalam pengembangan
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit SPJ</span>';
 	                }elseif($recVal['status'] == 5) {
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">SPJ Diverifikasi Kasubag Keuangan</span>';
+	                }elseif($recVal['status'] == 6) {
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Selesai</span>';
+	                // status ditolak masih dalam pengembangan
+	                }else{
 	                    $pesan = '';
 	                    if ($recVal['status_ver_bendahara'] == 0){
 	                        $pesan .= '<br>Keterangan Verifikasi: '.$recVal['ket_ver_bendahara']; 
@@ -1797,7 +1766,7 @@ public function get_datatable_sbu_lembur(){
 		}
 	}
 
-	function verifikasi_spt_lembur(){
+	function verifikasi_spt_lembur($no_return=false){
 		global $wpdb;
 		$ret = array(
 			'status'	=> 'success',
@@ -1808,7 +1777,7 @@ public function get_datatable_sbu_lembur(){
 				$user_id = um_user( 'ID' );
 				$user_meta = get_userdata($user_id);
 				$data = json_decode(stripslashes($_POST['data']), true);
-				if(empty($data['type_verifikasi'])){
+				if(empty($data['tipe_verifikasi'])){
 					$ret['status'] = 'error';
 					$ret['message'] = 'Tipe verifikasi tidak boleh kosong!';
 				}else if(empty($data['id_data'])){
@@ -1816,22 +1785,90 @@ public function get_datatable_sbu_lembur(){
 					$ret['message'] = 'ID SPT tidak boleh kosong!';
 				}else{
 					$id_spt = $data['id_data'];
-					$type_verifikasi = $data['type_verifikasi'];
+					$tipe_verifikasi = $data['tipe_verifikasi'];
+					$spt = $wpdb->get_row($wpdb->prepare("
+						select 
+							* 
+						from data_spt_lembur 
+						where id=%d
+					", $id_spt), ARRAY_A);
+					$spt_detail = $wpdb->get_results($wpdb->prepare("
+						select 
+							* 
+						from data_spt_lembur_detail 
+						where active=1
+							AND id_spt=%d
+					", $id_spt), ARRAY_A);
+					$spt_detail_all = array();
+					foreach($spt_detail as $detail){
+						$spt_detail_all[] = array(
+							'jenis_user' => 'pptk',
+							'id_spt' => $id_spt,
+							'id_pegawai' => $detail['id_pegawai'],
+							'id_standar_harga_lembur' => $detail['id_standar_harga_lembur'],
+							'id_standar_harga_makan' => $detail['id_standar_harga_makan'],
+							'uang_lembur' => $detail['uang_lembur'],
+							'uang_makan' => $detail['uang_makan'],
+							'jml_hari' => $detail['jml_hari'],
+							'jml_jam' => $detail['jml_jam'],
+							'jml_pajak' => $detail['jml_pajak'],
+							'waktu_mulai' => $detail['waktu_mulai'],
+							'waktu_akhir' => $detail['waktu_akhir'],
+							'waktu_mulai_hadir' => $detail['waktu_mulai_hadir'],
+							'waktu_akhir_hadir' => $detail['waktu_akhir_hadir'],
+							'tipe_hari' => $detail['tipe_hari'],
+							'update_user' => $user_meta->display_name,
+							'update_at' => current_time('mysql')
+						);
+					}
+					$option_spt = array(
+						'jenis_user' => 'pptk',
+						'id_spt' => $id_spt,
+						'nomor_spt' => $spt['nomor_spt'],
+						'waktu_mulai_spt' => $spt['waktu_mulai_spt'],
+						'waktu_selesai_spt' => $spt['waktu_selesai_spt'],
+						'tahun_anggaran' => $spt['tahun_anggaran'],
+						'id_skpd' => $spt['id_skpd'],
+						'jml_hari' => $spt['jml_hari'],
+						'jml_peg' => $spt['jml_peg'],
+						'jml_jam' => $spt['jml_jam'],
+						'uang_makan' => $spt['uang_makan'],
+						'uang_lembur' => $spt['uang_lembur'],
+						'jml_pajak' => $spt['jml_pajak'],
+						'dasar_lembur' => $spt['dasar_lembur'],
+						'ket_lembur' => $spt['ket_lembur'],
+						'update_user' => $user_meta->display_name,
+						'update_at' => current_time('mysql')
+					);
 					if(
-						$type_verifikasi == 'pptk'
+						$tipe_verifikasi == 'pptk'
 						&& (
 							in_array("pptk", $user_meta->roles)
 							||in_array("administrator", $user_meta->roles)
 						)
 					){
+						$option_spt['jenis_user'] = $tipe_verifikasi;
+						$wpdb->delete('data_spt_lembur_history', array( 
+							'id_spt' => $id_spt ,
+							'jenis_user' => $option_spt['jenis_user']
+						));
+						$wpdb->insert('data_spt_lembur_history', $option_spt);
+						$wpdb->delete('data_spt_lembur_detail_history', array( 
+							'id_spt' => $id_spt ,
+							'jenis_user' => $option_spt['jenis_user']
+						));
+						foreach($spt_detail_all as $detail){
+							$detail['jenis_user'] = $option_spt['jenis_user'];
+							$wpdb->insert('data_spt_lembur_detail_history', $detail);
+						}
 						$wpdb->update('data_spt_lembur', array(
-							'status' => 1
+							'status' => 1 // status SPT menjadi verifikasi kasubag keuangan
 						), array(
 							'id' => $id_spt
 						));
-						$ret['message'] == 'Berhasil submit data SPT!';
+						$ret['message'] = 'Berhasil submit data SPT oleh PPTK!';
 					}else if(
-						$type_verifikasi == 'kasubag_keuangan'
+						$tipe_verifikasi == 'kasubag_keuangan'
 						&& (
 							in_array("kasubag_keuangan", $user_meta->roles)
 							||in_array("administrator", $user_meta->roles)
@@ -1847,7 +1884,7 @@ public function get_datatable_sbu_lembur(){
 								$ret['status'] = 'error';
 								$ret['message'] = 'Keterangan harus diisi jika status ditolak';
 							}else{
-								$ret['message'] = 'Berhasil tidak menyetujui pengajuan SPT!';
+								$ret['message'] = 'Berhasil tidak menyetujui pengajuan SPT oleh Kasubag Keuangan!';
 							}
 						}
 						if($ret['status'] != 'error'){
@@ -1860,9 +1897,51 @@ public function get_datatable_sbu_lembur(){
 								'id' => $id_spt
 							));
 						}
+					}else if(
+						$tipe_verifikasi == 'ppk'
+						&& (
+							in_array("ppk", $user_meta->roles)
+							||in_array("administrator", $user_meta->roles)
+						)
+					){
+						$option_spt['jenis_user'] = $tipe_verifikasi;
+						$wpdb->delete('data_spt_lembur_history', array( 
+							'id_spt' => $id_spt ,
+							'jenis_user' => $option_spt['jenis_user']
+						));
+						$wpdb->insert('data_spt_lembur_history', $option_spt);
+						$wpdb->delete('data_spt_lembur_detail_history', array( 
+							'id_spt' => $id_spt ,
+							'jenis_user' => $option_spt['jenis_user']
+						));
+						foreach($spt_detail_all as $detail){
+							$detail['jenis_user'] = $option_spt['jenis_user'];
+							$wpdb->insert('data_spt_lembur_detail_history', $detail);
+						}
+						// status SPT menjadi verifikasi kepala
+						$wpdb->update('data_spt_lembur', array(
+							'status' => 3
+						), array(
+							'id' => $id_spt
+						));
+						$ret['message'] = 'Berhasil verifikasi data SPT oleh PPK SKPD!';
+					}else if(
+						$tipe_verifikasi == 'kepala'
+						&& (
+							in_array("kepala", $user_meta->roles)
+							||in_array("administrator", $user_meta->roles)
+						)
+					){
+						// status SPT menjadi menunggu submit SPJ
+						$wpdb->update('data_spt_lembur', array(
+							'status' => 4
+						), array(
+							'id' => $id_spt
+						));
+						$ret['message'] = 'Berhasil verifikasi data SPT oleh kepala SKPD!';
 					}else{
-						$ret['status'] == 'error';
-						$ret['message'] == 'Sistem tidak dapat melakukan verifikasi, hubungi admin!';
+						$ret['status'] = 'error';
+						$ret['message'] = 'Sistem tidak dapat melakukan verifikasi, hubungi admin!';
 					}
 				}
 			}else{
@@ -1877,6 +1956,10 @@ public function get_datatable_sbu_lembur(){
 				'message'	=> 'Format tidak sesuai!'
 			);
 		}
-		die(json_encode($ret));
+		if($no_return){
+			return $ret;
+		}else{
+			die(json_encode($ret));
+		}
 	}
 }
