@@ -99,6 +99,8 @@ CREATE TABLE `data_spt_lembur` (
   `ket_ver_kepala` text DEFAULT NULL,
   `status_ver_bendahara` tinyint(4) DEFAULT NULL COMMENT '0=ditolak, 1=disetujui',
   `ket_ver_bendahara` text DEFAULT NULL,
+  `status_ver_bendahara_spj` tinyint(4) DEFAULT NULL COMMENT '0=ditolak, 1=disetujui',
+  `ket_ver_bendahara_spj` text DEFAULT NULL,
   `ket_ver_ppk` text DEFAULT NULL,
   `ket_ver_kepala` text DEFAULT NULL,
   `user` text DEFAULT NULL,

@@ -140,3 +140,11 @@ foreach($laporan_spt as $peg){
         </tbody>
     </table>      
 </div>
+<script type="text/javascript">
+jQuery(document).ready(function(){
+    // penyesuaian thema wp full width page
+    jQuery('.mg-card-box').parent().removeClass('col-md-8').addClass('col-md-12');
+    jQuery('#secondary').parent().remove();
+    
+})
+</script>

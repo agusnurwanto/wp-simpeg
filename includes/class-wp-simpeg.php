@@ -187,6 +187,7 @@ class Wp_Simpeg {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'get_footer', $plugin_public, 'prefix_add_footer_styles' );
 
 		$this->loader->add_action('wp_ajax_get_datatable_pegawai', $plugin_public, 'get_datatable_pegawai');
 		$this->loader->add_action('wp_ajax_hapus_data_pegawai_by_id', $plugin_public, 'hapus_data_pegawai_by_id');

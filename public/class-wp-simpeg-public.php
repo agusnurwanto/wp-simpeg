@@ -74,14 +74,17 @@ class Wp_Simpeg_Public {
 		 * class.
 		 */
 
-		wp_enqueue_style($this->plugin_name . 'bootstrap', plugin_dir_url(__FILE__) . 'css/bootstrap.min.css', array(), $this->version, 'all');
 		wp_enqueue_style($this->plugin_name . 'select2', plugin_dir_url(__FILE__) . 'css/select2.min.css', array(), $this->version, 'all');
 		wp_enqueue_style($this->plugin_name . 'datatables', plugin_dir_url(__FILE__) . 'css/datatables.min.css', array(), $this->version, 'all');
 
 		wp_enqueue_style( 'dashicons' );
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/wp-simpeg-public.css', array(), $this->version, 'all' );
 
 	}
+
+	function prefix_add_footer_styles() {
+		wp_enqueue_style($this->plugin_name . 'bootstrap', plugin_dir_url(__FILE__) . 'css/bootstrap.min.css', array(), $this->version, 'all');
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/wp-simpeg-public.css', array(), $this->version, 'all' );
+	};
 
 
 	/**
@@ -1074,7 +1077,13 @@ class Wp_Simpeg_Public {
                     	$btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
                         $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Hapus Data"><i class="dashicons dashicons-trash"></i></a>';
                         $btn .= '<a class="btn btn-sm btn-primary" onclick="submit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Submit Data"><i class="dashicons dashicons-migrate"></i></a>';
-	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit</span>';
+
+	                    if ($recVal['status_ver_bendahara'] == 0){
+	                        $pesan = '<br><b>Keterangan:</b> '.$recVal['ket_ver_bendahara']; 
+	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">SPT Ditolak</span>'.$pesan;
+	                    }else{
+	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit</span>';
+	                    }
 	                }
 
 	                if($recVal['status'] == 1) {
@@ -1087,18 +1096,18 @@ class Wp_Simpeg_Public {
                     	$btn .= '<a class="btn btn-sm btn-success" onclick="verifikasi_kepala(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kepala"><i class="dashicons dashicons-yes"></i></a>';
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi Kepala</span>';
 	                }elseif($recVal['status'] == 4) {
-	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit SPJ</span>';
+	                    if ($recVal['status_ver_bendahara_spj'] == 0){
+	                        $pesan = '<br><b>Keterangan:</b> '.$recVal['ket_ver_bendahara_spj']; 
+	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">SPJ Ditolak</span>'.$pesan;
+	                    }else{
+	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit SPJ</span>';
+	                    }
 	                }elseif($recVal['status'] == 5) {
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">SPJ Diverifikasi Kasubag Keuangan</span>';
 	                }elseif($recVal['status'] == 6) {
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Selesai</span>';
-	                // status ditolak masih dalam pengembangan
 	                }else{
-	                    $pesan = '';
-	                    if ($recVal['status_ver_bendahara'] == 0){
-	                        $pesan .= '<br>Keterangan Verifikasi: '.$recVal['ket_ver_bendahara']; 
-	                    }
-	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Ditolak</span>'.$pesan;
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Not Found</span>'.$pesan;
 	                }
 
                     $btn .= '<a class="btn btn-sm btn-primary" target="_blank" href="'.$laporan_spt_lembur['url'].'?id_spt='.$recVal['id'].'" title="Print SPT"><i class="dashicons dashicons-printer"></i></a>';
