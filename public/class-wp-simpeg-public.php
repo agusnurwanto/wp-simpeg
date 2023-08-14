@@ -1072,10 +1072,7 @@ class Wp_Simpeg_Public {
 
                 foreach($queryRecords as $recKey => $recVal){
                     $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
-	                if(
-	                	$recVal['status'] == 0
-	                	|| $is_admin
-	                ){
+	                if($recVal['status'] == 0){
                     	$btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
                         $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Hapus Data"><i class="dashicons dashicons-trash"></i></a>';
                         $btn .= '<a class="btn btn-sm btn-primary" onclick="submit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Submit Data"><i class="dashicons dashicons-migrate"></i></a>';
@@ -1086,9 +1083,7 @@ class Wp_Simpeg_Public {
 	                    }else{
 	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit</span>';
 	                    }
-	                }
-
-	                if($recVal['status'] == 1) {
+	                }else if($recVal['status'] == 1) {
                     	$btn .= '<a class="btn btn-sm btn-success" onclick="verifikasi_kasubag_keuangan(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kasubag Keuangan"><i class="dashicons dashicons-yes"></i></a>';
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi Kasubag Keuangan</span>';
 	                }elseif($recVal['status'] == 2) {
@@ -1109,7 +1104,7 @@ class Wp_Simpeg_Public {
 	                }elseif($recVal['status'] == 6) {
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Selesai</span>';
 	                }else{
-	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Not Found</span>'.$pesan;
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Not Found</span>';
 	                }
 
                     $btn .= '<a class="btn btn-sm btn-primary" target="_blank" href="'.$laporan_spt_lembur['url'].'?id_spt='.$recVal['id'].'" title="Print SPT"><i class="dashicons dashicons-printer"></i></a>';
@@ -1152,6 +1147,7 @@ public function get_data_spj_by_id(){
             $ret['data'] = $wpdb->get_row($wpdb->prepare('
                 SELECT 
                     s.*,
+                    t.id as id_spt,
                     t.nomor_spt,
                     t.waktu_mulai_spt,
                     t.waktu_selesai_spt,
@@ -1344,9 +1340,9 @@ public function get_datatable_spj_lembur(){
 			'u.nama_skpd',
         	's.waktu_mulai_spt',
         	's.waktu_selesai_spt',
-        	's.status',
 			'p.file_daftar_hadir',
 			'p.foto_lembur',
+        	's.status',
           	's.id'
         );
         $where = $sqlTot = $sqlRec = "";
@@ -1366,7 +1362,7 @@ public function get_datatable_spj_lembur(){
         		AND s.tahun_anggaran=u.tahun_anggaran
         		AND s.active=u.active
         	LEFT JOIN data_spj_lembur as p on s.id=p.id_spt";
-        $where_first = " WHERE 1=1 AND s.active=1 AND s.status=3";
+        $where_first = " WHERE 1=1 AND s.active=1 AND s.status>=4";
         $sqlTot .= $sql_tot.$where_first;
         $sqlRec .= $sql.$where_first;
         if(isset($where) && $where != '') {
@@ -1384,16 +1380,27 @@ public function get_datatable_spj_lembur(){
         $queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
 
         foreach($queryRecords as $recKey => $recVal){
-            $btn = '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
-            $btn .= '<a class="btn btn-sm btn-primary" onclick="submit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Submit Data"><i class="dashicons dashicons-migrate"></i></a>';
             $queryRecords[$recKey]['file_daftar_hadir'] = '<a href="'.SIMPEG_PLUGIN_URL.'public/media/simpeg/'.$recVal['file_daftar_hadir'].'" target="_blank">'.$recVal['file_daftar_hadir'].'</a>';
             $queryRecords[$recKey]['foto_lembur'] = '<a href="'.SIMPEG_PLUGIN_URL.'public/media/simpeg/'.$recVal['foto_lembur'].'" target="_blank">'.$recVal['foto_lembur'].'</a>';
+
+	        if($recVal['status'] == 4) {
+	            $btn = '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
+	            $btn .= '<a class="btn btn-sm btn-primary" onclick="submit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Submit Data"><i class="dashicons dashicons-migrate"></i></a>';
+	            if ($recVal['status_ver_bendahara_spj'] == '0'){
+	                $pesan = '<br><b>Keterangan:</b> '.$recVal['ket_ver_bendahara_spj']; 
+	            	$queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">SPJ Ditolak</span>'.$pesan;
+	            }else{
+	            	$queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit SPJ</span>';
+	            }
+	        }elseif($recVal['status'] == 5) {
+	            $btn .= '<a class="btn btn-sm btn-success" onclick="verifikasi_kasubag_keuangan_spj(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi SPJ Kasubag Keuangan"><i class="dashicons dashicons-yes"></i></a>';
+	            $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">SPJ Diverifikasi Kasubag Keuangan</span>';
+	        }elseif($recVal['status'] == 6) {
+	            $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Selesai</span>';
+	        }else{
+	            $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Not Found</span>';
+	        }
             $queryRecords[$recKey]['aksi'] = $btn;
-        }
-		if($recVal['status'] == 3) {
-        	$btn .= '<a class="btn btn-sm btn-success" onclick="verifikasi_kepala(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kepala"><i class="dashicons dashicons-yes"></i></a>';
-        }elseif($recVal['status'] == 5) {
-        	$btn .= '<a class="btn btn-sm btn-success" onclick="ditolak_kepala(\''.$recVal['id'].'\'); return false;" href="#" title="Ditolak Kepala"><i class="dashicons dashicons-no"></i></a>';
         }
         $json_data = array(
             "draw"            => intval( $params['draw'] ),   

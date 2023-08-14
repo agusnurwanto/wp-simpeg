@@ -11,7 +11,7 @@
         <input type="hidden" value="<?php echo get_option( SIMPEG_APIKEY ); ?>" id="api_key">
     <h1 class="text-center" style="margin:3rem;">Surat Pertanggungjawaban Lembur</h1>
         <!-- <div style="margin-bottom: 25px;">
-            <button class="btn btn-primary" onclick="edit_data_spj_lembur();"><i class="dashicons dashicons-plus"></i> Edit Data</button>
+            <button class="btn btn-primary" onclick="tambah_data_spj_lembur();"><i class="dashicons dashicons-plus"></i> Edit Data</button>
         </div> -->
         <div class="wrap-table">
         <table id="management_data_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
@@ -22,6 +22,7 @@
                     <th class="text-center" style="vertical-align: middle;" colspan="2">Waktu SPT</th> 
                     <th class="text-center" style="vertical-align: middle;" rowspan="2">File Daftar Hadir</th>
                     <th class="text-center" style="vertical-align: middle;" rowspan="2">Foto Lembur</th>
+                    <th class="text-center" style="vertical-align: middle;" rowspan="2">Status</th>
                     <th class="text-center" style="vertical-align: middle; width: 30px;" rowspan="2">Aksi</th>
                 <tr>
                     <th class="text-center">Waktu Mulai</th>
@@ -147,6 +148,10 @@ function get_data_spj_by_id(){
                     className: "text-center"
                 },
                 {
+                    "data": 'status',
+                    className: "text-center"
+                },
+                {
                     "data": 'aksi',
                     className: "text-center"
                 }
@@ -220,6 +225,8 @@ function edit_data(_id){
         },
         success: function(res){
             if(res.status == 'success'){
+                jQuery("#file_daftar_hadir").val('');
+                jQuery("#foto_lembur").val('');
                 jQuery('#id_spt').val(res.data.id_spt);
                 jQuery('#id_data').val(res.data.id);
                 jQuery('#nomor_spt').val(res.data.nomor_spt).prop('disabled', true);
@@ -237,12 +244,10 @@ function edit_data(_id){
     });
 }
 
-//show Edit data
-function edit_data_spj_lembur(){
+//show tambah data
+function tambah_data_spj_lembur(){
     jQuery('#id_data').val('').prop('disabled', false);
     jQuery('#id_spt').val('').prop('disabled', false);
-    jQuery('#file_daftar_hadir').val('').prop('disabled', false);
-    jQuery('#foto_lembur').val('').prop('disabled', false);
 
     jQuery("#file_daftar_hadir").val('');
     jQuery("#file_daftar_hadir_existing").html('');
