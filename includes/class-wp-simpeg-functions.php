@@ -387,4 +387,60 @@ class SIMPEG_Functions
 	  	}
 	  	return $ret;
     }
+
+    public static function uploadFile(
+		string $api_key = '', 
+		string $path = '', 
+		array $file = array(), 
+		array $ext = array(),
+		int $maxSize = 1048576, // default 1MB
+		string $nama_file = ''
+	)
+	{
+		try{
+			if (!empty($api_key) && $api_key == get_option( SIMPEG_APIKEY )) {
+				if(!empty($file)){
+
+					if(empty($ext)){
+						throw new Exception('Extensi file belum ditentukan');
+					}
+
+					if(empty($path)){
+						throw new Exception('Lokasi folder belum ditentukan');
+					}
+
+					$imageFileType = strtolower(pathinfo($path.basename($file["name"]),PATHINFO_EXTENSION));
+					if(!in_array($imageFileType, $ext)){
+						throw new Exception('Lampiran wajib ber-type ' . implode(", ", $ext));
+					}
+
+					if($file['size'] > $maxSize){
+						throw new Exception('Ukuran file melebihi ukuran maksimal');
+					}
+
+					if(!empty($nama_file)){
+						$file['name'] = $nama_file.'.'.$imageFileType;
+					}else{
+						$nama_file = date('Y-m-d-H-i-s');
+						$file['name'] = $nama_file.'-'.$file['name'];
+					}
+					$target = $path .  $file['name'];
+					if(move_uploaded_file($file['tmp_name'], $target)){
+						return [
+							'status' => true,
+							'filename' => $file['name']
+						];
+					}
+					throw new Exception('Oops, gagal upload file, hubungi admin');
+				}
+				throw new Exception('Oops, file belum dipilih');
+			}
+			throw new Exception('Api key tidak ditemukan');
+		}catch(Exception $e){
+			return array(
+				'status' => false,
+				'message' => $e->getMessage()
+			);
+		}
+	}
 }

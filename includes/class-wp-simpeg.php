@@ -203,10 +203,10 @@ class Wp_Simpeg {
 		$this->loader->add_action('wp_ajax_get_data_spt_lembur_by_id', $plugin_public, 'get_data_spt_lembur_by_id');
 		$this->loader->add_action('wp_ajax_tambah_data_spt_lembur', $plugin_public, 'tambah_data_spt_lembur');
 
-		$this->loader->add_action('wp_ajax_get_datatable_data_spj', $plugin_public, 'get_datatable_data_spj');
+		$this->loader->add_action('wp_ajax_get_datatable_spj_lembur', $plugin_public, 'get_datatable_spj_lembur');
 		$this->loader->add_action('wp_ajax_hapus_data_spj_by_id', $plugin_public, 'hapus_data_spj_by_id');
 		$this->loader->add_action('wp_ajax_get_data_spj_by_id', $plugin_public, 'get_data_spj_by_id');
-		$this->loader->add_action('wp_ajax_tambah_data_spj', $plugin_public, 'tambah_data_spj');
+		$this->loader->add_action('wp_ajax_edit_data_spj_lembur', $plugin_public, 'edit_data_spj_lembur');
 
 		$this->loader->add_action('wp_ajax_get_datatable_laporan_spt', $plugin_public, 'get_datatable_laporan_spt');
 		$this->loader->add_action('wp_ajax_hapus_data_laporan_spt_by_id', $plugin_public, 'hapus_data_laporan_spt_by_id');

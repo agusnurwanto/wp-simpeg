@@ -42,7 +42,6 @@ CREATE TABLE `data_unit_lembur` (
 CREATE TABLE `data_pegawai_lembur` (
   `id` int(11) NOT NULL auto_increment,
   `id_skpd` int(11) NOT NULL,
-  `user_role` varchar(50) DEFAULT NULL,
   `nip` varchar(50) DEFAULT NULL,
   `nik` varchar(50) DEFAULT NULL,
   `gelar_depan` text DEFAULT NULL,
@@ -86,19 +85,15 @@ CREATE TABLE `data_pegawai_lembur` (
 CREATE TABLE `data_spt_lembur` (
   `id` int(11) NOT NULL auto_increment,
   `nomor_spt` text NOT NULL,
-  `waktu_mulai_spt` date NOT NULL,
-  `waktu_selesai_spt` date NOT NULL,
   `tahun_anggaran` year DEFAULT 2023,
   `id_skpd` int(11) NOT NULL,
   `id_ppk` int(11) DEFAULT NULL,
   `id_bendahara` int(11) DEFAULT NULL,
-  `jml_hari` int(11) DEFAULT NULL,
   `jml_peg` int(11) DEFAULT NULL,
   `jml_jam` int(11) DEFAULT NULL,
   `uang_makan` double DEFAULT NULL,
   `uang_lembur` double DEFAULT NULL,
   `jml_pajak` double DEFAULT NULL,
-  `dasar_lembur` text DEFAULT NULL,
   `ket_lembur` text DEFAULT NULL,
   `ket_ver_ppk` text DEFAULT NULL,
   `ket_ver_kepala` text DEFAULT NULL,
@@ -107,7 +102,7 @@ CREATE TABLE `data_spt_lembur` (
   `ket_ver_ppk` text DEFAULT NULL,
   `ket_ver_kepala` text DEFAULT NULL,
   `user` text DEFAULT NULL,
-  `status` tinyint(4) DEFAULT NULL COMMENT '0=belum diverifikasi, 1=disetujui kasubag keuangan, 2=disetujui ppk, 3=selesai', 
+  `status` tinyint(4) DEFAULT NULL COMMENT '0=belum diverifikasi, 1=disetujui kasubag keuangan, 2=disetujui ppk, 3=disetujui kepala, 4=selesai', 
   `update_at` datetime NOT NULL,
   `active` tinyint(4) DEFAULT '1' COMMENT '0=hapus, 1=aktif',
   PRIMARY KEY  (id)
@@ -135,12 +130,12 @@ CREATE TABLE `data_spt_lembur_history` (
 
 CREATE TABLE `data_spj_lembur` (
   `id` int(11) NOT NULL auto_increment,
-  `id_spj` int(11) NOT NULL,
+  `id_spt` int(11) NOT NULL,
   `file_daftar_hadir` text DEFAULT NULL,
   `foto_lembur` text DEFAULT NULL,
   `user` text DEFAULT NULL,
   `update_at` datetime NOT NULL,
-  `active` tinyint(4) DEFAULT '1' COMMENT '0=hapus, 1=aktif',
+  `status` tinyint(4) DEFAULT '0' COMMENT '0=Menunggu Submit, 1=Diverifikasi Kasubag Keuangan, 2=Selesai',
   PRIMARY KEY  (id)
 );
 
@@ -167,11 +162,6 @@ CREATE TABLE `data_spt_lembur_detail` (
   `id_pegawai` int(11) NOT NULL,
   `id_standar_harga_lembur` int(11) NOT NULL,
   `id_standar_harga_makan` int(11) NOT NULL,
-  `uang_lembur` double DEFAULT NULL,
-  `uang_makan` double DEFAULT NULL,
-  `jml_hari` int(11) DEFAULT NULL,
-  `jml_jam` int(11) DEFAULT NULL,
-  `jml_pajak` double DEFAULT NULL,
   `waktu_mulai` datetime DEFAULT NULL,
   `waktu_akhir` datetime DEFAULT NULL,
   `waktu_mulai_ppk` datetime DEFAULT NULL,
