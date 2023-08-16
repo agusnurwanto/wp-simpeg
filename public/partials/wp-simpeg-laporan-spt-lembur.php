@@ -25,6 +25,13 @@ if(empty($spt)){
     die('<h1 class="text-center">Data SPT tidak ditemukan</h1>');
 }
 
+$spj = $wpdb->get_row($wpdb->prepare('
+    SELECT 
+        * 
+    FROM data_spj_lembur
+    WHERE id_spt=%d
+',$input['id_spt']), ARRAY_A);
+
 if($spt['waktu_mulai_spt'] == $spt['waktu_selesai_spt']){
     if(empty($spt['waktu_mulai_spt'])){
         $waktu_spt = '-';    
@@ -34,6 +41,23 @@ if($spt['waktu_mulai_spt'] == $spt['waktu_selesai_spt']){
 }else{
     $waktu_spt = $this->tanggalan($spt['waktu_mulai_spt']).' sampai '.$this->tanggalan($spt['waktu_selesai_spt']);
 }
+
+if($spt['status'] == 0) {
+    $spt['status'] = '<span class="btn-primary btn-sm">Menunggu Submit</span>';
+}elseif($spt['status'] == 1) {
+    $spt['status'] = '<span class="btn-success btn-sm">Diverifikasi Kasubag Keuangan</span>';
+}elseif($spt['status'] == 2) {
+    $spt['status'] = '<span class="btn-success btn-sm">Diverifikasi PPK</span>';
+}elseif($spt['status'] == 3) {
+    $spt['status'] = '<span class="btn-success btn-sm">Diverifikasi Kepala</span>';
+}elseif($spt['status'] == 4) {
+    $spt['status'] = '<span class="btn-danger btn-sm">SPJ Ditolak</span>';
+}elseif($spt['status'] == 5) {
+    $spt['status'] = '<span class="btn-success btn-sm">SPJ Diverifikasi Kasubag Keuangan</span>';
+}elseif($spt['status'] == 6) {
+    $spt['status'] = '<span class="btn-primary btn-sm">Selesai</span>';
+}else
+    $spt['status'] = '<span class="btn-danger btn-sm">Not Found</span>';
 
 $laporan_spt = $wpdb->get_results($wpdb->prepare('
     SELECT 
@@ -56,6 +80,7 @@ $laporan_spt = $wpdb->get_results($wpdb->prepare('
 ', $input['id_spt']), ARRAY_A);
 $nomor = 0;
 $body = '';
+$body2 = '';
 foreach($laporan_spt as $peg){
     $nomor++;
     $nama_pegawai = $peg['gelar_depan'].' '.$peg['nama'].' '.$peg['gelar_belakang'];
@@ -75,7 +100,13 @@ foreach($laporan_spt as $peg){
     ';
 }
 ?>
-<div class="cetak">
+<div class="text-center" style="padding: 10px;">
+    <div class="col-md-12">
+        <h4>Status SPT Nomor : <?php echo $spt['nomor_spt']; ?><br><?php echo $spt['status']; ?></h4>
+            
+    </div>
+</div> 
+</div> <div class="cetak">
     <div style="padding: 10px;">
         <div class="laporan-surat break-print" id="content" contenteditable="true">
             <div class="no-surat text-center">
@@ -140,6 +171,29 @@ foreach($laporan_spt as $peg){
         </tbody>
     </table>      
 </div>
+<div class="cetak">
+    <div class="text-center" style="padding: 10px;">
+        <div class="col-md-12">
+            <h5>Lampiran Surat Pertanggungjawaban<br>Nomor : <?php echo $spt['nomor_spt']; ?></h5>
+                <table class="table table-borderless" style="width: 900px; margin: auto; border: 0;">
+            <tbody>
+                <tr>
+                    <th class="text-center">Foto daftar hadir</th>
+                </tr>
+                <tr>
+                    <td><img src="<?php echo SIMPEG_PLUGIN_URL.'public/media/simpeg/'.$spj['file_daftar_hadir'] ?>"></td>
+                </tr>
+                <tr>
+                    <th class="text-center">Foto lembur</th>
+                </tr>
+                <tr>
+                    <td><img src="<?php echo SIMPEG_PLUGIN_URL.'public/media/simpeg/'.$spj['foto_lembur'] ?>"></td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div> 
+</div> 
 <script type="text/javascript">
 jQuery(document).ready(function(){
     // penyesuaian thema wp full width page
