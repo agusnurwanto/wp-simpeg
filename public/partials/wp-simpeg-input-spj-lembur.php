@@ -49,29 +49,30 @@
             <div class="modal-body">
                 <input type='hidden' id='id_data' name="id_data">
                 <input type='hidden' id='id_spt' name="id_spt">
-                    <div class="form-group">
-                        <label>Nomor SPT</label>
-                        <input type="text" class="form-control" id="nomor_spt" name="nomor_spt"/>
-                    </div>
-                    <div class="form-group">
-                        <label>Nama SKPD</label>
-                        <input type="text" class="form-control" id="id_skpd" name="id_skpd"/>
-                    </div>
-                    <div class="form-group">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th class="text-center" style="width: 50%;">Tanggal Mulai</th>
-                                    <th class="text-center" style="width: 50%;">Tanggal Selesai</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td id="waktu_mulai_spt" class="text-center"></td>
-                                    <td id="waktu_selesai_spt" class="text-center"></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="form-group">
+                    <label>Nomor SPT</label>
+                    <input type="text" class="form-control" id="nomor_spt" name="nomor_spt"/>
+                </div>
+                <div class="form-group">
+                    <label>Nama SKPD</label>
+                    <input type="text" class="form-control" id="id_skpd" name="id_skpd"/>
+                </div>
+                <div class="form-group">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width: 50%;">Tanggal Mulai</th>
+                                <th class="text-center" style="width: 50%;">Tanggal Selesai</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="waktu_mulai_spt" class="text-center"></td>
+                                <td id="waktu_selesai_spt" class="text-center"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div class="form-group">
                     <label for="">Daftar Hadir</label>
                     <input type="file" name="file" class="form-control-file" id="file_daftar_hadir" accept="image/*,.pdf">
@@ -84,9 +85,54 @@
                     <small>Tipe file adalah .jpg .jpeg .png .pdf dengan maksimal ukuran 1MB.</small>
                     <div style="padding-top: 10px; padding-bottom: 10px;"><a id="foto_lembur_existing"></a></div>
                 </div>
+            </div>
             <div class="modal-footer">
                 <button class="btn btn-primary submitBtn" onclick="submitEditDataFormSPJLembur()">Simpan</button>
                 <button type="submit" class="components-button btn btn-secondary" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade mt-4" id="modalVerifikasiKasubagKeuangan" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Verifikasi SPJ Lembur oleh Kasubag Keuangan</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <td style="width: 130px;">Nomor SPT</td>
+                            <td style="width: 25px;" class="text-center">:</td>
+                            <td class="nomor_spt"></td>
+                        </tr>
+                        <tr>
+                            <td>Total Anggaran</td>
+                            <td class="text-center">:</td>
+                            <td class="total"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <form>
+                    <input type='hidden' name="id_data"/>
+                    <input type='hidden' name='tipe_verifikasi' value="kasubag_keuangan_spj"/>
+                    <div class="form-group">
+                        <label class="form-check-label"><input value="1" type="checkbox" id="status_bendahara" name="status_bendahara"> Disetujui (SPJ diterima)</label>
+                    </div>
+                    <div class="form-group keterangan_ditolak">
+                        <label>Keterangan</label>
+                        <textarea class="form-control" id="keterangan_status_bendahara" name="keterangan_status_bendahara"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" onclick="submitVerifikasiLembur(this);" class="btn btn-primary send_data">Simpan</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">Tutup</button>
             </div>
         </div>
     </div>
@@ -97,11 +143,11 @@ jQuery(document).ready(function(){
     jQuery('.mg-card-box').parent().removeClass('col-md-8').addClass('col-md-12');
     jQuery('#secondary').parent().remove();
     
-    get_data_spj_by_id();
+    get_data_spj();
     window.path_file = '<?php echo SIMPEG_PLUGIN_URL.'public/media/simpeg/'; ?>';
 });
 
-function get_data_spj_by_id(){
+function get_data_spj(){
     if(typeof dataspj_lembur == 'undefined'){
         window.dataspj_lembur = jQuery('#management_data_table').on('preXhr.dt', function(e, settings, data){
             jQuery("#wrap-loading").show();
@@ -178,9 +224,40 @@ function hapus_data(id){
             success:function(response){
                 jQuery('#wrap-loading').hide();
                 if(response.status == 'success'){
-                    get_data_spj_by_id(); 
+                    get_data_spj(); 
                 }else{
                     alert(`GAGAL! \n${response.message}`);
+                }
+            }
+        });
+    }
+}
+
+function submitVerifikasiLembur(that){
+    if(!jQuery('#status_bendahara').is(':checked')){
+        var ket = jQuery('#keterangan_status_bendahara').val();
+        if(ket == ''){
+            return alert('Keterangan harus diisi jika status ditolak');
+        }
+    }
+    if(confirm('Apakah anda yakin untuk memverifikasi data ini?')){
+        jQuery("#wrap-loading").show();
+        var form = getFormData(jQuery(that).closest('.modal').find('.modal-body form'));
+        jQuery.ajax({
+            method:'post',
+            url:'<?php echo admin_url('admin-ajax.php'); ?>',
+            dataType: 'json',
+            data: {
+                'action': 'verifikasi_spt_lembur',
+                'api_key': jQuery('#api_key').val(),
+                'data': JSON.stringify(form)
+            },
+            success:function(response){
+                jQuery('#wrap-loading').hide();
+                alert(response.message);
+                if(response.status == 'success'){
+                    jQuery('#modalVerifikasiKasubagKeuangan').modal('hide');
+                    get_data_spj();
                 }
             }
         });
@@ -195,21 +272,54 @@ function submit_data(id_spt){
             url: '<?php echo admin_url('admin-ajax.php'); ?>',
             dataType: 'json',
             data:{
-                'action': 'verifikasi_spj_lembur',
+                'action': 'verifikasi_spt_lembur',
                 'api_key': jQuery('#api_key').val(),
                 'data': JSON.stringify({
-                'id_data': id_spt
+                    'id_data': id_spt,
+                    'tipe_verifikasi': 'pptk_spj'
                 })
             },
             success: function(res){
                 jQuery('#wrap-loading').hide();
                 alert(res.message);
                 if(res.status == 'success'){
-                    get_data_spj_lembur();
+                    get_data_spj();
                 }
             }
         });
     }
+}
+
+function verifikasi_kasubag_keuangan(id_spt){
+    jQuery('#wrap-loading').show();
+    jQuery.ajax({
+        method: 'post',
+        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+        dataType: 'json',
+        data:{
+            'action': 'get_data_spt_lembur_by_id',
+            'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
+            'id': id_spt,
+        },
+        success: function(res){
+            if(res.status == 'success'){
+                jQuery('#modalVerifikasiKasubagKeuangan input[name="id_data"]').val(res.data.id);
+                jQuery('#modalVerifikasiKasubagKeuangan .nomor_spt').html(res.data.nomor_spt);
+                var total = (+res.data.uang_lembur)+(+res.data.uang_makan);
+                jQuery('#modalVerifikasiKasubagKeuangan .total').html('Rp '+formatRupiah(total));
+                if(res.data.status_ver_bendahara == 1){
+                    jQuery('#status_bendahara').prop('checked', true);
+                }else{
+                    jQuery('#status_bendahara').prop('checked', false);
+                }
+                jQuery('#modalVerifikasiKasubagKeuangan #keterangan_status_bendahara').val(res.data.ket_ver_bendahara);
+                jQuery('#modalVerifikasiKasubagKeuangan').modal('show');
+            }else{
+                alert(res.message);
+            }
+            jQuery('#wrap-loading').hide();
+        }
+    });
 }
 
 function edit_data(_id){
@@ -297,7 +407,7 @@ function submitEditDataFormSPJLembur(){
             alert(res.message);
             if(res.status == 'success'){
                 jQuery('#modalEditDataSPJLembur').modal('hide');
-                get_data_spj_by_id();
+                get_data_spj();
             }
         }
     });

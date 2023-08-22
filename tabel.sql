@@ -137,7 +137,6 @@ CREATE TABLE `data_spj_lembur` (
   `foto_lembur` text DEFAULT NULL,
   `user` text DEFAULT NULL,
   `update_at` datetime NOT NULL,
-  `status` tinyint(4) DEFAULT '0' COMMENT '0=Menunggu Submit, 1=Diverifikasi Kasubag Keuangan, 2=Selesai',
   PRIMARY KEY  (id)
 );
 
