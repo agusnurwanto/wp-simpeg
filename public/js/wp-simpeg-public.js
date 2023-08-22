@@ -36,3 +36,29 @@ function formatRupiah(angka, prefix){
 		return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
 	}
 }
+
+function getFormData($form){
+    var disabled = $form.find('[disabled]');
+    disabled.map(function(i, b){
+        jQuery(b).attr('disabled', false);
+    });
+    let unindexed_array = $form.serializeArray();
+    disabled.map(function(i, b){
+        jQuery(b).attr('disabled', true);
+    });
+    var data = {};
+    unindexed_array.map(function(b, i){
+        var nama_baru = b.name.split('[');
+        if(nama_baru.length > 1){
+            nama_baru = nama_baru[0];
+            if(!data[nama_baru]){
+                data[nama_baru] = [];
+            }
+            data[nama_baru].push(b.value);
+        }else{
+            data[b.name] = b.value;
+        }
+    })
+    console.log('data', data);
+    return data;
+}

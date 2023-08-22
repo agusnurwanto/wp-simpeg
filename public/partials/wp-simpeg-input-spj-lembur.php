@@ -307,12 +307,12 @@ function verifikasi_kasubag_keuangan(id_spt){
                 jQuery('#modalVerifikasiKasubagKeuangan .nomor_spt').html(res.data.nomor_spt);
                 var total = (+res.data.uang_lembur)+(+res.data.uang_makan);
                 jQuery('#modalVerifikasiKasubagKeuangan .total').html('Rp '+formatRupiah(total));
-                if(res.data.status_ver_bendahara == 1){
+                if(res.data.status_ver_bendahara_spj == 1){
                     jQuery('#status_bendahara').prop('checked', true);
                 }else{
                     jQuery('#status_bendahara').prop('checked', false);
                 }
-                jQuery('#modalVerifikasiKasubagKeuangan #keterangan_status_bendahara').val(res.data.ket_ver_bendahara);
+                jQuery('#modalVerifikasiKasubagKeuangan #keterangan_status_bendahara').val(res.data.ket_ver_bendahara_spj);
                 jQuery('#modalVerifikasiKasubagKeuangan').modal('show');
             }else{
                 alert(res.message);
