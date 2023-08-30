@@ -189,27 +189,20 @@ foreach($data_all as $peg_all){
         ){
             $uang_makan_lembur = $sbu_lembur['uang_makan'][0][$peg['kode_gol']]['harga'];
         }
-        if(
-            !empty($peg['tipe_hari'][1])
-            && !empty($peg['tipe_hari'][1])
-            && !empty($peg['tipe_hari'][1][$peg['kode_gol']])
-        ){
-            $peg_jam_kerja = $peg['tipe_hari'][1][$peg['kode_gol']][$peg['jml_jam']];
-        }
         // dikasih kondisi jika jam lembur dapat uang makan
         if(!empty($peg['id_standar_harga_makan'])){
             $total_uang_makan_lembur += $uang_makan_lembur;
         }
 
-        // if($peg['tipe_hari'] == 1){
-        //     $total_uang_lembur_hari_kerja += $peg['jml_jam']*$uang_lembur_hari_kerja;
-        //     $peg_jam_kerja += $peg['jml_jam'];
-        //     $jumlah_hari_kerja += $peg['jml_hari'];
-        // }else if($peg['tipe_hari'] == 2){
-        //     $total_uang_lembur_hari_libur += $peg['jml_jam']*$uang_lembur_hari_libur;
-        //     $peg_jam_libur = $peg['jml_jam'];
-        //     $jumlah_hari_libur += $peg['jml_hari'];
-        // }
+        if($peg['tipe_hari'] == 1){
+            $total_uang_lembur_hari_kerja += $peg['jml_jam']*$uang_lembur_hari_kerja;
+            $peg_jam_kerja += $peg['jml_jam'];
+            $jumlah_hari_kerja += $peg['jml_hari'];
+        }else if($peg['tipe_hari'] == 2){
+            $total_uang_lembur_hari_libur += $peg['jml_jam']*$uang_lembur_hari_libur;
+            $peg_jam_libur += $peg['jml_jam'];
+            $jumlah_hari_libur += $peg['jml_hari'];
+        }
         $total_pajak += $peg['jml_pajak'];
     }
     $penerimaan_kotor = $total_uang_lembur_hari_kerja + $total_uang_lembur_hari_libur + $total_uang_makan_lembur;

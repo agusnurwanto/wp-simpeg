@@ -158,11 +158,11 @@ class Wp_Simpeg_Public {
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-bulanan-lembur.php';
     }
 
-    public function laporan_spt_lembur($atts){
+    public function laporan_pegawai_lembur($atts){
         if(!empty($_GET) && !empty($_GET['post'])){
             return '';
         }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-spt-lembur.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-pegawai-lembur.php';
     }
 
 	public function get_skpd_simpeg(){
