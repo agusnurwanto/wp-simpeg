@@ -1343,9 +1343,7 @@ public function get_datatable_spj_lembur(){
 			'p.file_daftar_hadir',
 			'p.foto_lembur',
         	's.status',
-          	's.id',
-          	's.status_ver_bendahara_spj',
-          	's.ket_ver_bendahara_spj'
+          	's.id'
         );
         $where = $sqlTot = $sqlRec = "";
 
@@ -1395,7 +1393,7 @@ public function get_datatable_spj_lembur(){
 	            	$queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit SPJ</span>';
 	            }
 	        }elseif($recVal['status'] == 5) {
-	            $btn .= '<a class="btn btn-sm btn-success" onclick="verifikasi_kasubag_keuangan(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi SPJ Kasubag Keuangan"><i class="dashicons dashicons-yes"></i></a>';
+	            $btn .= '<a class="btn btn-sm btn-success" onclick="verifikasi_kasubag_keuangan_spj(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi SPJ Kasubag Keuangan"><i class="dashicons dashicons-yes"></i></a>';
 	            $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">SPJ Diverifikasi Kasubag Keuangan</span>';
 	        }elseif($recVal['status'] == 6) {
 	            $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Selesai</span>';
@@ -1999,87 +1997,6 @@ public function get_datatable_sbu_lembur(){
 							'id' => $id_spt
 						));
 						$ret['message'] = 'Berhasil verifikasi data SPT oleh kepala SKPD!';
-					}else if(
-						$tipe_verifikasi == 'pptk_spj'
-						&& (
-							in_array("pptk", $user_meta->roles)
-							||in_array("administrator", $user_meta->roles)
-						)
-					){
-						$spj = $wpdb->get_row($wpdb->prepare("
-							select 
-								* 
-							from data_spj_lembur 
-							where id=%d
-						", $id_spt), ARRAY_A);
-						if(empty($spj)){
-							$ret['status'] = 'error';
-							$ret['message'] = 'SPJ untuk nomor SPT '.$spt['nomor_spt'].' belum dibuat!';
-						}else if(empty($spj['file_daftar_hadir'])){
-							$ret['status'] = 'error';
-							$ret['message'] = 'File daftar hadir tidak boleh kosong!';
-						}else if(empty($spj['foto_lembur'])){
-							$ret['status'] = 'error';
-							$ret['message'] = 'File foto lembur tidak boleh kosong!';
-						}
-						if($ret['status'] != 'error'){
-							// status SPT menjadi SPJ Diverifikasi kasubag keuangan
-							$wpdb->update('data_spt_lembur', array(
-								'status' => 5
-							), array(
-								'id' => $id_spt
-							));
-							$ret['message'] = 'Berhasil submit data SPJ oleh PPTK!';
-						}
-					}else if(
-						$tipe_verifikasi == 'kasubag_keuangan_spj'
-						&& (
-							in_array("kasubag_keuangan", $user_meta->roles)
-							||in_array("administrator", $user_meta->roles)
-						)
-					){
-						$spj = $wpdb->get_row($wpdb->prepare("
-							select 
-								* 
-							from data_spj_lembur 
-							where id=%d
-						", $id_spt), ARRAY_A);
-						if(empty($spj)){
-							$ret['status'] = 'error';
-							$ret['message'] = 'SPJ untuk nomor SPT '.$spt['nomor_spt'].' belum dibuat!';
-						}else if(empty($spj['file_daftar_hadir'])){
-							$ret['status'] = 'error';
-							$ret['message'] = 'File daftar hadir tidak boleh kosong!';
-						}else if(empty($spj['foto_lembur'])){
-							$ret['status'] = 'error';
-							$ret['message'] = 'File foto lembur tidak boleh kosong!';
-						}
-						if($ret['status'] != 'error'){
-							$status_ver = 0;
-							$status_spt = 4;
-							if(!empty($data['status_bendahara'])){
-								$status_ver = 1;
-								$status_spt = 6; // status SPT menjadi selesai
-								$ret['message'] = 'Berhasil melakukan verifikasi SPJ oleh Kasubag Keuangan!';
-							}else{
-								if(empty($data['keterangan_status_bendahara'])){
-									$ret['status'] = 'error';
-									$ret['message'] = 'Keterangan harus diisi jika pengajuan SPJ ditolak';
-								}else{
-									$ret['message'] = 'Berhasil tidak menyetujui pengajuan SPJ oleh Kasubag Keuangan!';
-								}
-							}
-						}
-						if($ret['status'] != 'error'){
-							$options = array(
-								'status' => $status_spt,
-								'status_ver_bendahara_spj' => $status_ver,
-								'ket_ver_bendahara_spj' => $data['keterangan_status_bendahara']
-							);
-							$wpdb->update('data_spt_lembur', $options, array(
-								'id' => $id_spt
-							));
-						}
 					}else{
 						$ret['status'] = 'error';
 						$ret['message'] = 'Sistem tidak dapat melakukan verifikasi, hubungi admin!';

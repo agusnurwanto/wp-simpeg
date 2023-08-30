@@ -179,6 +179,13 @@ class Wp_Simpeg_Admin {
 			'no_key' => 1,
 			'post_status' => 'private'
 		));
+		$laporan_pegawai_lembur = $this->functions->generatePage(array(
+			'nama_page' => 'Laporan Surat Perintah Tugas per Pegawai',
+			'content' => '[laporan_pegawai_lembur]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
 		$url_sql_migrate = $this->functions->generatePage(array(
 			'nama_page' => 'Monitoring SQL migrate WP-SIMPEG',
 			'content' => '[monitoring_sql_migrate_wp_simpeg]',
@@ -204,6 +211,7 @@ class Wp_Simpeg_Admin {
             	<ol>
             		<li><a target="_blank" href="'.$laporan_bulanan_lembur['url'].'">'.$laporan_bulanan_lembur['title'].'</a></li>
             		<li><a target="_blank" href="'.$laporan_spt_lembur['url'].'">'.$laporan_spt_lembur['title'].'</a></li>
+            		<li><a target="_blank" href="'.$laporan_pegawai_lembur['url'].'">'.$laporan_pegawai_lembur['title'].'</a></li>
             		<li><a target="_blank" href="'.$input_spt_lembur['url'].'">'.$input_spt_lembur['title'].'</a></li>
             		<li><a target="_blank" href="'.$input_spj_lembur['url'].'">'.$input_spj_lembur['title'].'</a></li>
             	</ol>

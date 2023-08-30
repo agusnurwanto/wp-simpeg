@@ -62,13 +62,14 @@ if($spt['status'] == 0) {
 $laporan_spt = $wpdb->get_results($wpdb->prepare('
     SELECT 
         d.*,
-        p.gelar_depan,
-        p.nama,
-        p.gelar_belakang,
-        p.kode_gol,
-        p.nip,
-        p.jabatan,
-        p.gol_ruang
+        p.*
+        -- p.gelar_depan,
+        -- p.nama,
+        -- p.gelar_belakang,
+        -- p.kode_gol,
+        -- p.nip,
+        -- p.jabatan,
+        -- p.gol_ruang
     from data_spt_lembur_detail d
     INNER JOIN data_spt_lembur s on d.id_spt = s.id
         AND s.active=d.active
