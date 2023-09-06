@@ -88,6 +88,7 @@ $uang_lembur_hari_kerja_2= 0;
 if(
     !empty($sbu_lembur['uang_lembur'])
     && !empty($sbu_lembur['uang_lembur'][2])
+    && !empty($set_peg['kode_gol'])
     && !empty($sbu_lembur['uang_lembur'][2][$set_peg['kode_gol']])
 ){
     $uang_lembur_hari_kerja_2 = $sbu_lembur['uang_lembur'][2][$set_peg['kode_gol']]['harga'];
@@ -97,6 +98,7 @@ $uang_lembur_hari_libur_2= 0;
 if(
     !empty($sbu_lembur['uang_lembur'])
     && !empty($sbu_lembur['uang_lembur'][1])
+    && !empty($set_peg['kode_gol'])
     && !empty($sbu_lembur['uang_lembur'][1][$set_peg['kode_gol']])
 ){
     $uang_lembur_hari_libur_2 = $sbu_lembur['uang_lembur'][1][$set_peg['kode_gol']]['harga'];
@@ -106,6 +108,7 @@ $uang_makan_lembur_2= 0;
 if(
     !empty($sbu_lembur['uang_makan'][0])
     && !empty($sbu_lembur['uang_makan'][0])
+    && !empty($set_peg['kode_gol'])
     && !empty($sbu_lembur['uang_makan'][0][$set_peg['kode_gol']])
 ){
     $uang_makan_lembur_2 = $sbu_lembur['uang_makan'][0][$set_peg['kode_gol']]['harga'];
@@ -137,7 +140,7 @@ foreach($lap_pegawai as $peg){
     }
     $data_all[$peg['nomor_spt']][] = $peg;
 }
-// print_r($sbu_lembur);die($wpdb->last_query);
+// print_r($data_all);die($wpdb->last_query);
 
 
 $total_hari_kerja= 0;
@@ -260,36 +263,38 @@ foreach($data_all as $peg_all){
                     <tr>
                         <td style="width: 160px;">Nama</td>
                         <td style="width: 20px;" class="text-center">:</td>
-                        <td><?php echo $set_peg['gelar_depan']; ?> <?php echo $set_peg['nama']; ?> <?php echo $set_peg['gelar_belakang']; ?></td>
+                        <td>
+                <?php if(!empty($set_peg)): ?><?php echo $set_peg['gelar_depan']; ?> <?php echo $set_peg['nama']; ?> <?php echo $set_peg['gelar_belakang']; ?>
+                <?php endif; ?></td>
                     </tr>
                     <tr>
                         <td>NIP</td>
                         <td>:</td>
-                        <td><?php echo $set_peg['nip']; ?></td>
+                        <td><?php if(!empty($set_peg)): ?><?php echo $set_peg['nip']; ?><?php endif; ?></td>
                     </tr>
                     <tr>
                         <td>NIK</td>
                         <td>:</td>
-                        <td><?php echo $set_peg['nik']; ?></td>
+                        <td><?php if(!empty($set_peg)): ?><?php echo $set_peg['nik']; ?><?php endif; ?></td>
                     </tr>
                     <tr>
                         <td>Tempat, Tanggal Lahir</td>
                         <td>:</td>
-                        <td><?php echo $set_peg['tempat_lahir']; ?>, <?php echo $set_peg['tanggal_lahir']; ?> </td>
+                        <td><?php if(!empty($set_peg)): ?><?php echo $set_peg['tempat_lahir']; ?><?php endif; ?>, <?php if(!empty($set_peg)): ?><?php echo $set_peg['tanggal_lahir']; ?><?php endif; ?></td>
                     </tr>
                     <tr>
                         <td>Agama</td>
                         <td>:</td>
-                        <td><?php echo $set_peg['agama']; ?></td>
+                        <td><?php if(!empty($set_peg)): ?><?php echo $set_peg['agama']; ?><?php endif; ?></td>
                     </tr>
                     <tr>
                         <td>Alamat</td>
                         <td>:</td>
-                        <td><?php echo $set_peg['alamat']; ?></td>
+                        <td><?php if(!empty($set_peg)): ?><?php echo $set_peg['alamat']; ?><?php endif; ?></td>
                     <tr>
                         <td>Pendidikan Terakhir</td>
                         <td>:</td>
-                        <td><?php echo $set_peg['pendidikan']; ?></td>
+                        <td><?php if(!empty($set_peg)): ?><?php echo $set_peg['pendidikan']; ?><?php endif; ?></td>
                     </tr>
                     </tr>
                 </tbody>
@@ -301,32 +306,32 @@ foreach($data_all as $peg_all){
                     <tr>
                         <td style="width: 150px;">Unit Kerja</td>
                         <td style="width: 20px;">:</td>
-                        <td><?php echo $set_peg['unit_kerja_induk']; ?></td>
+                        <td><?php if(!empty($set_peg)): ?><?php echo $set_peg['unit_kerja_induk']; ?><?php endif; ?></td>
                     </tr>
                     <tr>
                         <td>Kartu Pegawai</td>
                         <td>:</td>
-                        <td><?php echo $set_peg['karpeg']; ?></td>
+                        <td><?php if(!empty($set_peg)): ?><?php echo $set_peg['karpeg']; ?><?php endif; ?></td>
                     </tr>
                     <tr>
                         <td>Jabatan</td>
                         <td>:</td>
-                        <td><?php echo $set_peg['jabatan']; ?></td>
+                        <td><?php if(!empty($set_peg)): ?><?php echo $set_peg['jabatan']; ?><?php endif; ?></td>
                     </tr>
                     <tr>
                         <td>Golongan</td>
                         <td>:</td>
-                        <td><?php echo $set_peg['gol_ruang']; ?></td>
+                        <td><?php if(!empty($set_peg)): ?><?php echo $set_peg['gol_ruang']; ?><?php endif; ?></td>
                     </tr>
                     <tr>
                         <td>Harga Satuan</td>
                         <td>:</td>
-                        <td>Hari Kerja : <?php echo $uang_lembur_hari_kerja_2; ?><br>Hari Libur : <?php echo $uang_lembur_hari_libur_2; ?></td>
+                        <td>Hari Kerja : <?php if(!empty($uang_lembur_hari_kerja_2)): ?><?php echo $uang_lembur_hari_kerja_2; ?><?php endif; ?><br>Hari Libur : <?php if(!empty($uang_lembur_hari_libur_2)): ?><?php echo $uang_lembur_hari_libur_2; ?><?php endif; ?></td>
                     </tr>
                     <tr>
                         <td>Uang Makan</td>
                         <td>:</td>
-                        <td><?php echo $uang_makan_lembur_2; ?></td>
+                        <td><?php if(!empty($uang_makan_lembur)): ?><?php echo $uang_makan_lembur_2; ?><?php endif; ?></td>
                     </tr>
                 </tbody>
             </table>

@@ -101,98 +101,101 @@ foreach($laporan_spt as $peg){
     ';
 }
 ?>
-<div class="text-center" style="padding: 10px;">
-    <div class="col-md-12">
-        <h4>Status SPT Nomor : <?php echo $spt['nomor_spt']; ?><br><?php echo $spt['status']; ?></h4>
-            
-    </div>
-</div> 
-</div> <div class="cetak">
-    <div style="padding: 10px;">
-        <div class="laporan-surat break-print" id="content" contenteditable="true">
-            <div class="no-surat text-center">
-                <div class="col-md-12">
-                    <h5>SURAT PERINTAH TUGAS<br>Nomor : <?php echo $spt['nomor_spt']; ?></h5>
-                </div>
-            </div>
-            <div class="body-surat row">
-                <div class="col-md-12">
-                    <table class="table table-borderless" style="width: 900px; margin: auto; border: 0;">
-                        <tbody>
-                            <tr>
-                                <td style="width: 100px;">DASAR</td>
-                                <td style="width: 30px;" class="text-center">:</td>
-                                <td><?php echo $spt['dasar_lembur']; ?></td>
-                            </tr>
-                            <tr>
-                                <td colspan="3" class="text-center">MEMERINTAHKAN</td>
-                            </tr>
-                            <tr>
-                                <td>KEPADA</td>
-                                <td class="text-center">:</td>
-                                <td>Nama-nama yang tertera dalam lampiran ini.</td>
-                            </tr>
-                            <tr>
-                                <td>UNTUK</td>
-                                <td class="text-center">:</td>
-                                <td>Melaksanakan <?php echo $spt['ket_lembur']; ?> pada tanggal <?php echo $waktu_spt; ?>.</td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td>Demikian Surat Perintah Tugas ini dibuat untuk digunakan sebagaimana mestinya.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="cetak container-fluid" style="margin: 20px 0; overflow: auto;">
-    <h5 class="text-center">Lampiran Surat Perintah Tugas<br>Nomor : <?php echo $spt['nomor_spt']; ?></h5>
-    <table class="table table-bordered" style="width: 1200px; margin: auto;">
-        <thead>
-            <tr>
-                <td class="text-center text_blok" style="vertical-align: middle; width: 40px;" rowspan="2">No</td>
-                <td class="text-center text_blok" style="vertical-align: middle; width: 340px;" rowspan="2">Nama</td>
-                <td class="text-center text_blok" style="vertical-align: middle; width: 300px;" rowspan="2">NIP</td>
-                <td class="text-center text_blok" style="vertical-align: middle; width: 100px;" rowspan="2">Pangkat/ Gol. Ruang</td>
-                <td class="text-center text_blok" style="vertical-align: middle;" rowspan="2">Jabatan</td>
-                <td class="text-center text_blok" style="vertical-align: middle;" colspan="3">Pelaksanaan</td>
-            </tr>
-            <tr>
-                <td class="kanan bawah text-center text_blok" rowspan="2" style="width: 140px;">Mulai</td>
-                <td class="kanan bawah text-center text_blok" rowspan="2" style="width: 140px;">Selesai</td>
-                <td class="kanan bawah text-center text_blok" rowspan="2" style="width: 140px;">Jumlah</td>
-            </tr>
-        </thead>
-        <tbody>
-            <?php echo $body; ?>
-        </tbody>
-    </table>      
-</div>
-<div class="cetak">
+<div class="cetak" style="background-color: #ffff;">
     <div class="text-center" style="padding: 10px;">
         <div class="col-md-12">
-            <h5>Lampiran Surat Pertanggungjawaban<br>Nomor : <?php echo $spt['nomor_spt']; ?></h5>
-                <table class="table table-borderless" style="width: 900px; margin: auto; border: 0;">
-            <tbody>
-                <tr>
-                    <th class="text-center">Foto daftar hadir</th>
-                </tr>
-                <tr>
-                    <td><img src="<?php echo SIMPEG_PLUGIN_URL.'public/media/simpeg/'.$spj['file_daftar_hadir'] ?>"></td>
-                </tr>
-                <tr>
-                    <th class="text-center">Foto lembur</th>
-                </tr>
-                <tr>
-                    <td><img src="<?php echo SIMPEG_PLUGIN_URL.'public/media/simpeg/'.$spj['foto_lembur'] ?>"></td>
-                </tr>
-            </tbody>
-        </table>
+            <h4>Status SPT Nomor : <?php echo $spt['nomor_spt']; ?><br><?php echo $spt['status']; ?></h4>      
+    </div>
+        </div> 
+    <div class="cetak">
+        <div style="padding: 10px;">
+            <div class="laporan-surat break-print" id="content" contenteditable="true">
+                <div class="no-surat text-center">
+                    <div class="col-md-12">
+                        <h5>SURAT PERINTAH TUGAS<br>Nomor : <?php echo $spt['nomor_spt']; ?></h5>
+                    </div>
+                </div>
+                <div class="body-surat row">
+                    <div class="col-md-12">
+                        <table class="table table-borderless" style="width: 900px; margin: auto; border: 0;">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 100px;">DASAR</td>
+                                    <td style="width: 30px;" class="text-center">:</td>
+                                    <td><?php echo $spt['dasar_lembur']; ?></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-center">MEMERINTAHKAN</td>
+                                </tr>
+                                <tr>
+                                    <td>KEPADA</td>
+                                    <td class="text-center">:</td>
+                                    <td>Nama-nama yang tertera dalam lampiran ini.</td>
+                                </tr>
+                                <tr>
+                                    <td>UNTUK</td>
+                                    <td class="text-center">:</td>
+                                    <td>Melaksanakan <?php echo $spt['ket_lembur']; ?> pada tanggal <?php echo $waktu_spt; ?>.</td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td>Demikian Surat Perintah Tugas ini dibuat untuk digunakan sebagaimana mestinya.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+    <div class="cetak container-fluid" style="margin: 20px 0; overflow: auto;">
+        <h5 class="text-center">Lampiran Surat Perintah Tugas<br>Nomor : <?php echo $spt['nomor_spt']; ?></h5>
+        <table class="table table-bordered" style="width: 1200px; margin: auto;" >
+            <thead>
+                <tr>
+                    <td class="text-center text_blok" style="vertical-align: middle; width: 40px;" rowspan="2">No</td>
+                    <td class="text-center text_blok" style="vertical-align: middle; width: 340px;" rowspan="2">Nama</td>
+                    <td class="text-center text_blok" style="vertical-align: middle; width: 300px;" rowspan="2">NIP</td>
+                    <td class="text-center text_blok" style="vertical-align: middle; width: 100px;" rowspan="2">Pangkat/ Gol. Ruang</td>
+                    <td class="text-center text_blok" style="vertical-align: middle;" rowspan="2">Jabatan</td>
+                    <td class="text-center text_blok" style="vertical-align: middle;" colspan="3">Pelaksanaan</td>
+                </tr>
+                <tr>
+                    <td class="kanan bawah text-center text_blok" rowspan="2" style="width: 140px;">Mulai</td>
+                    <td class="kanan bawah text-center text_blok" rowspan="2" style="width: 140px;">Selesai</td>
+                    <td class="kanan bawah text-center text_blok" rowspan="2" style="width: 140px;">Jumlah</td>
+                </tr>
+            </thead>
+            <tbody>
+                <?php echo $body; ?>
+            </tbody>
+        </table>      
+    </div>
+    <div class="cetak">
+        <div class="text-center" style="padding: 10px;">
+            <div class="col-md-12">
+                <h5>Lampiran Surat Pertanggungjawaban<br>Nomor : <?php echo $spt['nomor_spt']; ?></h5>
+                    <table class="table table-borderless" style="width: 900px; margin: auto; border: 0;">
+                <tbody>
+                <?php if(!empty($spj)): ?>
+                    <tr>
+                        <th class="text-center">Foto daftar hadir</th>
+                    </tr>
+                    <tr>
+                        <td><img src="<?php echo SIMPEG_PLUGIN_URL.'public/media/simpeg/'.$spj['file_daftar_hadir'] ?>"></td>
+                    </tr>
+                    <tr>
+                        <th class="text-center">Foto lembur</th>
+                    </tr>
+                    <tr>
+                        <td><img src="<?php echo SIMPEG_PLUGIN_URL.'public/media/simpeg/'.$spj['foto_lembur'] ?>"></td>
+                    </tr>
+                <?php endif; ?>
+                </tbody>
+            </table>
+            </div>
+        </div> 
     </div> 
 </div> 
 <script type="text/javascript">
