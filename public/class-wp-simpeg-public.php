@@ -1092,13 +1092,13 @@ class Wp_Simpeg_Public {
 	                    }
 	                }else if($recVal['status'] == 1) {
                     	$btn .= '<a class="btn btn-sm btn-success" onclick="verifikasi_kasubag_keuangan(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kasubag Keuangan"><i class="dashicons dashicons-yes"></i></a>';
-	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi Kasubag Keuangan</span>';
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Menunggu verifikasi Kasubag Keuangan</span>';
 	                }elseif($recVal['status'] == 2) {
                     	$btn .= '<a class="btn btn-sm btn-success" onclick="verifikasi_ppk(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi PPK"><i class="dashicons dashicons-yes"></i></a>';
-	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi PPK</span>';
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Menunggu verifikasi PPK</span>';
 	                }elseif($recVal['status'] == 3) {
                     	$btn .= '<a class="btn btn-sm btn-success" onclick="verifikasi_kepala(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kepala"><i class="dashicons dashicons-yes"></i></a>';
-	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Diverifikasi Kepala</span>';
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Menunggu verifikasi Kepala</span>';
 	                }elseif($recVal['status'] == 4) {
 	                    if ($recVal['status_ver_bendahara_spj'] == '0'){
 	                        $pesan = '<br><b>Keterangan:</b> '.$recVal['ket_ver_bendahara_spj']; 
@@ -1107,7 +1107,7 @@ class Wp_Simpeg_Public {
 	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit SPJ</span>';
 	                    }
 	                }elseif($recVal['status'] == 5) {
-	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">SPJ Diverifikasi Kasubag Keuangan</span>';
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">SPJ Menunggu verifikasi Kasubag Keuangan</span>';
 	                }elseif($recVal['status'] == 6) {
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Selesai</span>';
 	                }else{
