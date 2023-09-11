@@ -344,28 +344,28 @@ foreach($data_all as $peg_all){
         <table class="table table-bordered" id="cetak">
             <thead>
                 <tr>
-                    <th class="atas kanan bawah kiri text-center" style="vertical-align: middle;" rowspan="2">No</th>
-                    <th class="atas kanan bawah text-center" style="vertical-align: middle;" rowspan="2">Nomor SPT</th>
-                    <th class="atas kanan bawah text-center" style="vertical-align: middle;" colspan="2">Waktu SPT</th>
-                    <th class="atas kanan bawah text-center" style="vertical-align: middle;" colspan="3">Hari Kerja</th>
-                    <th class="atas kanan bawah text-center" style="vertical-align: middle;" colspan="3">Hari Libur</th>
-                    <th class="atas kanan bawah text-center" style="vertical-align: middle;"rowspan="2">Uang Makan</th>
-                    <th class="atas kanan bawah text-center" style="vertical-align: middle;"rowspan="2">Penerimaan Kotor</th>
-                    <th class="atas kanan bawah text-center" style="vertical-align: middle;"rowspan="2">Pajak</th>
-                    <th class="atas kanan bawah text-center" style="vertical-align: middle;"rowspan="2">Penerimaan Bersih</th>
-                    <th class="atas kanan bawah text-center" style="vertical-align: middle;" colspan="2" >Lampiran SPJ</th>
+                    <th class="text-center" style="vertical-align: middle;" rowspan="2">No</th>
+                    <th class="text-center" style="vertical-align: middle;" rowspan="2">Nomor SPT</th>
+                    <th class="text-center" style="vertical-align: middle;" colspan="2">Waktu SPT</th>
+                    <th class="text-center" style="vertical-align: middle;" colspan="3">Hari Kerja</th>
+                    <th class="text-center" style="vertical-align: middle;" colspan="3">Hari Libur</th>
+                    <th class="text-center" style="vertical-align: middle;"rowspan="2">Uang Makan</th>
+                    <th class="text-center" style="vertical-align: middle;"rowspan="2">Penerimaan Kotor</th>
+                    <th class="text-center" style="vertical-align: middle;"rowspan="2">Pajak</th>
+                    <th class="text-center" style="vertical-align: middle;"rowspan="2">Penerimaan Bersih</th>
+                    <th class="text-center" style="vertical-align: middle;" colspan="2" >Lampiran SPJ</th>
                 </tr>
                 <tr>
-                    <th class="kanan bawah text-center">Waktu Mulai</th>
-                    <th class="kanan bawah text-center">Waktu Selesai</th>
-                    <th class="kanan bawah text-center">Hari</th>
-                    <th class="kanan bawah text-center">Jam</th>
-                    <th class="kanan bawah text-center">Total</th>
-                    <th class="kanan bawah text-center">Hari</th>
-                    <th class="kanan bawah text-center">Jam</th>
-                    <th class="kanan bawah text-center">Total</th>
-                    <th style="width: 160px;" class="kanan bawah text-center">Daftar Hadir</th>
-                    <th style="width: 160px;" class="kanan bawah text-center" >Foto Lembur</th>
+                    <th class="text-center">Waktu Mulai</th>
+                    <th class="text-center">Waktu Selesai</th>
+                    <th class="text-center">Hari</th>
+                    <th class="text-center">Jam</th>
+                    <th class="text-center">Total</th>
+                    <th class="text-center">Hari</th>
+                    <th class="text-center">Jam</th>
+                    <th class="text-center">Total</th>
+                    <th style="width: 160px;" class="text-center">Daftar Hadir</th>
+                    <th style="width: 160px;" class="text-center" >Foto Lembur</th>
                 </tr>
                 <tr style="">
                     <th class="text-center">1</th>
