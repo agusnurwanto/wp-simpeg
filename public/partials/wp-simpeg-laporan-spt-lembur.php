@@ -151,7 +151,7 @@ foreach($laporan_spt as $peg){
     </div>
     <div class="cetak container-fluid" style="margin: 20px 0; overflow: auto;">
         <h5 class="text-center">Lampiran Surat Perintah Tugas<br>Nomor : <?php echo $spt['nomor_spt']; ?></h5>
-        <table class="table table-bordered" style="width: 1200px; margin: auto;" >
+        <table class="table table-bordered" style="width: 1200px; margin: auto;" id="cetak">
             <thead>
                 <tr>
                     <td class="text-center text_blok" style="vertical-align: middle; width: 40px;" rowspan="2">No</td>
@@ -162,9 +162,9 @@ foreach($laporan_spt as $peg){
                     <td class="text-center text_blok" style="vertical-align: middle;" colspan="3">Pelaksanaan</td>
                 </tr>
                 <tr>
-                    <td class="kanan bawah text-center text_blok" rowspan="2" style="width: 140px;">Mulai</td>
-                    <td class="kanan bawah text-center text_blok" rowspan="2" style="width: 140px;">Selesai</td>
-                    <td class="kanan bawah text-center text_blok" rowspan="2" style="width: 140px;">Jumlah</td>
+                    <td class="text-center text_blok" style="width: 140px;">Mulai</td>
+                    <td class="text-center text_blok" style="width: 140px;">Selesai</td>
+                    <td class="text-center text_blok" style="width: 140px;">Jumlah</td>
                 </tr>
             </thead>
             <tbody>
@@ -180,13 +180,13 @@ foreach($laporan_spt as $peg){
                 <tbody>
                 <?php if(!empty($spj)): ?>
                     <tr>
-                        <th class="text-center">Foto daftar hadir</th>
+                        <th class="text-center"><h5>Foto daftar hadir</h5></th>
                     </tr>
                     <tr>
                         <td><img src="<?php echo SIMPEG_PLUGIN_URL.'public/media/simpeg/'.$spj['file_daftar_hadir'] ?>"></td>
                     </tr>
                     <tr>
-                        <th class="text-center">Foto lembur</th>
+                        <th class="text-center"><h5>Foto lembur</h5></th>
                     </tr>
                     <tr>
                         <td><img src="<?php echo SIMPEG_PLUGIN_URL.'public/media/simpeg/'.$spj['foto_lembur'] ?>"></td>
@@ -200,6 +200,7 @@ foreach($laporan_spt as $peg){
 </div> 
 <script type="text/javascript">
 jQuery(document).ready(function(){
+        run_download_excel_simpeg();
     // penyesuaian thema wp full width page
     jQuery('.mg-card-box').parent().removeClass('col-md-8').addClass('col-md-12');
     jQuery('#secondary').parent().remove();

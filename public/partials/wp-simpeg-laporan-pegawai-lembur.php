@@ -341,7 +341,7 @@ foreach($data_all as $peg_all){
 <div class="row">
     <div class="col-md-12">
     <h2 class="text-center">Laporan Surat Perintah Tugas per Pegawai<br>Tahun <?php echo $input['tahun']; ?></h2>
-        <table class="table table-bordered">
+        <table class="table table-bordered" id="cetak">
             <thead>
                 <tr>
                     <th class="atas kanan bawah kiri text-center" style="vertical-align: middle;" rowspan="2">No</th>
@@ -410,6 +410,7 @@ foreach($data_all as $peg_all){
 </div>
 <script type="text/javascript">
 jQuery(document).ready(function(){
+    run_download_excel_simpeg();
     // penyesuaian thema wp full width page
     jQuery('.mg-card-box').parent().removeClass('col-md-8').addClass('col-md-12');
     jQuery('#secondary').parent().remove();

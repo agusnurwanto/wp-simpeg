@@ -1,3 +1,9 @@
 .modal .btn, table .btn {
     margin-bottom: 5px;
 }
+
+ @media  print {
+    .hide-print {
+        display: none;
+    }
+}
