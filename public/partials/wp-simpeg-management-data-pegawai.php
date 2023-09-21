@@ -73,7 +73,7 @@
                     <input type="text" id='id_skpd' name="id_skpd" class="form-control" placeholder=''/>
                 </div>
                 <div class="form-group">
-                    <label for='nik' style='display:inline-block'>Id nama</label>
+                    <label for='nik' style='display:inline-block'>NIK</label>
                     <input type='text' id='nik' name="nik" class="form-control" placeholder=''>
                 </div>
                 <div class="form-group">
