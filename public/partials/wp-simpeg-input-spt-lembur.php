@@ -199,6 +199,32 @@ if(in_array("administrator", $user_meta->roles)){
         </div>
     </div>
 </div>
+
+<div class="modal fade mt-4" id="modalImportData" tabindex="-1" role="dialog" aria-labelledby="modalImportDataLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalImportDataLabel">Import Data SPT Lembur</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            <input type='hidden' id='id_data' name="id_data"/>
+            Pilih file excel .xlsx : <input type="file" id="import_data" accept=".xlsx" onchange="filePickedSimpeg(event);">
+            <div style="padding-top: 10px; padding-bottom: 10px;"><a id="import_data_existing"></a></div>
+            Data Json: <textarea id="data-excel" class="cf-select__input"></textarea>
+            <small>Contoh format file excel bisa <a href=<?php echo SIMPEG_PLUGIN_URL.'public/media/simpeg/contoh_import_excel.xlsx'; ?> target="_blank">download disini</a>. <br>Sheet file excel yang akan diimport harus diberi nama <b>data</b>. Untuk kolom nilai angka ditulis tanpa tanda titik.</small>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary submitBtn" onclick="submitImportData()">Simpan</button>
+                <button type="submit" class="components-button btn btn-secondary" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="<?php echo SIMPEG_PLUGIN_URL; ?>admin/js/jszip.js"></script>
+<script type="text/javascript" src="<?php echo SIMPEG_PLUGIN_URL; ?>admin/js/xlsx.js"></script>
 <script>    
 jQuery(document).ready(function(){
     // penyesuaian thema wp full width page
@@ -925,6 +951,17 @@ function tambah_data_spt_lembur(){
     jQuery('#modalTambahDataSPTLembur').modal('show');
 }
 <?php endif; ?>
+<?php if($can_tambah_data): ?>
+function import_data_spt_lembur(){
+    jQuery('#id_data').val('');
+    jQuery("#import_data").val('');
+    jQuery("#import_data_existing").html('');
+    jQuery("#import_data_existing").attr('target', '_blank');
+    jQuery("#import_data_existing").attr('href', '');
+    jQuery('#modalImportData .send_data').show();
+    jQuery('#modalImportData').modal('show');
+}
+<?php endif; ?>
 
 function submitTambahDataFormSPTLembur(){
     var nomor_spt = jQuery('#nomor_spt').val();
@@ -1151,6 +1188,36 @@ function get_sbu(no_loading = false){
             });
         }else{
             return resolve(data_sbu_global[tahun]);
+        }
+    });
+}
+
+function submitImportData(){
+    var import_data = jQuery('#data-excel').val();
+    if(typeof import_data == 'undefined'){
+        return alert('Upload file dulu!');
+    }
+
+    jQuery('#wrap-loading').show();
+    let tempData = new FormData();
+    tempData.append('action', 'import_data_spt_lembur');
+    tempData.append('api_key', '<?php echo get_option(SIMPEG_APIKEY); ?>');
+    tempData.append('import_data', import_data);
+    jQuery.ajax({
+        method: 'post',
+        url: '<?php echo admin_url('admin-ajax.php'); ?>',
+        dataType: 'json',
+        data: tempData,
+        processData: false,
+        contentType: false,
+        cache: false,
+        success: function(res){
+            jQuery('#wrap-loading').hide();
+            alert(res.message);
+            if(res.status == 'success'){
+                jQuery('#modalImportData').modal('hide');
+                get_data_spt_lembur();
+            }
         }
     });
 }

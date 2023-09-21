@@ -46,6 +46,7 @@
                     <th class="text-center">Nilai Prestasi</th>
                     <th class="text-center">Email</th>
                     <th class="text-center">Tahun</th>
+                    <th class="text-center">User</th>
                     <th class="text-center" style="width: 150px;">Aksi</th>
                 </tr>
             </thead>
@@ -182,6 +183,10 @@
                 <div class="form-group">
                     <label for='tahun' style='display:inline-block'>Tahun</label>
                     <input type="text" id='tahun' name="tahun" class="form-control" placeholder=''/>
+                </div>
+                <div class="form-group">
+                    <label for='user_role' style='display:inline-block'>User</label>
+                    <input type="text" id='user_role' name="user_role" class="form-control" placeholder=''/>
                 </div>
             </div> 
             <div class="modal-footer">
@@ -338,6 +343,10 @@ function get_data_pegawai(){
                     className: "text-center"
                 },
                 {
+                    "data": 'user_role',
+                    className: "text-center"
+                },
+                {
                     "data": 'aksi',
                     className: "text-center"
                 }
@@ -416,6 +425,7 @@ function edit_data(_id){
                 jQuery('#nilai_prestasi').val(res.data.nilai_prestasi);
                 jQuery('#email').val(res.data.email);
                 jQuery('#tahun').val(res.data.tahun);
+                jQuery('#user_role').val(res.data.user_role);
                 jQuery('#modalTambahDataPegawai').modal('show');
             }else{
                 alert(res.message);
@@ -457,6 +467,7 @@ function tambah_data_pegawai(){
     jQuery('#nilai_prestasi').val('');
     jQuery('#email').val('');
     jQuery('#tahun').val('');
+    jQuery('#user_role').val('');
     jQuery('#modalTambahDataPegawai').modal('show');
 }
 
@@ -578,6 +589,10 @@ function submitTambahDataFormPegawai(){
     if(tahun == ''){
         return alert('Data tahun tidak boleh kosong!');
     }
+    var user_role = jQuery('#user_role').val();
+    if(user_role == ''){
+        return alert('Data User tidak boleh kosong!');
+    }
 
     jQuery('#wrap-loading').show();
     jQuery.ajax({
@@ -617,6 +632,7 @@ function submitTambahDataFormPegawai(){
             'nilai_prestasi': nilai_prestasi,
             'email': email,
             'tahun': tahun,
+            'user_role': user_role,
         },
         success: function(res){
             alert(res.message);

@@ -532,6 +532,9 @@ class Wp_Simpeg_Public {
 	            //     $ret['status'] = 'error';
 	            //     $ret['message'] = 'Data tahun tidak boleh kosong!';
 	            // }
+	            if($ret['status'] != 'error' && !empty($_POST['user_role'])){
+	                $user_role = $_POST['user_role'];
+	            }
 	            if($ret['status'] != 'error'){
 	                $data = array(
 	                    'id_skpd' => $id_skpd,
@@ -563,6 +566,7 @@ class Wp_Simpeg_Public {
 	                    'nilai_prestasi' => $nilai_prestasi,
 	                    'email' => $email,
 	                    'tahun' => $tahun,
+	                    'user_role' => $user_role,
 	                    'active' => 1,
 	                    'update_at' => current_time('mysql')
 	                );
@@ -649,7 +653,8 @@ class Wp_Simpeg_Public {
 				   26 => 'nilai_prestasi',
 				   27 => 'email',
 				   28 => 'tahun',
-                   29 => 'id'
+				   29 => 'user_role',
+                   30 => 'id'
                 );
                 $where = $sqlTot = $sqlRec = "";
 
@@ -1401,7 +1406,7 @@ public function get_datatable_spj_lembur(){
 	            }
 	        }elseif($recVal['status'] == 5) {
 	            $btn .= '<a class="btn btn-sm btn-success" onclick="verifikasi_kasubag_keuangan_spj(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi SPJ Kasubag Keuangan"><i class="dashicons dashicons-yes"></i></a>';
-	            $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">SPJ Diverifikasi Kasubag Keuangan</span>';
+	            $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">SPJ Menunggu Verifikasi Kasubag Keuangan</span>';
 	        }elseif($recVal['status'] == 6) {
 	            $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Selesai</span>';
 	        }else{
@@ -1702,313 +1707,481 @@ public function get_datatable_sbu_lembur(){
         die(json_encode($return));
     }
 
-	public function run_sql_migrate_wp_simpeg(){
-		global $wpdb;
-		$ret = array(
-			'status'	=> 'success',
-			'message'	=> 'Berhasil menjalankan SQL migrate!'
-		);
-		if (!empty($_POST)) {
-			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
-				$file = basename($_POST['file']);
-				$ret['value'] = $file.' (tgl: '.date('Y-m-d H:i:s').')';
+public function run_sql_migrate_wp_simpeg(){
+	global $wpdb;
+	$ret = array(
+		'status'	=> 'success',
+		'message'	=> 'Berhasil menjalankan SQL migrate!'
+	);
+	if (!empty($_POST)) {
+		if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
+			$file = basename($_POST['file']);
+			$ret['value'] = $file.' (tgl: '.date('Y-m-d H:i:s').')';
+			if($file == 'tabel.sql'){
+				$path = SIMPEG_PLUGIN_PATH.'/'.$file;
+			}else{
+				$path = SIMPEG_PLUGIN_PATH.'/sql-migrate/'.$file;
+			}
+			if(file_exists($path)){
+				$sql = file_get_contents($path);
+				$ret['sql'] = $sql;
 				if($file == 'tabel.sql'){
-					$path = SIMPEG_PLUGIN_PATH.'/'.$file;
-				}else{
-					$path = SIMPEG_PLUGIN_PATH.'/sql-migrate/'.$file;
-				}
-				if(file_exists($path)){
-					$sql = file_get_contents($path);
-					$ret['sql'] = $sql;
-					if($file == 'tabel.sql'){
-						require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-						$wpdb->hide_errors();
-						$rows_affected = dbDelta($sql);
-						if(empty($rows_affected)){
-							$ret['status'] = 'error';
-							$ret['message'] = $wpdb->last_error;
-						}else{
-							$ret['message'] = implode(' | ', $rows_affected);
-						}
+					require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+					$wpdb->hide_errors();
+					$rows_affected = dbDelta($sql);
+					if(empty($rows_affected)){
+						$ret['status'] = 'error';
+						$ret['message'] = $wpdb->last_error;
 					}else{
-						$wpdb->hide_errors();
-						$res = $wpdb->query($sql);
-						if(empty($res)){
-							$ret['status'] = 'error';
-							$ret['message'] = $wpdb->last_error;
-						}else{
-							$ret['message'] = $res;
-						}
-					}
-					if($ret['status'] == 'success'){
-						$ret['version'] = $this->version;
-						update_option('_last_update_sql_migrate_wp_simpeg', $ret['value']);
-						update_option('_wp_simpeg_db_version', $this->version);
+						$ret['message'] = implode(' | ', $rows_affected);
 					}
 				}else{
-					$ret['status'] = 'error';
-					$ret['message'] = 'File '.$file.' tidak ditemukan!';
+					$wpdb->hide_errors();
+					$res = $wpdb->query($sql);
+					if(empty($res)){
+						$ret['status'] = 'error';
+						$ret['message'] = $wpdb->last_error;
+					}else{
+						$ret['message'] = $res;
+					}
+				}
+				if($ret['status'] == 'success'){
+					$ret['version'] = $this->version;
+					update_option('_last_update_sql_migrate_wp_simpeg', $ret['value']);
+					update_option('_wp_simpeg_db_version', $this->version);
 				}
 			}else{
-				$ret = array(
-					'status' => 'error',
-					'message'	=> 'Api Key tidak sesuai!'
-				);
+				$ret['status'] = 'error';
+				$ret['message'] = 'File '.$file.' tidak ditemukan!';
 			}
 		}else{
 			$ret = array(
 				'status' => 'error',
-				'message'	=> 'Format tidak sesuai!'
+				'message'	=> 'Api Key tidak sesuai!'
 			);
 		}
+	}else{
+		$ret = array(
+			'status' => 'error',
+			'message'	=> 'Format tidak sesuai!'
+		);
+	}
+	die(json_encode($ret));
+}
+
+function rupiah($total){
+	return number_format($total, 0, ',', '.');
+}
+
+public function tanggalan(string $tanggal){
+	
+	$tanggal = explode("-", $tanggal);
+
+	$bulan = $this->get_bulan($tanggal[1]);
+
+	return $tanggal[2] . " " . $bulan . " " . $tanggal[0];		
+}
+
+public function get_bulan($bulan) {
+	if(!empty($bulan)){
+		$bulan = (int) $bulan;
+	}
+	if(empty($bulan)){
+		$bulan = date('m');
+	}
+	$nama_bulan = array(
+		"Januari", 
+		"Februari", 
+		"Maret", 
+		"April", 
+		"Mei", 
+		"Juni", 
+		"Juli", 
+		"Agustus", 
+		"September", 
+		"Oktober", 
+		"November", 
+		"Desember"
+	);
+	return $nama_bulan[$bulan-1];
+}
+
+function menu_spt_lembur(){
+	global $wpdb;
+	$user_id = um_user( 'ID' );
+	$user_meta = get_userdata($user_id);
+	if(empty($user_meta->roles)){
+		echo 'User ini tidak dapat akses sama sekali :)';
+	}else if(
+		in_array("kepala", $user_meta->roles)
+		|| in_array("ppk", $user_meta->roles)
+		|| in_array("kasubag_keuangan", $user_meta->roles)
+		|| in_array("pptk", $user_meta->roles)
+	){
+		$id_pegawai_lembur = get_user_meta($user_id, 'id_pegawai_lembur');
+		if(!empty($id_pegawai_lembur)){
+			$input_spt_lembur = $this->functions->generatePage(array(
+				'nama_page' => 'Input SPT Lembur',
+				'content' => '[input_spt_lembur]',
+				'show_header' => 1,
+				'post_status' => 'private'
+			));
+			echo '
+			<ul class="aksi-lembur text-center">
+				<li><a href="'.$input_spt_lembur['url'].'" target="_blank" class="btn btn-info">SPT Lembur</a></li>
+			</ul>';
+		}else{
+			echo 'User ID pegawai tidak ditemukan!';
+		}
+	}
+}
+
+function verifikasi_spt_lembur($no_return=false){
+	global $wpdb;
+	$ret = array(
+		'status'	=> 'success',
+		'message'	=> 'Berhasil verifikasi SPT!'
+	);
+	if (!empty($_POST)) {
+		if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
+			$user_id = um_user( 'ID' );
+			$user_meta = get_userdata($user_id);
+			$data = json_decode(stripslashes($_POST['data']), true);
+			if(empty($data['tipe_verifikasi'])){
+				$ret['status'] = 'error';
+				$ret['message'] = 'Tipe verifikasi tidak boleh kosong!';
+			}else if(empty($data['id_data'])){
+				$ret['status'] = 'error';
+				$ret['message'] = 'ID SPT tidak boleh kosong!';
+			}else{
+				$id_spt = $data['id_data'];
+				$tipe_verifikasi = $data['tipe_verifikasi'];
+				$spt = $wpdb->get_row($wpdb->prepare("
+					select 
+						* 
+					from data_spt_lembur 
+					where id=%d
+				", $id_spt), ARRAY_A);
+				$spt_detail = $wpdb->get_results($wpdb->prepare("
+					select 
+						* 
+					from data_spt_lembur_detail 
+					where active=1
+						AND id_spt=%d
+				", $id_spt), ARRAY_A);
+				$spt_detail_all = array();
+				foreach($spt_detail as $detail){
+					$spt_detail_all[] = array(
+						'jenis_user' => 'pptk',
+						'id_spt' => $id_spt,
+						'id_pegawai' => $detail['id_pegawai'],
+						'id_standar_harga_lembur' => $detail['id_standar_harga_lembur'],
+						'id_standar_harga_makan' => $detail['id_standar_harga_makan'],
+						'uang_lembur' => $detail['uang_lembur'],
+						'uang_makan' => $detail['uang_makan'],
+						'jml_hari' => $detail['jml_hari'],
+						'jml_jam' => $detail['jml_jam'],
+						'jml_pajak' => $detail['jml_pajak'],
+						'waktu_mulai' => $detail['waktu_mulai'],
+						'waktu_akhir' => $detail['waktu_akhir'],
+						'waktu_mulai_hadir' => $detail['waktu_mulai_hadir'],
+						'waktu_akhir_hadir' => $detail['waktu_akhir_hadir'],
+						'tipe_hari' => $detail['tipe_hari'],
+						'update_user' => $user_meta->display_name,
+						'update_at' => current_time('mysql')
+					);
+				}
+				$option_spt = array(
+					'jenis_user' => 'pptk',
+					'id_spt' => $id_spt,
+					'nomor_spt' => $spt['nomor_spt'],
+					'waktu_mulai_spt' => $spt['waktu_mulai_spt'],
+					'waktu_selesai_spt' => $spt['waktu_selesai_spt'],
+					'tahun_anggaran' => $spt['tahun_anggaran'],
+					'id_skpd' => $spt['id_skpd'],
+					'jml_hari' => $spt['jml_hari'],
+					'jml_peg' => $spt['jml_peg'],
+					'jml_jam' => $spt['jml_jam'],
+					'uang_makan' => $spt['uang_makan'],
+					'uang_lembur' => $spt['uang_lembur'],
+					'jml_pajak' => $spt['jml_pajak'],
+					'dasar_lembur' => $spt['dasar_lembur'],
+					'ket_lembur' => $spt['ket_lembur'],
+					'update_user' => $user_meta->display_name,
+					'update_at' => current_time('mysql')
+				);
+				if(
+					$tipe_verifikasi == 'pptk'
+					&& (
+						in_array("pptk", $user_meta->roles)
+						||in_array("administrator", $user_meta->roles)
+					)
+				){
+					$option_spt['jenis_user'] = $tipe_verifikasi;
+					$wpdb->delete('data_spt_lembur_history', array( 
+						'id_spt' => $id_spt ,
+						'jenis_user' => $option_spt['jenis_user']
+					));
+					$wpdb->insert('data_spt_lembur_history', $option_spt);
+					$wpdb->delete('data_spt_lembur_detail_history', array( 
+						'id_spt' => $id_spt ,
+						'jenis_user' => $option_spt['jenis_user']
+					));
+					foreach($spt_detail_all as $detail){
+						$detail['jenis_user'] = $option_spt['jenis_user'];
+						$wpdb->insert('data_spt_lembur_detail_history', $detail);
+					}
+					$wpdb->update('data_spt_lembur', array(
+						'status' => 1 // status SPT menjadi verifikasi kasubag keuangan
+					), array(
+						'id' => $id_spt
+					));
+					$ret['message'] = 'Berhasil submit data SPT oleh PPTK!';
+				}else if(
+					$tipe_verifikasi == 'kasubag_keuangan'
+					&& (
+						in_array("kasubag_keuangan", $user_meta->roles)
+						||in_array("administrator", $user_meta->roles)
+					)
+				){
+					$status_ver = 0;
+					$status_spt = 0;
+					if(!empty($data['status_bendahara'])){
+						$status_ver = 1;
+						$status_spt = 2; // status SPT menjadi verifikasi PPK
+					}else{
+						if(empty($data['keterangan_status_bendahara'])){
+							$ret['status'] = 'error';
+							$ret['message'] = 'Keterangan harus diisi jika status ditolak';
+						}else{
+							$ret['message'] = 'Berhasil tidak menyetujui pengajuan SPT oleh Kasubag Keuangan!';
+						}
+					}
+					if($ret['status'] != 'error'){
+						$options = array(
+							'status' => $status_spt,
+							'status_ver_bendahara' => $status_ver,
+							'ket_ver_bendahara' => $data['keterangan_status_bendahara']
+						);
+						$wpdb->update('data_spt_lembur', $options, array(
+							'id' => $id_spt
+						));
+					}
+				}else if(
+					$tipe_verifikasi == 'ppk'
+					&& (
+						in_array("ppk", $user_meta->roles)
+						||in_array("administrator", $user_meta->roles)
+					)
+				){
+					$option_spt['jenis_user'] = $tipe_verifikasi;
+					$wpdb->delete('data_spt_lembur_history', array( 
+						'id_spt' => $id_spt ,
+						'jenis_user' => $option_spt['jenis_user']
+					));
+					$wpdb->insert('data_spt_lembur_history', $option_spt);
+					$wpdb->delete('data_spt_lembur_detail_history', array( 
+						'id_spt' => $id_spt ,
+						'jenis_user' => $option_spt['jenis_user']
+					));
+					foreach($spt_detail_all as $detail){
+						$detail['jenis_user'] = $option_spt['jenis_user'];
+						$wpdb->insert('data_spt_lembur_detail_history', $detail);
+					}
+					// status SPT menjadi verifikasi kepala
+					$wpdb->update('data_spt_lembur', array(
+						'status' => 3
+					), array(
+						'id' => $id_spt
+					));
+					$ret['message'] = 'Berhasil verifikasi data SPT oleh PPK SKPD!';
+				}else if(
+					$tipe_verifikasi == 'kepala'
+					&& (
+						in_array("kepala", $user_meta->roles)
+						||in_array("administrator", $user_meta->roles)
+					)
+				){
+					// status SPT menjadi menunggu submit SPJ
+					$wpdb->update('data_spt_lembur', array(
+						'status' => 4
+					), array(
+						'id' => $id_spt
+					));
+					$ret['message'] = 'Berhasil verifikasi data SPT oleh kepala SKPD!';
+				}else{
+					$ret['status'] = 'error';
+					$ret['message'] = 'Sistem tidak dapat melakukan verifikasi, hubungi admin!';
+				}
+			}
+		}else{
+			$ret = array(
+				'status' => 'error',
+				'message'	=> 'Api Key tidak sesuai!'
+			);
+		}
+	}else{
+		$ret = array(
+			'status' => 'error',
+			'message'	=> 'Format tidak sesuai!'
+		);
+	}
+	if($no_return){
+		return $ret;
+	}else{
 		die(json_encode($ret));
 	}
+}
 
-	function rupiah($total){
-		return number_format($total, 0, ',', '.');
-	}
-
-	public function tanggalan(string $tanggal){
-		
-		$tanggal = explode("-", $tanggal);
-
-		$bulan = $this->get_bulan($tanggal[1]);
-
-		return $tanggal[2] . " " . $bulan . " " . $tanggal[0];		
-	}
-
-	public function get_bulan($bulan) {
-		if(!empty($bulan)){
-			$bulan = (int) $bulan;
-		}
-		if(empty($bulan)){
-			$bulan = date('m');
-		}
-		$nama_bulan = array(
-			"Januari", 
-			"Februari", 
-			"Maret", 
-			"April", 
-			"Mei", 
-			"Juni", 
-			"Juli", 
-			"Agustus", 
-			"September", 
-			"Oktober", 
-			"November", 
-			"Desember"
-		);
-		return $nama_bulan[$bulan-1];
-	}
-
-	function menu_spt_lembur(){
-		global $wpdb;
-		$user_id = um_user( 'ID' );
-		$user_meta = get_userdata($user_id);
-		if(empty($user_meta->roles)){
-			echo 'User ini tidak dapat akses sama sekali :)';
-		}else if(
-			in_array("kepala", $user_meta->roles)
-			|| in_array("ppk", $user_meta->roles)
-			|| in_array("kasubag_keuangan", $user_meta->roles)
-			|| in_array("pptk", $user_meta->roles)
-		){
-			$id_pegawai_lembur = get_user_meta($user_id, 'id_pegawai_lembur');
-			if(!empty($id_pegawai_lembur)){
-				$input_spt_lembur = $this->functions->generatePage(array(
-					'nama_page' => 'Input SPT Lembur',
-					'content' => '[input_spt_lembur]',
-					'show_header' => 1,
-					'post_status' => 'private'
-				));
-				echo '
-				<ul class="aksi-lembur text-center">
-					<li><a href="'.$input_spt_lembur['url'].'" target="_blank" class="btn btn-info">SPT Lembur</a></li>
-				</ul>';
-			}else{
-				echo 'User ID pegawai tidak ditemukan!';
-			}
-		}
-	}
-
-	function verifikasi_spt_lembur($no_return=false){
-		global $wpdb;
-		$ret = array(
-			'status'	=> 'success',
-			'message'	=> 'Berhasil verifikasi SPT!'
-		);
+public function import_data_spt_lembur(){
+	global $wpdb;
+	$ret = array(
+		'status'	=> 'success',
+			'message'	=> 'Berhasil import excel!'
+	);
 		if (!empty($_POST)) {
 			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
 				$user_id = um_user( 'ID' );
 				$user_meta = get_userdata($user_id);
-				$data = json_decode(stripslashes($_POST['data']), true);
-				if(empty($data['tipe_verifikasi'])){
-					$ret['status'] = 'error';
-					$ret['message'] = 'Tipe verifikasi tidak boleh kosong!';
-				}else if(empty($data['id_data'])){
-					$ret['status'] = 'error';
-					$ret['message'] = 'ID SPT tidak boleh kosong!';
-				}else{
-					$id_spt = $data['id_data'];
-					$tipe_verifikasi = $data['tipe_verifikasi'];
-					$spt = $wpdb->get_row($wpdb->prepare("
-						select 
-							* 
-						from data_spt_lembur 
-						where id=%d
-					", $id_spt), ARRAY_A);
-					$spt_detail = $wpdb->get_results($wpdb->prepare("
-						select 
-							* 
-						from data_spt_lembur_detail 
-						where active=1
-							AND id_spt=%d
-					", $id_spt), ARRAY_A);
-					$spt_detail_all = array();
-					foreach($spt_detail as $detail){
-						$spt_detail_all[] = array(
-							'jenis_user' => 'pptk',
-							'id_spt' => $id_spt,
-							'id_pegawai' => $detail['id_pegawai'],
-							'id_standar_harga_lembur' => $detail['id_standar_harga_lembur'],
-							'id_standar_harga_makan' => $detail['id_standar_harga_makan'],
-							'uang_lembur' => $detail['uang_lembur'],
-							'uang_makan' => $detail['uang_makan'],
-							'jml_hari' => $detail['jml_hari'],
-							'jml_jam' => $detail['jml_jam'],
-							'jml_pajak' => $detail['jml_pajak'],
-							'waktu_mulai' => $detail['waktu_mulai'],
-							'waktu_akhir' => $detail['waktu_akhir'],
-							'waktu_mulai_hadir' => $detail['waktu_mulai_hadir'],
-							'waktu_akhir_hadir' => $detail['waktu_akhir_hadir'],
-							'tipe_hari' => $detail['tipe_hari'],
-							'update_user' => $user_meta->display_name,
-							'update_at' => current_time('mysql')
-						);
-					}
-					$option_spt = array(
-						'jenis_user' => 'pptk',
-						'id_spt' => $id_spt,
-						'nomor_spt' => $spt['nomor_spt'],
-						'waktu_mulai_spt' => $spt['waktu_mulai_spt'],
-						'waktu_selesai_spt' => $spt['waktu_selesai_spt'],
-						'tahun_anggaran' => $spt['tahun_anggaran'],
-						'id_skpd' => $spt['id_skpd'],
-						'jml_hari' => $spt['jml_hari'],
-						'jml_peg' => $spt['jml_peg'],
-						'jml_jam' => $spt['jml_jam'],
-						'uang_makan' => $spt['uang_makan'],
-						'uang_lembur' => $spt['uang_lembur'],
-						'jml_pajak' => $spt['jml_pajak'],
-						'dasar_lembur' => $spt['dasar_lembur'],
-						'ket_lembur' => $spt['ket_lembur'],
-						'update_user' => $user_meta->display_name,
-						'update_at' => current_time('mysql')
-					);
-					if(
-						$tipe_verifikasi == 'pptk'
-						&& (
-							in_array("pptk", $user_meta->roles)
-							||in_array("administrator", $user_meta->roles)
-						)
-					){
-						$option_spt['jenis_user'] = $tipe_verifikasi;
-						$wpdb->delete('data_spt_lembur_history', array( 
-							'id_spt' => $id_spt ,
-							'jenis_user' => $option_spt['jenis_user']
-						));
-						$wpdb->insert('data_spt_lembur_history', $option_spt);
-						$wpdb->delete('data_spt_lembur_detail_history', array( 
-							'id_spt' => $id_spt ,
-							'jenis_user' => $option_spt['jenis_user']
-						));
-						foreach($spt_detail_all as $detail){
-							$detail['jenis_user'] = $option_spt['jenis_user'];
-							$wpdb->insert('data_spt_lembur_detail_history', $detail);
-						}
-						$wpdb->update('data_spt_lembur', array(
-							'status' => 1 // status SPT menjadi verifikasi kasubag keuangan
-						), array(
-							'id' => $id_spt
-						));
-						$ret['message'] = 'Berhasil submit data SPT oleh PPTK!';
-					}else if(
-						$tipe_verifikasi == 'kasubag_keuangan'
-						&& (
-							in_array("kasubag_keuangan", $user_meta->roles)
-							||in_array("administrator", $user_meta->roles)
-						)
-					){
-						$status_ver = 0;
-						$status_spt = 0;
-						if(!empty($data['status_bendahara'])){
-							$status_ver = 1;
-							$status_spt = 2; // status SPT menjadi verifikasi PPK
-						}else{
-							if(empty($data['keterangan_status_bendahara'])){
-								$ret['status'] = 'error';
-								$ret['message'] = 'Keterangan harus diisi jika status ditolak';
-							}else{
-								$ret['message'] = 'Berhasil tidak menyetujui pengajuan SPT oleh Kasubag Keuangan!';
-							}
-						}
-						if($ret['status'] != 'error'){
-							$options = array(
-								'status' => $status_spt,
-								'status_ver_bendahara' => $status_ver,
-								'ket_ver_bendahara' => $data['keterangan_status_bendahara']
-							);
-							$wpdb->update('data_spt_lembur', $options, array(
-								'id' => $id_spt
-							));
-						}
-					}else if(
-						$tipe_verifikasi == 'ppk'
-						&& (
-							in_array("ppk", $user_meta->roles)
-							||in_array("administrator", $user_meta->roles)
-						)
-					){
-						$option_spt['jenis_user'] = $tipe_verifikasi;
-						$wpdb->delete('data_spt_lembur_history', array( 
-							'id_spt' => $id_spt ,
-							'jenis_user' => $option_spt['jenis_user']
-						));
-						$wpdb->insert('data_spt_lembur_history', $option_spt);
-						$wpdb->delete('data_spt_lembur_detail_history', array( 
-							'id_spt' => $id_spt ,
-							'jenis_user' => $option_spt['jenis_user']
-						));
-						foreach($spt_detail_all as $detail){
-							$detail['jenis_user'] = $option_spt['jenis_user'];
-							$wpdb->insert('data_spt_lembur_detail_history', $detail);
-						}
-						// status SPT menjadi verifikasi kepala
-						$wpdb->update('data_spt_lembur', array(
-							'status' => 3
-						), array(
-							'id' => $id_spt
-						));
-						$ret['message'] = 'Berhasil verifikasi data SPT oleh PPK SKPD!';
-					}else if(
-						$tipe_verifikasi == 'kepala'
-						&& (
-							in_array("kepala", $user_meta->roles)
-							||in_array("administrator", $user_meta->roles)
-						)
-					){
-						// status SPT menjadi menunggu submit SPJ
-						$wpdb->update('data_spt_lembur', array(
-							'status' => 4
-						), array(
-							'id' => $id_spt
-						));
-						$ret['message'] = 'Berhasil verifikasi data SPT oleh kepala SKPD!';
-					}else{
-						$ret['status'] = 'error';
-						$ret['message'] = 'Sistem tidak dapat melakukan verifikasi, hubungi admin!';
-					}
-				}
+				$data = json_decode(stripslashes($_POST['import_data']), true);
+				$data_db = array(
+                    'nomor_spt'=> $data[0]['nomor_spt'],
+					'id_skpd'=> $data[0]['id_skpd'],
+                    'tahun_anggaran'=> $data[0]['tahun_anggaran'],
+                    'waktu_mulai_spt'=> $data[0]['waktu_mulai_spt'],
+                    'waktu_selesai_spt'=> $data[0]['waktu_selesai_spt'],
+		            'uang_lembur'=> 0, 
+		            'uang_makan'=> 0, 
+		            'dasar_lembur'=> $data[0]['dasar_lembur'], 
+		            'ket_lembur'=> $data[0]['ket_lembur'], 
+		            'jml_hari'=> 0, 
+		            'jml_jam'=> 0, 
+		            'jml_peg'=> 0, 
+		            'jml_pajak'=> 0,
+                    'user' => $user_meta->display_name,
+                    'update_at' => current_time('mysql'),
+					'active' => 1
+				);
+                $data_detail_lembur = array();
+
+            	$sbu = $wpdb->get_results($wpdb->prepare("
+            		SELECT 
+            			* 
+            		from data_sbu_lembur 
+            		where tahun_anggaran=%d
+            			AND active=1
+            	", $data['tahun_anggaran']), ARRAY_A);
+            	$newSbu = array();
+            	foreach($sbu as $val){
+            		if(empty($newSbu[$val['jenis_sbu']])){
+            			$newSbu[$val['jenis_sbu']] = array();
+            		}
+            		if(empty($newSbu[$val['jenis_sbu']][$val['id_golongan']])){
+            			$newSbu[$val['jenis_sbu']][$val['id_golongan']] = array();
+            		}
+            		if(empty($newSbu[$val['jenis_sbu']][$val['id_golongan']][$val['jenis_hari']])){
+            			$newSbu[$val['jenis_sbu']][$val['id_golongan']][$val['jenis_hari']] = $val;
+            		}
+            	}
+
+            	$uang_lembur_all = 0;
+            	$uang_makan_all = 0;
+            	$pajak_all = 0;
+            	$jml_peg = array();
+	            foreach($data as $key => $pegawai){
+	            	$sbu = array();
+	            	$detail_peg = $wpdb->get_row($wpdb->prepare("
+	            		SELECT 
+	            			* 
+	            		from data_pegawai_lembur 
+	            		where id=%d
+	            	", $pegawai['id_pegawai']), ARRAY_A);
+	            	$jml_peg[$pegawai['id_pegawai']] = true;
+	            	$sbu_lembur = $newSbu['uang_lembur'][$detail_peg['kode_gol']][$pegawai['jenis_hari']];
+	                $uang_lembur = $sbu_lembur['harga'];
+	                $id_standar_harga_lembur = $sbu_lembur['id'];
+	            	$pajak = 0;
+                	if(!empty($sbu_lembur['pph_21'])){
+            			$pajak += ($uang_makan*$sbu_lembur['pph_21'])/100;
+                	}
+            		$uang_lembur_all += $uang_lembur;
+            		$id_standar_harga_makan = 0;
+            		if($pegawai['uang_makan'] == 1){
+            			$sbu_makan = $newSbu['uang_makan'][$detail_peg['kode_gol']][0];
+	  		            $id_standar_harga_makan = $sbu_makan['id'];
+	                	$uang_makan = $sbu_makan['harga'];
+	                	if(!empty($sbu_makan['pph_21'])){
+	            			$pajak += ($uang_makan*$sbu_makan['pph_21'])/100;
+	                	}
+            			$uang_makan_all += $uang_makan;
+            		}
+            		$pajak_all += $pajak;
+	            	$data_detail_lembur[] = array(
+	            		'id_spt' => '',
+						'id_pegawai' => $pegawai['id_pegawai'],
+						'id_standar_harga_lembur' => $id_standar_harga_lembur,
+						'id_standar_harga_makan' => $id_standar_harga_makan,
+						'uang_lembur' => $uang_lembur,
+						'uang_makan' => $uang_makan,
+						'jml_hari' => 1,
+						'jml_jam' => 1,
+						'jml_pajak' => $pajak,
+						'waktu_mulai' => $pegawai['waktu_mulai'],
+						'waktu_akhir' => $pegawai['waktu_selesai'],
+						'tipe_hari' => $pegawai['jenis_hari'],
+						'update_at' => current_time('mysql'),
+						'active' => 1
+	            	);
+	            }
+				$data_db['uang_lembur'] = $uang_lembur_all;
+				$data_db['uang_makan'] = $uang_makan_all;
+				$data_db['jml_pajak'] = $pajak_all;
+				$data_db['jml_peg'] = count($jml_peg);
+            	$data_db['status'] = 0;
+                $cek_id = $wpdb->get_row($wpdb->prepare('
+                    SELECT
+                        id,
+                        nomor_spt,
+                        active
+                    FROM data_spt_lembur
+                    WHERE nomor_spt=%s
+                    	AND tahun_anggaran=%d
+                ', $nomor_spt, $tahun_anggaran), ARRAY_A);
+                if(empty($cek_id)){
+                    $cek = $wpdb->insert('data_spt_lembur', $data_db);
+                    if(!empty($cek)){
+                    	$data['id_data'] = $wpdb->insert_id;
+                    }
+                }else{
+                    if($cek_id['active'] == 0){
+                    	$data['id_data'] = $cek_id['id'];
+                        $wpdb->update('data_spt_lembur', $data_db, array(
+                            'id' => $cek_id['id']
+                        ));
+                    }else{
+                        $ret['status'] = 'error';
+                        $ret['message'] = 'Gagal disimpan. Data SPT dengan nomor_spt="'.$cek_id['nomor_spt'].'" sudah ada!';
+                    }
+                }
+	            if($ret['status'] != 'error'){
+                    $wpdb->update('data_spt_lembur_detail', array('active' => 0), array(
+                        'id_spt' => $data['id_data']
+                    ));
+		die(json_encode($data['id_data']));
+	            	foreach($data_detail_lembur as $detail_lembur){
+	            		$detail_lembur['id_spt'] = $data['id_data'];
+	                    if(empty($detail_lembur['id'])){
+	                        $wpdb->insert('data_spt_lembur_detail', $detail_lembur);
+	                    }else{
+                            $wpdb->update('data_spt_lembur_detail', $detail_lembur, array(
+                                'id' => $detail_lembur['id']
+                            ));
+                        }
+                        if(!empty($wpdb->last_error)){
+                        	$ret['error'][] = $wpdb->last_error;
+                        }
+	            	}
+	            }
 			}else{
 				$ret = array(
 					'status' => 'error',
@@ -2016,15 +2189,9 @@ public function get_datatable_sbu_lembur(){
 				);
 			}
 		}else{
-			$ret = array(
-				'status' => 'error',
-				'message'	=> 'Format tidak sesuai!'
-			);
+			$ret['status'] = 'error';
+			$ret['message'] = 'Format Salah!';
 		}
-		if($no_return){
-			return $ret;
-		}else{
-			die(json_encode($ret));
-		}
-	}
+		die(json_encode($ret));
+	}	
 }
