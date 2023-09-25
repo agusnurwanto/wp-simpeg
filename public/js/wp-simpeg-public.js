@@ -66,9 +66,9 @@ function getFormData($form){
 
 function run_download_excel_simpeg(type){
 	var current_url = window.location.href;
-	var body = '<a id="excel" onclick="return false;" href="#" class="btn btn-primary">DOWNLOAD EXCEL</a>';
+	var body = '<a id="excel" onclick="return false;" href="#" class="btn btn-primary text-center">DOWNLOAD EXCEL</a>';
 	var download_excel = ''
-		+'<div id="action-sipd" class="hide-print">'
+		+'<div class="text-center" style="margin-top: 10px;" id="action-sipd" class="hide-print">'
 			+body
 		+'</div>';
 	if(jQuery('.entry-content').length >= 1){

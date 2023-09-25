@@ -190,7 +190,7 @@ class Wp_Simpeg_Public {
 	            ', $_POST['tahun_anggaran']), ARRAY_A);
 	            $html = '<option value="">Pilih SKPD</option>';
 	            foreach($ret['data'] as $skpd){
-	            	$html .= '<option value="'.$skpd['id_skpd'].'">'.$skpd['kode_skpd'].' '.$skpd['nama_skpd'].'</option>';
+	            	$html .= '<option value="'.$skpd['id_skpd'].'">'.$skpd['kode_skpd'].' '.$skpd['nama_skpd'].' ( ID = '.$skpd['id_skpd'].')</option>';
 	            }
 	            $ret['html'] = $html;
 	        }else{
@@ -225,7 +225,7 @@ class Wp_Simpeg_Public {
 	            ', $_POST['id_skpd'], $tahun_anggaran), ARRAY_A);
 	            $html = '<option value="">Pilih Pegawai</option>';
 	            foreach($ret['data'] as $pegawai){
-	            	$html .= '<option golongan="'.$pegawai['kode_gol'].'" value="'.$pegawai['id'].'">'.$pegawai['gelar_depan'].' '.$pegawai['nama'].' '.$pegawai['gelar_belakang'].'</option>';
+	            	$html .= '<option golongan="'.$pegawai['kode_gol'].'" value="'.$pegawai['id'].'">'.$pegawai['gelar_depan'].' '.$pegawai['nama'].' '.$pegawai['gelar_belakang'].' ( ID = '.$pegawai['id'].') </option>';
 	            }
 	            $ret['html'] = $html;
 	        }else{
@@ -653,7 +653,7 @@ class Wp_Simpeg_Public {
 				   26 => 'nilai_prestasi',
 				   27 => 'email',
 				   28 => 'tahun',
-				   29 => 'user_role',
+                   29 => 'user_role',
                    30 => 'id'
                 );
                 $where = $sqlTot = $sqlRec = "";
@@ -1121,6 +1121,9 @@ class Wp_Simpeg_Public {
 
                     $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-primary" target="_blank" href="'.$laporan_spt_lembur['url'].'?id_spt='.$recVal['id'].'" title="Print SPT"><i class="dashicons dashicons-printer"></i></a>';
 	                $queryRecords[$recKey]['aksi'] = $btn;
+	                $queryRecords[$recKey]['uang_lembur'] = $this->rupiah($recVal['uang_lembur']);
+	                $queryRecords[$recKey]['uang_makan'] = $this->rupiah($recVal['uang_makan']);
+	                $queryRecords[$recKey]['jml_pajak'] = $this->rupiah($recVal['jml_pajak']);
 	            }
 	     
             $json_data = array(
@@ -2044,17 +2047,23 @@ public function import_data_spt_lembur(){
 				$user_id = um_user( 'ID' );
 				$user_meta = get_userdata($user_id);
 				$data = json_decode(stripslashes($_POST['import_data']), true);
+
+        		$date1 = new DateTime($data[0]['tanggal_mulai_spt'].'T00:00:00');
+				$date2 = new DateTime($data[0]['tanggal_selesai_spt'].'T00:00:00');
+				$diff = $date2->diff($date1);
+				$hari = $diff->days+1;
+
 				$data_db = array(
                     'nomor_spt'=> $data[0]['nomor_spt'],
 					'id_skpd'=> $data[0]['id_skpd'],
                     'tahun_anggaran'=> $data[0]['tahun_anggaran'],
-                    'waktu_mulai_spt'=> $data[0]['waktu_mulai_spt'],
-                    'waktu_selesai_spt'=> $data[0]['waktu_selesai_spt'],
+                    'waktu_mulai_spt'=> $data[0]['tanggal_mulai_spt'],
+                    'waktu_selesai_spt'=> $data[0]['tanggal_selesai_spt'],
 		            'uang_lembur'=> 0, 
 		            'uang_makan'=> 0, 
 		            'dasar_lembur'=> $data[0]['dasar_lembur'], 
 		            'ket_lembur'=> $data[0]['ket_lembur'], 
-		            'jml_hari'=> 0, 
+		            'jml_hari'=> $hari, 
 		            'jml_jam'=> 0, 
 		            'jml_peg'=> 0, 
 		            'jml_pajak'=> 0,
@@ -2068,9 +2077,9 @@ public function import_data_spt_lembur(){
             		SELECT 
             			* 
             		from data_sbu_lembur 
-            		where tahun_anggaran=%d
+            		where tahun=%d
             			AND active=1
-            	", $data['tahun_anggaran']), ARRAY_A);
+            	", $data[0]['tahun_anggaran']), ARRAY_A);
             	$newSbu = array();
             	foreach($sbu as $val){
             		if(empty($newSbu[$val['jenis_sbu']])){
@@ -2086,6 +2095,7 @@ public function import_data_spt_lembur(){
 
             	$uang_lembur_all = 0;
             	$uang_makan_all = 0;
+            	$jml_jam_all = 0;
             	$pajak_all = 0;
             	$jml_peg = array();
 	            foreach($data as $key => $pegawai){
@@ -2096,25 +2106,38 @@ public function import_data_spt_lembur(){
 	            		from data_pegawai_lembur 
 	            		where id=%d
 	            	", $pegawai['id_pegawai']), ARRAY_A);
+            		$date1 = new DateTime(str_replace(' ', 'T', $pegawai['waktu_mulai']));
+					$date2 = new DateTime(str_replace(' ', 'T', $pegawai['waktu_selesai']));
+					$diff = $date2->diff($date1);
+					$hours = $diff->h;
+					$hours = $hours + ($diff->days*24);
+					$jml_jam_all += $hours;
+					$hari_pegawai = $diff->days+1;
+
 	            	$jml_peg[$pegawai['id_pegawai']] = true;
 	            	$sbu_lembur = $newSbu['uang_lembur'][$detail_peg['kode_gol']][$pegawai['jenis_hari']];
-	                $uang_lembur = $sbu_lembur['harga'];
+	                $uang_lembur = $sbu_lembur['harga'] * $hours;
 	                $id_standar_harga_lembur = $sbu_lembur['id'];
 	            	$pajak = 0;
                 	if(!empty($sbu_lembur['pph_21'])){
-            			$pajak += ($uang_makan*$sbu_lembur['pph_21'])/100;
+            			$pajak += ($uang_lembur*$sbu_lembur['pph_21'])/100;
                 	}
+
             		$uang_lembur_all += $uang_lembur;
-            		$id_standar_harga_makan = 0;
-            		if($pegawai['uang_makan'] == 1){
-            			$sbu_makan = $newSbu['uang_makan'][$detail_peg['kode_gol']][0];
-	  		            $id_standar_harga_makan = $sbu_makan['id'];
-	                	$uang_makan = $sbu_makan['harga'];
-	                	if(!empty($sbu_makan['pph_21'])){
-	            			$pajak += ($uang_makan*$sbu_makan['pph_21'])/100;
-	                	}
-            			$uang_makan_all += $uang_makan;
-            		}
+	            	
+	            	$id_standar_harga_makan = 0;
+	            	$uang_makan = 0;
+					if($hours >= 2){
+	            		if($pegawai['uang_makan'] == 1){
+	            			$sbu_makan = $newSbu['uang_makan'][$detail_peg['kode_gol']][0];
+		  		            $id_standar_harga_makan = $sbu_makan['id'];
+		                	$uang_makan = $sbu_makan['harga'];
+		                	if(!empty($sbu_makan['pph_21'])){
+		            			$pajak += ($uang_makan*$sbu_makan['pph_21'])/100;
+		                	}
+	            			$uang_makan_all += $uang_makan;
+	            		}
+					}
             		$pajak_all += $pajak;
 	            	$data_detail_lembur[] = array(
 	            		'id_spt' => '',
@@ -2123,8 +2146,8 @@ public function import_data_spt_lembur(){
 						'id_standar_harga_makan' => $id_standar_harga_makan,
 						'uang_lembur' => $uang_lembur,
 						'uang_makan' => $uang_makan,
-						'jml_hari' => 1,
-						'jml_jam' => 1,
+						'jml_hari' => $hari_pegawai,
+						'jml_jam' => $hours,
 						'jml_pajak' => $pajak,
 						'waktu_mulai' => $pegawai['waktu_mulai'],
 						'waktu_akhir' => $pegawai['waktu_selesai'],
@@ -2136,8 +2159,10 @@ public function import_data_spt_lembur(){
 				$data_db['uang_lembur'] = $uang_lembur_all;
 				$data_db['uang_makan'] = $uang_makan_all;
 				$data_db['jml_pajak'] = $pajak_all;
+				$data_db['jml_jam'] = $jml_jam_all;
 				$data_db['jml_peg'] = count($jml_peg);
-            	$data_db['status'] = 0;
+
+	            $data_db['status'] = 0;
                 $cek_id = $wpdb->get_row($wpdb->prepare('
                     SELECT
                         id,
@@ -2151,6 +2176,9 @@ public function import_data_spt_lembur(){
                     $cek = $wpdb->insert('data_spt_lembur', $data_db);
                     if(!empty($cek)){
                     	$data['id_data'] = $wpdb->insert_id;
+                    }else{
+                        $ret['status'] = 'error';
+                        $ret['message'] = 'Gagal disimpan. '.$wpdb->last_error;
                     }
                 }else{
                     if($cek_id['active'] == 0){
@@ -2167,7 +2195,6 @@ public function import_data_spt_lembur(){
                     $wpdb->update('data_spt_lembur_detail', array('active' => 0), array(
                         'id_spt' => $data['id_data']
                     ));
-		die(json_encode($data['id_data']));
 	            	foreach($data_detail_lembur as $detail_lembur){
 	            		$detail_lembur['id_spt'] = $data['id_data'];
 	                    if(empty($detail_lembur['id'])){
@@ -2178,7 +2205,7 @@ public function import_data_spt_lembur(){
                             ));
                         }
                         if(!empty($wpdb->last_error)){
-                        	$ret['error'][] = $wpdb->last_error;
+                        	$ret['error'][] = $wpdb->last_error.' '.$wpdb->last_query;
                         }
 	            	}
 	            }
@@ -2188,7 +2215,7 @@ public function import_data_spt_lembur(){
 					'message'	=> 'Api Key tidak sesuai!'
 				);
 			}
-		}else{
+		}else {
 			$ret['status'] = 'error';
 			$ret['message'] = 'Format Salah!';
 		}

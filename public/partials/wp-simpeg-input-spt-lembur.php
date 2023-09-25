@@ -40,6 +40,7 @@ if(in_array("administrator", $user_meta->roles)){
             echo '
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_data_spt_lembur();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                <button class="btn btn-warning" onclick="import_data_spt_lembur();"><i class="dashicons dashicons-media-spreadsheet"></i> Import Data</button>
             </div>
             ';
         }
