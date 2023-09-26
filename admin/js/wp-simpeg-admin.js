@@ -10,7 +10,7 @@ jQuery(document).ready(function(){
     }
 });
 
-function filePickedSatset(oEvent) {
+function filePickedSimpeg(oEvent) {
     jQuery('#wrap-loading').show();
     // Get The File From The Input
     var oFile = oEvent.target.files[0];

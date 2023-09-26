@@ -245,7 +245,7 @@ class Wp_Simpeg_Admin {
 	            	</ol>
 		        	' ),
 		        Field::make( 'html', 'crb_simpeg_pegawai_upload_html' )
-	            	->set_html( '<h3>Import EXCEL data Pegawai</h3>Pilih file excel .xlsx : <input type="file" id="file-excel" onchange="filePickedSatset(event);"><br>Contoh format file excel bisa <a target="_blank" href="'.SIMPEG_PLUGIN_URL. 'excel/contoh_simpeg_pegawai.xlsx">download di sini</a>. Sheet file excel yang akan diimport harus diberi nama <b>data</b>. Untuk kolom nilai angka ditulis tanpa tanda titik.' ),
+	            	->set_html( '<h3>Import EXCEL data Pegawai</h3>Pilih file excel .xlsx : <input type="file" id="file-excel" onchange="filePickedSimpeg(event);"><br>Contoh format file excel bisa <a target="_blank" href="'.SIMPEG_PLUGIN_URL. 'excel/contoh_simpeg_pegawai.xlsx">download di sini</a>. Sheet file excel yang akan diimport harus diberi nama <b>data</b>. Untuk kolom nilai angka ditulis tanpa tanda titik.' ),
 		        Field::make( 'html', 'crb_simpeg_pegawai' )
 	            	->set_html( 'Data JSON : <textarea id="data-excel" class="cf-select__input"></textarea>' ),
 		        Field::make( 'html', 'crb_simpeg_pegawai_save_button' )
@@ -270,7 +270,7 @@ class Wp_Simpeg_Admin {
             	</ol>
 	        	' ),
 	        Field::make( 'html', 'crb_sbu_lembur_upload_html' )
-            	->set_html( '<h3>Import EXCEL data SBU Lembur</h3>Pilih file excel .xlsx : <input type="file" id="file-excel" onchange="filePickedSatset(event);"><br>Contoh format file excel bisa <a target="_blank" href="'.SIMPEG_PLUGIN_URL. 'excel/contoh_sbu_lembur.xlsx">download di sini</a>. Sheet file excel yang akan diimport harus diberi nama <b>data</b>. Untuk kolom nilai angka ditulis tanpa tanda titik.' ),
+            	->set_html( '<h3>Import EXCEL data SBU Lembur</h3>Pilih file excel .xlsx : <input type="file" id="file-excel" onchange="filePickedSimpeg(event);"><br>Contoh format file excel bisa <a target="_blank" href="'.SIMPEG_PLUGIN_URL. 'excel/contoh_sbu_lembur.xlsx">download di sini</a>. Sheet file excel yang akan diimport harus diberi nama <b>data</b>. Untuk kolom nilai angka ditulis tanpa tanda titik.' ),
 	        Field::make( 'html', 'crb_sbu_lembur' )
             	->set_html( 'Data JSON : <textarea id="data-excel" class="cf-select__input"></textarea>' ),
 	        Field::make( 'html', 'crb_sbu_lembur_save_button' )
