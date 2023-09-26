@@ -290,7 +290,7 @@ function submit_data(id_spt){
     }
 }
 
-function verifikasi_kasubag_keuangan(id_spt){
+function verifikasi_kasubag_keuangan_spj(id_spt){
     jQuery('#wrap-loading').show();
     jQuery.ajax({
         method: 'post',

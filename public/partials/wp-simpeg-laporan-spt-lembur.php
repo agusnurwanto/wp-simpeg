@@ -109,7 +109,7 @@ foreach($laporan_spt as $peg){
         </div> 
     <div class="cetak">
         <div style="padding: 10px;">
-            <div class="laporan-surat break-print" id="content" contenteditable="true">
+            <div class="laporan-surat break-print" id="content" contenteditable="false">
                 <div class="no-surat text-center">
                     <div class="col-md-12">
                         <h5>SURAT PERINTAH TUGAS<br>Nomor : <?php echo $spt['nomor_spt']; ?></h5>

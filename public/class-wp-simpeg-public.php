@@ -1829,9 +1829,23 @@ function menu_spt_lembur(){
 				'show_header' => 1,
 				'post_status' => 'private'
 			));
+			$menu_spj = '';
+			if(
+				in_array("kasubag_keuangan", $user_meta->roles)
+				|| in_array("pptk", $user_meta->roles)
+			){
+				$input_spj_lembur = $this->functions->generatePage(array(
+					'nama_page' => 'Input SPJ Lembur',
+					'content' => '[input_spj_lembur]',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$menu_spj = '<li style="display: inline-block"> <a style="margin-left: 10px;" href="'.$input_spj_lembur['url'].'" target="_blank" class="btn btn-info">SPJ Lembur</a></li>';
+			}
 			echo '
 			<ul class="aksi-lembur text-center">
-				<li><a href="'.$input_spt_lembur['url'].'" target="_blank" class="btn btn-info">SPT Lembur</a></li>
+				<li style="list-style: none; display: inline-block"><a href="'.$input_spt_lembur['url'].'" target="_blank" class="btn btn-info">SPT Lembur</a></li>
+				'.$menu_spj.'
 			</ul>';
 		}else{
 			echo 'User ID pegawai tidak ditemukan!';
