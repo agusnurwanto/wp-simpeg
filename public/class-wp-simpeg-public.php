@@ -1365,8 +1365,8 @@ class Wp_Simpeg_Public {
 	        $where = $sqlTot = $sqlRec = "";
 
 	        if( !empty($params['search']['value']) ) { 
-	            $where .=" OR u.nama_skpd LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
-	            $where .=" OR s.nomor_spt LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
+	            $where .=" OR u.nama_skpd LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%").")";
+	            $where .=" OR s.nomor_spt LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%").")";
 	        }
 
 	        // getting total number records without any search
@@ -1386,7 +1386,7 @@ class Wp_Simpeg_Public {
 	            $sqlTot .= $where;
 	            $sqlRec .= $where;
 	        }
-	        $limit = '';
+	        $limit = ''; 
 	        if($params['length'] != -1){
 	            $limit = "  LIMIT ".$wpdb->prepare('%d', $params['start'])." ,".$wpdb->prepare('%d', $params['length']);
 	        }
@@ -1399,7 +1399,7 @@ class Wp_Simpeg_Public {
 	        foreach($queryRecords as $recKey => $recVal){
 	            $queryRecords[$recKey]['file_daftar_hadir'] = '<a href="'.SIMPEG_PLUGIN_URL.'public/media/simpeg/'.$recVal['file_daftar_hadir'].'" target="_blank">'.$recVal['file_daftar_hadir'].'</a>';
 	            $queryRecords[$recKey]['foto_lembur'] = '<a href="'.SIMPEG_PLUGIN_URL.'public/media/simpeg/'.$recVal['foto_lembur'].'" target="_blank">'.$recVal['foto_lembur'].'</a>';
-
+	            $btn = '';
 		        if($recVal['status'] == 4) {
 		            $btn = '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
 		            $btn .= '<a class="btn btn-sm btn-primary" onclick="submit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Submit Data"><i class="dashicons dashicons-migrate"></i></a>';
@@ -2039,8 +2039,9 @@ class Wp_Simpeg_Public {
 							select 
 								* 
 							from data_spj_lembur 
-							where id=%d
+							where id_spt=%d
 						", $id_spt), ARRAY_A);
+						// print_r($spj); die($wpdb->last_query);
 						if(empty($spj)){
 							$ret['status'] = 'error';
 							$ret['message'] = 'SPJ untuk nomor SPT '.$spt['nomor_spt'].' belum dibuat!';
@@ -2071,7 +2072,7 @@ class Wp_Simpeg_Public {
 							select 
 								* 
 							from data_spj_lembur 
-							where id=%d
+							where id_spt=%d
 						", $id_spt), ARRAY_A);
 						if(empty($spj)){
 							$ret['status'] = 'error';
