@@ -245,7 +245,7 @@ class Wp_Simpeg_Admin {
 	            	</ol>
 		        	' ),
 		        Field::make( 'html', 'crb_simpeg_pegawai_upload_html' )
-	            	->set_html( '<h3>Import EXCEL data Pegawai</h3>Pilih file excel .xlsx : <input type="file" id="file-excel" onchange="filePickedSimpeg(event);"><br>Contoh format file excel bisa <a target="_blank" href="'.SIMPEG_PLUGIN_URL. 'excel/contoh_simpeg_pegawai.xlsx">download di sini</a>. Sheet file excel yang akan diimport harus diberi nama <b>data</b>. Untuk kolom nilai angka ditulis tanpa tanda titik.' ),
+	            	->set_html( '<h3>Import EXCEL data Pegawai</h3>Pilih file excel .xlsx : <input type="file" id="file-excel" onchange="filePickedSimpeg(event);"><br>Contoh format file excel bisa <a target="_blank" href="'.SIMPEG_PLUGIN_URL. 'public/media/simpeg/datapegawai.xlsx">download di sini</a>. Sheet file excel yang akan diimport harus diberi nama <b>data</b>. Untuk kolom nilai angka ditulis tanpa tanda titik.' ),
 		        Field::make( 'html', 'crb_simpeg_pegawai' )
 	            	->set_html( 'Data JSON : <textarea id="data-excel" class="cf-select__input"></textarea>' ),
 		        Field::make( 'html', 'crb_simpeg_pegawai_save_button' )
@@ -344,7 +344,8 @@ class Wp_Simpeg_Admin {
 				    'karis_karsu' => $newData['karis_karsu'],
 				    'nilai_prestasi' => $newData['nilai_prestasi'],
 				    'email' => $newData['email'],
-				    'tahun' => $newData['tahun']
+				    'tahun' => $newData['tahun'],
+				    'user_role' => $newData['user_role'],
 				);
 				$wpdb->last_error = "";
 				$cek_id = $wpdb->get_var($wpdb->prepare("
