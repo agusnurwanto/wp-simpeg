@@ -45,15 +45,15 @@ if($spt['waktu_mulai_spt'] == $spt['waktu_selesai_spt']){
 if($spt['status'] == 0) {
     $spt['status'] = '<span class="btn-primary btn-sm">Menunggu Submit</span>';
 }elseif($spt['status'] == 1) {
-    $spt['status'] = '<span class="btn-success btn-sm">Diverifikasi Kasubag Keuangan</span>';
+    $spt['status'] = '<span class="btn-success btn-sm">Menunggu Verifikasi Kasubag Keuangan</span>';
 }elseif($spt['status'] == 2) {
-    $spt['status'] = '<span class="btn-success btn-sm">Diverifikasi PPK</span>';
+    $spt['status'] = '<span class="btn-success btn-sm">Menunggu Verifikasi PPK</span>';
 }elseif($spt['status'] == 3) {
-    $spt['status'] = '<span class="btn-success btn-sm">Diverifikasi Kepala</span>';
+    $spt['status'] = '<span class="btn-success btn-sm">Menunggu Verifikasi Kepala</span>';
 }elseif($spt['status'] == 4) {
     $spt['status'] = '<span class="btn-danger btn-sm">SPJ Ditolak</span>';
 }elseif($spt['status'] == 5) {
-    $spt['status'] = '<span class="btn-success btn-sm">SPJ Diverifikasi Kasubag Keuangan</span>';
+    $spt['status'] = '<span class="btn-success btn-sm">SPJ Menunggu Verifikasi Kasubag Keuangan</span>';
 }elseif($spt['status'] == 6) {
     $spt['status'] = '<span class="btn-primary btn-sm">Selesai</span>';
 }else
