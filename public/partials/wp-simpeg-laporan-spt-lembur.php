@@ -65,7 +65,7 @@ $laporan_spt = $wpdb->get_results($wpdb->prepare('
         p.*
         -- p.gelar_depan,
         -- p.nama,
-        -- p.gelar_belakang,
+        -- p.gelar_bgielakang,
         -- p.kode_gol,
         -- p.nip,
         -- p.jabatan,
@@ -101,6 +101,7 @@ foreach($laporan_spt as $peg){
     ';
 }
 ?>
+<div id="wrap-action"></div>
 <div class="cetak" style="background-color: #ffff;">
     <div class="text-center" style="padding: 10px;">
         <div class="col-md-12">

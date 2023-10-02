@@ -243,6 +243,7 @@ foreach($data_all as $peg_all){
 }
 
 ?>
+<div id="wrap-action"></div>
 <div class="text-center" style="margin-top: 30px;">
     <label style="margin-left: 10px;" for="tahun">Tahun:</label>
     <select style="margin-left: 10px;" name="tahun" id="tahun">

@@ -203,6 +203,8 @@ foreach($data_all as $peg_all){
     ';
 }
 ?>
+
+<div id="wrap-action"></div>
 <div class="text-center" style="margin-top: 30px;">
     <label for="bulan">Bulan:  </label>
     <select style="margin-left: 10px;" name="bulan" id="bulan">

@@ -1078,7 +1078,6 @@ class Wp_Simpeg_Public {
 					'nama_page' => 'Laporan Surat Perintah Tugas',
 					'content' => '[laporan_spt_lembur]',
 					'show_header' => 1,
-					'no_key' => 1,
 					'post_status' => 'private'
 				));
 
@@ -1119,7 +1118,7 @@ class Wp_Simpeg_Public {
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Not Found</span>';
 	                }
 
-                    $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-primary" target="_blank" href="'.$laporan_spt_lembur['url'].'?id_spt='.$recVal['id'].'" title="Print SPT"><i class="dashicons dashicons-printer"></i></a>';
+                    $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-primary" target="_blank" href="'.$laporan_spt_lembur['url'].'&id_spt='.$recVal['id'].'" title="Print SPT"><i class="dashicons dashicons-printer"></i></a>';
 	                $queryRecords[$recKey]['aksi'] = $btn;
 	                $queryRecords[$recKey]['uang_lembur'] = $this->rupiah($recVal['uang_lembur']);
 	                $queryRecords[$recKey]['uang_makan'] = $this->rupiah($recVal['uang_makan']);

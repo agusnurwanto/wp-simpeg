@@ -68,10 +68,12 @@ function run_download_excel_simpeg(type){
 	var current_url = window.location.href;
 	var body = '<a id="excel" onclick="return false;" href="#" class="btn btn-primary text-center">DOWNLOAD EXCEL</a>';
 	var download_excel = ''
-		+'<div class="text-center" style="margin-top: 10px;" id="action-sipd" class="hide-print">'
+		+'<div class="text-center" style="margin-top: 10px;" id="action-simpeg" class="hide-print">'
 			+body
 		+'</div>';
-	if(jQuery('.entry-content').length >= 1){
+	if(jQuery('#wrap-action').length >= 1){
+		jQuery('#wrap-action').prepend(download_excel);
+	}else if(jQuery('.entry-content').length >= 1){
 		jQuery('.entry-content').prepend(download_excel);
 	}else{
 		jQuery('body').prepend(download_excel);
