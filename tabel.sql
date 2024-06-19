@@ -77,6 +77,7 @@ CREATE TABLE `data_pegawai_lembur` (
   `nilai_prestasi` int(11) DEFAULT NULL,
   `email` text DEFAULT NULL,
   `tahun` year DEFAULT NULL,
+  `user_role` text DEFAULT NULL,
   `update_at` datetime NOT NULL,
   `active` tinyint(4) DEFAULT 1,
   PRIMARY KEY  (id)
