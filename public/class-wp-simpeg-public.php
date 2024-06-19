@@ -110,10 +110,11 @@ class Wp_Simpeg_Public {
 		wp_enqueue_script($this->plugin_name . 'select2', plugin_dir_url(__FILE__) . 'js/select2.min.js', array('jquery'), $this->version, false);
 		wp_enqueue_script($this->plugin_name . 'datatables', plugin_dir_url(__FILE__) . 'js/datatables.min.js', array('jquery'), $this->version, false);
 		wp_enqueue_script($this->plugin_name . 'chart', plugin_dir_url(__FILE__) . 'js/chart.min.js', array('jquery'), $this->version, false);
-		wp_localize_script( $this->plugin_name, 'ajax', array(
-		    'url' => admin_url( 'admin-ajax.php' )
-		));
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp-simpeg-public.js', array( 'jquery' ), $this->version, false );
+		wp_localize_script($this->plugin_name, 'ajax', array(
+			'api_key' => get_option(SIMPEG_APIKEY),
+			'url' => admin_url('admin-ajax.php')
+		));
 	}
 
     public function monitoring_sql_migrate_wp_simpeg($atts){
