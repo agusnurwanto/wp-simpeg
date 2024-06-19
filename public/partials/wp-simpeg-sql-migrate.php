@@ -85,7 +85,7 @@
 	function run_sql_migrate(file) {
 		jQuery("#wrap-loading").show();
 		jQuery.ajax({
-			url: ajax.url,
+            url:'<?php echo admin_url('admin-ajax.php'); ?>',
 	      	type: "post",
 	      	data: {
 	      		"action": "run_sql_migrate_wp_simpeg",
