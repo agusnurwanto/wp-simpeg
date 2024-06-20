@@ -322,6 +322,7 @@ class Wp_Simpeg_Admin {
 				    'gelar_depan' => $newData['gelar_depan'],
 				    'nama' => $newData['nama'],
 				    'gelar_belakang' => $newData['gelar_belakang'],
+				    'nama_lengkap' => $newData['nama_lengkap'],
 				    'tempat_lahir' => $newData['tempat_lahir'],
 				    'tanggal_lahir' => $newData['tanggal_lahir'],
 				    'kode_jenis_kelamin' => $newData['kode_jenis_kelamin'],

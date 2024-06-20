@@ -20,11 +20,17 @@
                     <th class="text-center">Id SKPD</th>
                     <th class="text-center">NIK</th>
                     <th class="text-center">NIP</th>
+                    <th class="text-center">Gelar Depan</th>
                     <th class="text-center">Nama</th>
-                    <th class="text-center">Tanggal Lahir</th>
+                    <th class="text-center">Gelar Belakang</th>
+                    <th class="text-center">Nama Lengkap</th>
                     <th class="text-center">Tempat Lahir</th>
+                    <th class="text-center">Tanggal Lahir</th>
+                    <th class="text-center">Jenis Kelamin</th>
+                    <th class="text-center">Kode Jenis Kelamin</th>
                     <th class="text-center">Status</th>
                     <th class="text-center">Golongan Ruang</th>
+                    <th class="text-center">Kode Golongan</th>
                     <th class="text-center">TMT Pangkat</th>
                     <th class="text-center">Eselon</th>
                     <th class="text-center">Jabatan</th>
@@ -81,8 +87,20 @@
                     <input type="text" id='nip' name="nip" class="form-control" placeholder=''/>
                 </div>
                 <div class="form-group">
+                    <label for='gelar_depan' style='display:inline-block'>Gelar Depan</label>
+                    <input type="text" id='gelar_depan' name="gelar_depan" class="form-control" placeholder=''/>
+                </div>
+                <div class="form-group">
                     <label for='nama' style='display:inline-block'>Nama</label>
                     <input type="text" id='nama' name="nama" class="form-control" placeholder=''/>
+                </div>
+                <div class="form-group">
+                    <label for='gelar_belakang' style='display:inline-block'>Gelar Belakang</label>
+                    <input type="text" id='gelar_belakang' name="gelar_belakang" class="form-control" placeholder=''/>
+                </div>
+                <div class="form-group">
+                    <label for='nama_lengkap' style='display:inline-block'>Nama Lengkap</label>
+                    <input type="text" id='nama_lengkap' name="nama_lengkap" class="form-control" placeholder=''/>
                 </div>
                 <div class="form-group">
                     <label for='tanggal_lahir' style='display:inline-block'>Tanggal Lahir</label>
@@ -93,12 +111,24 @@
                     <input type="text" id='tempat_lahir' name="tempat_lahir" class="form-control" placeholder=''/>
                 </div>
                 <div class="form-group">
+                    <label for='jenis_kelamin' style='display:inline-block'>Jenis Kelamin</label>
+                    <input type="text" id='jenis_kelamin' name="jenis_kelamin" class="form-control" placeholder=''/>
+                </div>
+                <div class="form-group">
+                    <label for='kode_jenis_kelamin' style='display:inline-block'>Kode Jenis Kelamin</label>
+                    <input type="text" id='kode_jenis_kelamin' name="kode_jenis_kelamin" class="form-control" placeholder=''/>
+                </div>
+                <div class="form-group">
                     <label for='status' style='display:inline-block'>Status</label>
                     <input type="text" id='status' name="status" class="form-control" placeholder=''/>
                 </div>
                 <div class="form-group">
                     <label for='gol_ruang' style='display:inline-block'>Golongan Ruang</label>
                     <input type="text" id='gol_ruang' name="gol_ruang" class="form-control" placeholder=''/>
+                </div>
+                <div class="form-group">
+                    <label for='kode_gol' style='display:inline-block'>Kode Golongan</label>
+                    <input type="text" id='kode_gol' name="kode_gol" class="form-control" placeholder=''/>
                 </div>
                 <div class="form-group">
                     <label for='tmt_pangkat' style='display:inline-block'>TMT Pangkat</label>
@@ -239,7 +269,19 @@ function get_data_pegawai(){
                     className: "text-center"
                 },
                 {
+                    "data": 'gelar_depan',
+                    className: "text-center"
+                },
+                {
                     "data": 'nama',
+                    className: "text-center"
+                },
+                {
+                    "data": 'gelar_belakang',
+                    className: "text-center"
+                },
+                {
+                    "data": 'nama_lengkap',
                     className: "text-center"
                 },
                 {
@@ -251,11 +293,23 @@ function get_data_pegawai(){
                     className: "text-center"
                 },
                 {
+                    "data": 'jenis_kelamin',
+                    className: "text-center"
+                },
+                {
+                    "data": 'kode_jenis_kelamin',
+                    className: "text-center"
+                },
+                {
                     "data": 'status',
                     className: "text-center"
                 },
                 {
                     "data": 'gol_ruang',
+                    className: "text-center"
+                },
+                {
+                    "data": 'kode_gol',
                     className: "text-center"
                 },
                 {
@@ -426,6 +480,12 @@ function edit_data(_id){
                 jQuery('#email').val(res.data.email);
                 jQuery('#tahun').val(res.data.tahun);
                 jQuery('#user_role').val(res.data.user_role);
+                jQuery('#gelar_depan').val(res.data.gelar_depan);
+                jQuery('#gelar_belakang').val(res.data.gelar_belakang);
+                jQuery('#nama_lengkap').val(res.data.nama_lengkap);
+                jQuery('#jenis_kelamin').val(res.data.jenis_kelamin);
+                jQuery('#kode_jenis_kelamin').val(res.data.kode_jenis_kelamin);
+                jQuery('#kode_gol').val(res.data.kode_gol);
                 jQuery('#modalTambahDataPegawai').modal('show');
             }else{
                 alert(res.message);
@@ -468,6 +528,12 @@ function tambah_data_pegawai(){
     jQuery('#email').val('');
     jQuery('#tahun').val('');
     jQuery('#user_role').val('');
+    jQuery('#gelar_depan').val('');
+    jQuery('#gelar_belakang').val('');
+    jQuery('#nama_lengkap').val('');
+    jQuery('#jenis_kelamin').val('');
+    jQuery('#kode_jenis_kelamin').val('');
+    jQuery('#kode_gol').val('');
     jQuery('#modalTambahDataPegawai').modal('show');
 }
 
@@ -593,6 +659,30 @@ function submitTambahDataFormPegawai(){
     if(user_role == ''){
         return alert('Data User tidak boleh kosong!');
     }
+    var gelar_depan = jQuery('#gelar_depan').val();
+    if(gelar_depan == ''){
+        return alert('Data gelar_depan tidak boleh kosong!');
+    }
+    var gelar_belakang = jQuery('#gelar_belakang').val();
+    if(gelar_belakang == ''){
+        return alert('Data gelar_belakang tidak boleh kosong!');
+    }
+    var nama_lengkap = jQuery('#nama_lengkap').val();
+    if(nama_lengkap == ''){
+        return alert('Data nama_lengkap tidak boleh kosong!');
+    }
+    var jenis_kelamin = jQuery('#jenis_kelamin').val();
+    if(jenis_kelamin == ''){
+        return alert('Data jenis_kelamin tidak boleh kosong!');
+    }
+    var kode_jenis_kelamin = jQuery('#kode_jenis_kelamin').val();
+    if(kode_jenis_kelamin == ''){
+        return alert('Data kode_jenis_kelamin tidak boleh kosong!');
+    }
+    var kode_gol = jQuery('#kode_gol').val();
+    if(kode_gol == ''){
+        return alert('Data kode_gol tidak boleh kosong!');
+    }
 
     jQuery('#wrap-loading').show();
     jQuery.ajax({
@@ -633,6 +723,12 @@ function submitTambahDataFormPegawai(){
             'email': email,
             'tahun': tahun,
             'user_role': user_role,
+            'gelar_depan': gelar_depan,
+            'gelar_belakang': gelar_belakang,
+            'nama_lengkap': nama_lengkap,
+            'jenis_kelamin': jenis_kelamin,
+            'kode_jenis_kelamin': kode_jenis_kelamin,
+            'kode_gol': kode_gol,
         },
         success: function(res){
             alert(res.message);

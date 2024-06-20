@@ -330,213 +330,151 @@ class Wp_Simpeg_Public {
 	    );
 	    if(!empty($_POST)){
 	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
-	            if($ret['status'] != 'error' && !empty($_POST['id_skpd'])){
-	                $id_skpd = $_POST['id_skpd'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data id_skpd tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['nik'])){
-	                $nik = $_POST['nik'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data nik tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['nip'])){
-	                $nip = $_POST['nip'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data nip tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['nama'])){
-	                $nama = $_POST['nama'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data nama tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['tempat_lahir'])){
-	                $tempat_lahir = $_POST['tempat_lahir'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data tempat_lahir tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['tanggal_lahir'])){
-	                $tanggal_lahir = $_POST['tanggal_lahir'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data tanggal_lahir tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['status'])){
-	                $status = $_POST['status'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data status tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['gol_ruang'])){
-	                $gol_ruang = $_POST['gol_ruang'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data gol_ruang tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['tmt_pangkat'])){
-	                $tmt_pangkat = $_POST['tmt_pangkat'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data tmt_pangkat tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['eselon'])){
-	                $eselon = $_POST['eselon'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data eselon tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['jabatan'])){
-	                $jabatan = $_POST['jabatan'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data jabatan tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['tipe_pegawai'])){
-	                $tipe_pegawai = $_POST['tipe_pegawai'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data tipe_pegawai tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['tmt_jabatan'])){
-	                $tmt_jabatan = $_POST['tmt_jabatan'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data tmt_jabatan tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['agama'])){
-	                $agama = $_POST['agama'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data agama tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['alamat'])){
-	                $alamat = $_POST['alamat'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data alamat tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['no_hp'])){
-	                $no_hp = $_POST['no_hp'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data no_hp tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['satuan_kerja'])){
-	                $satuan_kerja = $_POST['satuan_kerja'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data satuan_kerja tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['unit_kerja_induk'])){
-	                $unit_kerja_induk = $_POST['unit_kerja_induk'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data unit_kerja_induk tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['tmt_pensiun'])){
-	                $tmt_pensiun = $_POST['tmt_pensiun'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data tmt_pensiun tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['pendidikan'])){
-	                $pendidikan = $_POST['pendidikan'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data pendidikan tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['kode_pendidikan'])){
-	                $kode_pendidikan = $_POST['kode_pendidikan'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data kode_pendidikan tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['nama_sekolah'])){
-	                $nama_sekolah = $_POST['nama_sekolah'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data nama_sekolah tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['nama_pendidikan'])){
-	                $nama_pendidikan = $_POST['nama_pendidikan'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data nama_pendidikan tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['lulus'])){
-	                $lulus = $_POST['lulus'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data lulus tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['karpeg'])){
-	                $karpeg = $_POST['karpeg'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data karpeg tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['karis_karsu'])){
-	                $karis_karsu = $_POST['karis_karsu'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data karis_karsu tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['nilai_prestasi'])){
-	                $nilai_prestasi = $_POST['nilai_prestasi'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data nilai_prestasi tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['email'])){
-	                $email = $_POST['email'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data email tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['tahun'])){
-	                $tahun = $_POST['tahun'];
-	            }
-	            // else{
-	            //     $ret['status'] = 'error';
-	            //     $ret['message'] = 'Data tahun tidak boleh kosong!';
-	            // }
-	            if($ret['status'] != 'error' && !empty($_POST['user_role'])){
-	                $user_role = $_POST['user_role'];
-	            }
-	            if($ret['status'] != 'error'){
+				if (empty($_POST['gelar_depan'])) {
+				    $ret['status'] = 'error';
+				    $ret['message'] = 'Data gelar_depan tidak boleh kosong!';
+				} else if (empty($_POST['gelar_belakang'])) {
+				    $ret['status'] = 'error';
+				    $ret['message'] = 'Data gelar_belakang tidak boleh kosong!';
+				} else if (empty($_POST['nama_lengkap'])) {
+				    $ret['status'] = 'error';
+				    $ret['message'] = 'Data nama_lengkap tidak boleh kosong!';
+				} else if (empty($_POST['jenis_kelamin'])) {
+				    $ret['status'] = 'error';
+				    $ret['message'] = 'Data jenis_kelamin tidak boleh kosong!';
+				} else if (empty($_POST['kode_jenis_kelamin'])) {
+				    $ret['status'] = 'error';
+				    $ret['message'] = 'Data kode_jenis_kelamin tidak boleh kosong!';
+				} else if (empty($_POST['kode_gol'])) {
+				    $ret['status'] = 'error';
+				    $ret['message'] = 'Data kode_gol tidak boleh kosong!';
+				} else if (empty($_POST['id_skpd'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data id_skpd tidak boleh kosong!';
+                } else if (empty($_POST['nik'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data nik tidak boleh kosong!';
+                } else if (empty($_POST['nip'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data nip tidak boleh kosong!';
+                } else if (empty($_POST['nama'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data nama tidak boleh kosong!';
+                } else if (empty($_POST['tempat_lahir'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data tempat_lahir tidak boleh kosong!';
+                } else if (empty($_POST['tanggal_lahir'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data tanggal_lahir tidak boleh kosong!';
+                } else if (empty($_POST['status'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data status tidak boleh kosong!';
+                } else if (empty($_POST['gol_ruang'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data gol_ruang tidak boleh kosong!';
+                } else if (empty($_POST['tmt_pangkat'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data tmt_pangkat tidak boleh kosong!';
+                } else if (empty($_POST['eselon'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data eselon tidak boleh kosong!';
+                } else if (empty($_POST['jabatan'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data jabatan tidak boleh kosong!';
+                } else if (empty($_POST['tipe_pegawai'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data tipe_pegawai tidak boleh kosong!';
+                } else if (empty($_POST['tmt_jabatan'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data tmt_jabatan tidak boleh kosong!';
+                } else if (empty($_POST['agama'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data agama tidak boleh kosong!';
+                } else if (empty($_POST['alamat'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data alamat tidak boleh kosong!';
+                } else if (empty($_POST['no_hp'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data no_hp tidak boleh kosong!';
+                } else if (empty($_POST['satuan_kerja'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data satuan_kerja tidak boleh kosong!';
+                } else if (empty($_POST['unit_kerja_induk'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data unit_kerja_induk tidak boleh kosong!';
+                } else if (empty($_POST['tmt_pensiun'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data tmt_pensiun tidak boleh kosong!';
+                } else if (empty($_POST['pendidikan'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data pendidikan tidak boleh kosong!';
+                } else if (empty($_POST['kode_pendidikan'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data kode_pendidikan tidak boleh kosong!';
+                } else if (empty($_POST['nama_sekolah'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data nama_sekolah tidak boleh kosong!';
+                } else if (empty($_POST['nama_pendidikan'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data nama_pendidikan tidak boleh kosong!';
+                } else if (empty($_POST['lulus'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data lulus tidak boleh kosong!';
+                } else if (empty($_POST['karpeg'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data karpeg tidak boleh kosong!';
+                } else if (empty($_POST['karis_karsu'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data karis_karsu tidak boleh kosong!';
+                } else if (empty($_POST['nilai_prestasi'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data nilai_prestasi tidak boleh kosong!';
+                } else if (empty($_POST['email'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data email tidak boleh kosong!';
+                } else if (empty($_POST['tahun'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data tahun tidak boleh kosong!';
+                } else if (empty($_POST['user_role'])) {
+                    $ret['status'] = 'error';
+                    $ret['message'] = 'Data user_role tidak boleh kosong!';
+                } else {
+                	$id_skpd = $_POST['id_skpd'];
+		            $nik = $_POST['nik'];
+		            $nip = $_POST['nip'];
+		            $nama = $_POST['nama'];
+		            $tempat_lahir = $_POST['tempat_lahir'];
+		            $tanggal_lahir = $_POST['tanggal_lahir'];
+		            $status = $_POST['status'];
+		            $gol_ruang = $_POST['gol_ruang'];
+		            $tmt_pangkat = $_POST['tmt_pangkat'];
+		            $eselon = $_POST['eselon'];
+		            $jabatan = $_POST['jabatan'];
+		            $tipe_pegawai = $_POST['tipe_pegawai'];
+		            $tmt_jabatan = $_POST['tmt_jabatan'];
+		            $agama = $_POST['agama'];
+		            $alamat = $_POST['alamat'];
+		            $no_hp = $_POST['no_hp'];
+		            $satuan_kerja = $_POST['satuan_kerja'];
+		            $unit_kerja_induk = $_POST['unit_kerja_induk'];
+		            $tmt_pensiun = $_POST['tmt_pensiun'];
+		            $pendidikan = $_POST['pendidikan'];
+		            $kode_pendidikan = $_POST['kode_pendidikan'];
+		            $nama_sekolah = $_POST['nama_sekolah'];
+		            $nama_pendidikan = $_POST['nama_pendidikan'];
+		            $lulus = $_POST['lulus'];
+		            $karpeg = $_POST['karpeg'];
+		            $karis_karsu = $_POST['karis_karsu'];
+		            $nilai_prestasi = $_POST['nilai_prestasi'];
+		            $email = $_POST['email'];
+		            $tahun = $_POST['tahun'];
+		            $user_role = $_POST['user_role'];
+					$gelar_depan = $_POST['gelar_depan'];
+					$gelar_belakang = $_POST['gelar_belakang'];
+					$nama_lengkap = $_POST['nama_lengkap'];
+					$jenis_kelamin = $_POST['jenis_kelamin'];
+					$kode_jenis_kelamin = $_POST['kode_jenis_kelamin'];
+					$kode_gol = $_POST['kode_gol'];
 	                $data = array(
 	                    'id_skpd' => $id_skpd,
 	                    'nik' => $nik,
@@ -568,6 +506,12 @@ class Wp_Simpeg_Public {
 	                    'email' => $email,
 	                    'tahun' => $tahun,
 	                    'user_role' => $user_role,
+	                    'gelar_depan' => $gelar_depan,
+						'gelar_belakang' => $gelar_belakang,
+						'nama_lengkap' => $nama_lengkap,
+						'jenis_kelamin' => $jenis_kelamin,
+						'kode_jenis_kelamin' => $kode_jenis_kelamin,
+						'kode_gol' => $kode_gol,
 	                    'active' => 1,
 	                    'update_at' => current_time('mysql')
 	                );
@@ -628,34 +572,40 @@ class Wp_Simpeg_Public {
 				   0 => 'id_skpd',
 				   1 => 'nik',
 				   2 => 'nip',
-				   3 => 'nama',
-				   4 => 'tempat_lahir',
-				   5 => 'tanggal_lahir',
-				   6 => 'status',
-				   7 => 'gol_ruang',
-				   8 => 'tmt_pangkat',
-				   9 => 'eselon',
-				   10 => 'jabatan',
-				   11 => 'tipe_pegawai',
-				   12 => 'tmt_jabatan',
-				   13 => 'agama',
-				   14 => 'alamat',
-				   15 => 'no_hp',
-				   16 => 'satuan_kerja',
-				   17 => 'unit_kerja_induk',
-				   18 => 'tmt_pensiun',
-				   19 => 'pendidikan',
-				   20 => 'kode_pendidikan',
-				   21 => 'nama_sekolah',
-				   22 => 'nama_pendidikan',
-				   23 => 'lulus',
-				   24 => 'karpeg',
-				   25 => 'karis_karsu',
-				   26 => 'nilai_prestasi',
-				   27 => 'email',
-				   28 => 'tahun',
-                   29 => 'user_role',
-                   30 => 'id'
+				   3 => 'gelar_depan',
+				   4 => 'nama',
+				   5 => 'gelar_belakang',
+				   6 => 'nama_lengkap',
+				   7 => 'tempat_lahir',
+				   8 => 'tanggal_lahir',
+				   9 => 'jenis_kelamin',
+				   10 => 'kode_jenis_kelamin',
+				   11 => 'status',
+				   12 => 'gol_ruang',
+				   13 => 'kode_gol',
+				   14 => 'tmt_pangkat',
+				   15 => 'eselon',
+				   16 => 'jabatan',
+				   17 => 'tipe_pegawai',
+				   18 => 'tmt_jabatan',
+				   19 => 'agama',
+				   20 => 'alamat',
+				   21 => 'no_hp',
+				   22 => 'satuan_kerja',
+				   23 => 'unit_kerja_induk',
+				   24 => 'tmt_pensiun',
+				   25 => 'pendidikan',
+				   26 => 'kode_pendidikan',
+				   27 => 'nama_sekolah',
+				   28 => 'nama_pendidikan',
+				   29 => 'lulus',
+				   30 => 'karpeg',
+				   31 => 'karis_karsu',
+				   32 => 'nilai_prestasi',
+				   33 => 'email',
+				   34 => 'tahun',
+                   35 => 'user_role',
+                   36 => 'id'
                 );
                 $where = $sqlTot = $sqlRec = "";
 
