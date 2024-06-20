@@ -481,6 +481,9 @@ class Wp_Simpeg_Admin {
 			if(empty($username)){
 				$username = $user['nik'];
 			}
+			if (empty($username)) {
+			    $username = $user['nama'];
+			}
 			$email = $user['email'];
 			if(empty($email)){
 				$email = $username.'@simpeglocal.com';
