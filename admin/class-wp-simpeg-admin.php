@@ -306,8 +306,8 @@ class Wp_Simpeg_Admin {
 		);
 		if (!empty($_POST)) {
 			$ret['data'] = array(
-				'insert' => 0, 
-				'update' => 0,
+				'insert' => array(), 
+				'update' => array(),
 				'error' => array()
 			);
 			foreach ($_POST['data'] as $k => $data) {
@@ -315,6 +315,9 @@ class Wp_Simpeg_Admin {
 				foreach($data as $kk => $vv){
 					$newData[trim(preg_replace('/\s+/', ' ', $kk))] = trim(preg_replace('/\s+/', ' ', $vv));
 				}
+				// if(empty($newData['user_role'])){
+				// 	$newData['user_role'] = 'ppk';
+				// }
 				$data_db = array(
 					'id_skpd' => $newData['id_skpd'],
 				    'nik' => $newData['nik'],
@@ -357,16 +360,18 @@ class Wp_Simpeg_Admin {
 					SELECT 
 						id 
 					from data_pegawai_lembur 
-					where nip=%s"
+					where nip=%s,
+						nik=%s"
 					, $newData['nip']));
 				if(empty($cek_id)){
 					$wpdb->insert("data_pegawai_lembur", $data_db);
-					$ret['data']['insert']++;
+					$ret['data']['insert'][] = $data_db;
 				}else{
 					$wpdb->update("data_pegawai_lembur", $data_db, array(
 						"id" => $cek_id
 					));
-					$ret['data']['update']++;
+					// wp_update_user($data_db);
+					$ret['data']['update'][] = $data_db;
 				}
 				if(!empty($wpdb->last_error)){
 					$ret['data']['error'][] = array($wpdb->last_error, $data_db);
