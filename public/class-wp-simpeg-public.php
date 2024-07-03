@@ -152,6 +152,13 @@ class Wp_Simpeg_Public {
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-input-spj-lembur.php';
     }
 
+    public function menu_absensi_pegawai_lembur($atts){
+        if(!empty($_GET) && !empty($_GET['post'])){
+            return '';
+        }
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-absensi-pegawai-lembur.php';
+    }
+
     public function laporan_bulanan_lembur($atts){
         if(!empty($_GET) && !empty($_GET['post'])){
             return '';
@@ -1761,10 +1768,36 @@ class Wp_Simpeg_Public {
 		return $nama_bulan[$bulan-1];
 	}
 
+	public function pilih_tahun_anggaran_lembur()
+	{
+		global $wpdb;
+		$tahun_aktif = false;
+		$class_hide = '';
+		if (!empty($_GET) && !empty($_GET['tahun'])) {
+			$tahun_aktif = $_GET['tahun'];
+			$class_hide = 'display: none;';
+		}
+		$tahun = $wpdb->get_results('select tahun_anggaran from data_unit_lembur group by tahun_anggaran', ARRAY_A);
+		echo "
+		<h5 class='text-center' style='" . $class_hide . "'>PILIH TAHUN ANGGARAN</h5>
+		<ul class='daftar-tahun-lembur text-center' style='margin: 0 0 10px 0;'>";
+		foreach ($tahun as $k => $v) {
+			$class = 'btn-primary';
+			if ($tahun_aktif == $v['tahun_anggaran']) {
+				$class = 'btn-success';
+			}
+			echo "<li><a href='?tahun=" . $v['tahun_anggaran'] . "' class='btn " . $class . "'>" . $v['tahun_anggaran'] . "</a></li>";
+		}
+		echo "</ul>";
+	}
+
 	function menu_spt_lembur(){
 		global $wpdb;
 		$user_id = um_user( 'ID' );
 		$user_meta = get_userdata($user_id);
+		// if (!empty($_GET) && !empty($_GET['tahun'])) {
+		// 	echo '<h1 class="text-center">TAHUN ANGGARAN TERPILIH<br>' . $_GET['tahun'] . '</h1>';
+		// }
 		if(empty($user_meta->roles)){
 			echo 'User ini tidak dapat akses sama sekali :)';
 		}else if(
@@ -1773,6 +1806,11 @@ class Wp_Simpeg_Public {
 			|| in_array("kasubag_keuangan", $user_meta->roles)
 			|| in_array("pptk", $user_meta->roles)
 		){
+
+			// $this->pilih_tahun_anggaran_lembur();
+			// if (empty($_GET) || empty($_GET['tahun'])) {
+			// 	return;
+			// }
 			$id_pegawai_lembur = get_user_meta($user_id, 'id_pegawai_lembur');
 			if(!empty($id_pegawai_lembur)){
 				$input_spt_lembur = $this->functions->generatePage(array(
@@ -1794,10 +1832,46 @@ class Wp_Simpeg_Public {
 					));
 					$menu_spj = '<li style="display: inline-block"> <a style="margin-left: 10px;" href="'.$input_spj_lembur['url'].'" target="_blank" class="btn btn-info">SPJ Lembur</a></li>';
 				}
+				$menu_absensi = '';
+				if(
+					in_array("pegawai", $user_meta->roles)
+				){
+					$menu_absensi_pegawai_lembur = $this->functions->generatePage(array(
+						'nama_page' => 'Menu Absensi Lembur',
+						'content' => '[menu_absensi_pegawai_lembur]',
+						'show_header' => 1,
+						'post_status' => 'private'
+					));
+					$menu_absensi = '<li style="display: inline-block"> <a style="margin-left: 10px;" href="'.$menu_absensi_pegawai_lembur['url'].'" target="_blank" class="btn btn-info">Menu Absensi Lembur</a></li>';
+				}
 				echo '
 				<ul class="aksi-lembur text-center">
 					<li style="list-style: none; display: inline-block"><a href="'.$input_spt_lembur['url'].'" target="_blank" class="btn btn-info">SPT Lembur</a></li>
-					'.$menu_spj.'
+					'.$menu_spj.' '.$menu_absensi.'
+				</ul>';
+			}else{
+				echo 'User ID pegawai tidak ditemukan!';
+			}
+		} else if(
+			in_array("pegawai", $user_meta->roles)
+		){
+
+			// $this->pilih_tahun_anggaran_lembur();
+			// if (empty($_GET) || empty($_GET['tahun'])) {
+			// 	return;
+			// }
+
+			$id_pegawai_lembur = get_user_meta($user_id, 'id_pegawai_lembur');
+			if(!empty($id_pegawai_lembur)){
+				$menu_absensi_pegawai_lembur = $this->functions->generatePage(array(
+					'nama_page' => 'Menu Absensi Lembur',
+					'content' => '[menu_absensi_pegawai_lembur]',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				echo '
+				<ul class="aksi-lembur text-center">
+					<li style="list-style: none; display: inline-block"><a href="'.$menu_absensi_pegawai_lembur['url'].'" target="_blank" class="btn btn-info">Menu Absensi Lembur</a></li>
 				</ul>';
 			}else{
 				echo 'User ID pegawai tidak ditemukan!';

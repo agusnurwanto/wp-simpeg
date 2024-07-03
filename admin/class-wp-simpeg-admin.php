@@ -144,6 +144,13 @@ class Wp_Simpeg_Admin {
 			'no_key' => 1,
 			'post_status' => 'private'
 		));
+		$management_data_absensi = $this->functions->generatePage(array(
+			'nama_page' => 'Management Data Absensi Pegawai',
+			'content' => '[menu_absensi_pegawai_lembur]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
 		$input_spt_lembur = $this->functions->generatePage(array(
 			'nama_page' => 'Input SPT Lembur',
 			'content' => '[input_spt_lembur]',
@@ -242,6 +249,7 @@ class Wp_Simpeg_Admin {
 					<h5>HALAMAN TERKAIT</h5>
 	            	<ol>
 	            		<li><a target="_blank" href="'.$management_data_pegawai['url'].'">'.$management_data_pegawai['title'].'</a></li>
+	            		<li><a target="_blank" href="'.$management_data_absensi['url'].'">'.$management_data_absensi['title'].'</a></li>
 	            	</ol>
 		        	' ),
 		        Field::make( 'html', 'crb_simpeg_pegawai_upload_html' )
