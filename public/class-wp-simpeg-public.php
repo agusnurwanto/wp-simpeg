@@ -1864,8 +1864,8 @@ class Wp_Simpeg_Public {
 			$id_pegawai_lembur = get_user_meta($user_id, 'id_pegawai_lembur');
 			if(!empty($id_pegawai_lembur)){
 				$menu_absensi_pegawai_lembur = $this->functions->generatePage(array(
-					'nama_page' => 'Menu Absensi Lembur',
-					'content' => '[menu_absensi_pegawai_lembur]',
+					'nama_page' => 'Menu Absensi Lembur '.$id_pegawai_lembur,
+					'content' => '[menu_absensi_pegawai_lembur id='.$id_pegawai_lembur.']',
 					'show_header' => 1,
 					'post_status' => 'private'
 				));
