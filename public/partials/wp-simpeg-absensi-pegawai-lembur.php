@@ -1,5 +1,9 @@
 <?php
 global $wpdb;
+
+$input = shortcode_atts(array(
+    'tahun_anggaran' => '2022'
+), $atts);
 $idtahun = $wpdb->get_results("select distinct tahun_anggaran from data_unit_lembur", ARRAY_A);
 $tahun = "<option value='-1'>Pilih Tahun</option>";
 foreach($idtahun as $val){
@@ -21,7 +25,7 @@ $disabled = 'disabled';
 <div class="cetak">
     <div style="padding: 10px;margin:0 0 3rem 0;">
         <input type="hidden" value="<?php echo get_option( SIMPEG_APIKEY ); ?>" id="api_key">
-        <h1 class="text-center" style="margin:3rem;">Input Data Surat Perintah Tugas (SPT)</h1>
+        <h1 class="text-center" style="margin:3rem;">Input Data Absensi Pegawai<br> Tahun <?php echo $input['tahun_anggaran']; ?></h1>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_data_spt_lembur();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
                 <button class="btn btn-warning" onclick="import_data_spt_lembur();"><i class="dashicons dashicons-media-spreadsheet"></i> Import Data</button>
@@ -909,7 +913,6 @@ function detail_data(_id){
     });
 }
 
-<?php if($can_tambah_data): ?>
 //show tambah data
 function tambah_data_spt_lembur(){
     jQuery('#id_data').val('');
@@ -932,8 +935,6 @@ function tambah_data_spt_lembur(){
     jQuery('#modalTambahDataSPTLembur .send_data').show();
     jQuery('#modalTambahDataSPTLembur').modal('show');
 }
-<?php endif; ?>
-<?php if($can_tambah_data): ?>
 function import_data_spt_lembur(){
     jQuery('#id_data').val('');
     jQuery("#import_data").val('');
@@ -943,7 +944,6 @@ function import_data_spt_lembur(){
     jQuery('#modalImportData .send_data').show();
     jQuery('#modalImportData').modal('show');
 }
-<?php endif; ?>
 
 function submitTambahDataFormSPTLembur(){
     var nomor_spt = jQuery('#nomor_spt').val();
