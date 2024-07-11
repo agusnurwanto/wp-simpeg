@@ -156,3 +156,19 @@ CREATE TABLE `data_spt_lembur_detail` (
   `active` tinyint(4) DEFAULT '1' COMMENT '0=hapus, 1=aktif',
   PRIMARY KEY  (id)
 );
+
+CREATE TABLE `data_absensi_lembur` (
+  `id` int(11) NOT NULL auto_increment,
+  `tahun_anggaran` year DEFAULT 2024,
+  `id_skpd` int(11) NOT NULL,
+  `jml_peg` int(11) DEFAULT NULL,
+  `jml_jam` int(11) DEFAULT NULL,
+  `uang_makan` double DEFAULT NULL,
+  `uang_lembur` double DEFAULT NULL,
+  `jml_pajak` double DEFAULT NULL,
+  `ket_lembur` text DEFAULT NULL,
+  `user` text DEFAULT NULL,
+  `update_at` datetime NOT NULL,
+  `active` tinyint(4) DEFAULT '1' COMMENT '0=hapus, 1=aktif',
+  PRIMARY KEY  (id)
+);

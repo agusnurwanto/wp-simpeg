@@ -222,6 +222,8 @@ class Wp_Simpeg {
 		$this->loader->add_action('wp_ajax_run_sql_migrate_wp_simpeg', $plugin_public, 'run_sql_migrate_wp_simpeg');
 		$this->loader->add_action('wp_ajax_verifikasi_spt_lembur', $plugin_public, 'verifikasi_spt_lembur');
 		$this->loader->add_action('wp_ajax_import_data_spt_lembur', $plugin_public, 'import_data_spt_lembur');
+		
+		$this->loader->add_action('wp_ajax_get_datatable_data_absensi_lembur', $plugin_public, 'get_datatable_data_absensi_lembur');
 
 		add_shortcode('management_data_pegawai_simpeg', array($plugin_public, 'management_data_pegawai_simpeg'));
 		add_shortcode('management_data_sbu_lembur', array($plugin_public, 'management_data_sbu_lembur'));

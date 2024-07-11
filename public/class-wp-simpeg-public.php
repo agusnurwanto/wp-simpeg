@@ -2355,4 +2355,96 @@ class Wp_Simpeg_Public {
 		}
 		die(json_encode($ret));
 	}	
+
+	public function get_datatable_data_absensi_lembur(){
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil get data!',
+	        'data'  => array()
+	    );
+
+	    if(!empty($_POST)){
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
+	            $user_id = um_user( 'ID' );
+	            $user_meta = get_userdata($user_id);
+	            $params = $columns = $totalRecords = $data = array();
+	            $params = $_REQUEST;
+	            $columns = array( 
+	            	'u.nama_skpd',
+	            	's.jml_peg',
+	            	's.jml_jam',
+	            	's.uang_makan',
+	            	's.uang_lembur',
+	            	's.jml_pajak',
+	            	's.ket_lembur',
+	              	's.id'
+	            );
+	            $where = $sqlTot = $sqlRec = "";
+
+	            if( !empty($params['search']['value']) ) { 
+	                $where .=" OR u.nama_skpd LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
+	                $where .=" OR s.ket_lembur LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
+	            }
+
+	            // getting total number records without any search
+	            $sql_tot = "SELECT count(id) as jml FROM `data_spt_lembur` s";
+	            $sql = "
+	            	SELECT 
+	            		".implode(', ', $columns)." 
+	            	FROM `data_spt_lembur` s
+	            	LEFT JOIN data_unit_lembur as u on s.id_skpd=u.id_skpd
+	            		AND s.tahun_anggaran=u.tahun_anggaran
+	            		AND s.active=u.active";
+	            $where_first = " WHERE 1=1 AND s.active=1";
+	            $sqlTot .= $sql_tot.$where_first;
+	            $sqlRec .= $sql.$where_first;
+	            if(isset($where) && $where != '') {
+	                $sqlTot .= $where;
+	                $sqlRec .= $where;
+	            }
+
+                $limit = '';
+                if($params['length'] != -1){
+                    $limit = "  LIMIT ".$wpdb->prepare('%d', $params['start'])." ,".$wpdb->prepare('%d', $params['length']);
+                }
+                $sqlRec .=  " ORDER BY ". $columns[$params['order'][0]['column']]."   ".str_replace("'", '', $wpdb->prepare('%s', $params['order'][0]['dir'])).$limit;
+
+                $queryTot = $wpdb->get_results($sqlTot, ARRAY_A);
+                $totalRecords = $queryTot[0]['jml'];
+                $queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
+
+                foreach($queryRecords as $recKey => $recVal){
+                    $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
+                	$btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
+                    $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Hapus Data"><i class="dashicons dashicons-trash"></i></a>';
+	                $queryRecords[$recKey]['aksi'] = $btn;
+	                $queryRecords[$recKey]['uang_lembur'] = $this->rupiah($recVal['uang_lembur']);
+	                $queryRecords[$recKey]['uang_makan'] = $this->rupiah($recVal['uang_makan']);
+	                $queryRecords[$recKey]['jml_pajak'] = $this->rupiah($recVal['jml_pajak']);
+	            }
+	     
+	            $json_data = array(
+	                "draw"            => intval( $params['draw'] ),   
+	                "recordsTotal"    => intval( $totalRecords ),  
+	                "recordsFiltered" => intval($totalRecords),
+	                "data"            => $queryRecords,
+	                "sql"             => $sqlRec
+	            );
+
+	            die(json_encode($json_data));
+	        }else{
+	            $return = array(
+	                'status' => 'error',
+	                'message'   => 'Api Key tidak sesuai!'
+	            );
+	        }
+	    }else{
+	        $return = array(
+	            'status' => 'error',
+	            'message'   => 'Format tidak sesuai!'
+	        );
+	    }
+	    die(json_encode($return));
+	} 
 }

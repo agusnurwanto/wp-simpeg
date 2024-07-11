@@ -28,23 +28,20 @@ $disabled = 'disabled';
         <h1 class="text-center" style="margin:3rem;">Input Data Absensi Pegawai<br> Tahun <?php echo $input['tahun_anggaran']; ?></h1>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_data_spt_lembur();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
-                <button class="btn btn-warning" onclick="import_data_spt_lembur();"><i class="dashicons dashicons-media-spreadsheet"></i> Import Data</button>
             </div>
         </div>
         <div class="wrap-table">
             <table id="management_data_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                 <thead>
                     <tr>
-                        <th class="text-center">Nomor SPT</th>
+                        <th class="text-center">Nama Pegawai</th>
                         <th class="text-center">SKPD</th>
-                        <th class="text-center">Jumlah Pegawai</th>
                         <th class="text-center">Jumlah Jam</th>
                         <th class="text-center">Uang Makan</th>
                         <th class="text-center">Uang Lembur</th>
                         <th class="text-center">Total Pajak</th>
                         <th class="text-center">Keterangan Lembur</th>
-                        <th class="text-center">Keterangan Verifikasi</th>
-                        <th class="text-center">Status</th>
+                        <th class="text-center">Foto Kegiatan</th>
                         <th class="text-center" style="width: 35px;">Aksi</th>
                     </tr>
                 </thead>
@@ -55,11 +52,11 @@ $disabled = 'disabled';
     </div>          
 </div>
 
-<div class="modal fade mt-4" id="modalTambahDataSPTLembur" role="dialog" aria-hidden="true">
+<div class="modal fade mt-4" id="modalTambahDataAbsensiLembur" role="dialog" aria-hidden="true">
     <div class="modal-dialog" style="min-width: 90vw;" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalTambahDataSPTLemburLabel">Tambah Data Surat Perintah Tugas (SPT)</h5>
+                <h5 class="modal-title" id="modalTambahDataAbsensiLemburLabel">Tambah Data Absensi</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -67,11 +64,6 @@ $disabled = 'disabled';
             <div class="modal-body">
                 <form id="form-spt">
                     <input type='hidden' id='id_data' name="id_data"/>
-                    <input type='hidden' id='tipe_verifikasi' name="tipe_verifikasi"/>
-                    <div class="form-group">
-                        <label>Nomor SPT</label>
-                        <input type="text" class="form-control" id="nomor_spt" name="nomor_spt"/>
-                    </div>
                     <div class="form-group">
                         <label>Pilih Tahun Anggaran</label>
                         <select class="form-control" id="tahun_anggaran" name="tahun_anggaran" onchange="get_skpd();">
@@ -82,22 +74,6 @@ $disabled = 'disabled';
                         <label>Pilih SKPD</label>
                         <select class="form-control" id="id_skpd" name="id_skpd" onchange="get_pegawai();">
                         </select>
-                    </div>
-                    <div class="form-group" style="display: none;">
-                        <label>Keterangan Verifikasi PPK (Pejabat Penatausahaan Keuangan) SKPD</label>
-                        <textarea class="form-control" id="ket_ver_ppk" name="ket_ver_ppk"></textarea>
-                    </div>
-                    <div class="form-group" style="display: none;">
-                        <label>Keterangan Verifikasi Kepala</label>
-                        <textarea class="form-control" id="ket_ver_kepala" name="ket_ver_kepala"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Dasar Lembur</label>
-                        <textarea class="form-control" id="dasar_lembur" name="dasar_lembur"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Peruntukan Lembur</label>
-                        <textarea class="form-control" id="ket_lembur" name="ket_lembur"></textarea>
                     </div>
                     <div class="form-group">
                         <table class="table table-bordered">
@@ -126,85 +102,24 @@ $disabled = 'disabled';
                                 <th class="text-center" style="width: 220px;">Waktu</th>
                                 <th class="text-center" style="width: 220px;">Total</th>
                                 <th class="text-center">Keterangan</th>
-                                <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                         </tbody>
                     </table>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="submit" onclick="submitTambahDataFormSPTLembur();" class="btn btn-primary send_data">Simpan</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade mt-4" id="modalVerifikasiKasubagKeuangan" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Verifikasi SPT Lembur oleh Kasubag Keuangan</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <table class="table table-bordered">
-                    <tbody>
-                        <tr>
-                            <td style="width: 130px;">Nomor SPT</td>
-                            <td style="width: 25px;" class="text-center">:</td>
-                            <td class="nomor_spt"></td>
-                        </tr>
-                        <tr>
-                            <td>Total Anggaran</td>
-                            <td class="text-center">:</td>
-                            <td class="total"></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <form>
-                    <input type='hidden' name="id_data"/>
-                    <input type='hidden' name='tipe_verifikasi' value="kasubag_keuangan"/>
                     <div class="form-group">
-                        <label class="form-check-label"><input value="1" type="checkbox" id="status_bendahara" name="status_bendahara"> Disetujui (Anggaran Tersedia)</label>
+                        <label for="foto_kegiatab">Pilih File</label>
+                        <input type="file" class="form-control-file" id="foto_kegiatab" name="foto_kegiatab" accept="application/pdf" required>
+                        <div style="padding-top: 10px; padding-bottom: 10px;"><a id="foto_kegiatabExisting" target="_blank"></a></div>
                     </div>
-                    <div class="form-group keterangan_ditolak">
-                        <label>Keterangan</label>
-                        <textarea class="form-control" id="keterangan_status_bendahara" name="keterangan_status_bendahara"></textarea>
+                    <div class="alert alert-warning mt-2" role="alert">
+                        Maksimal ukuran file: 1MB. Format file yang diperbolehkan: JPEG, JPG.
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="submit" onclick="submitVerifikasiLembur(this);" class="btn btn-primary send_data">Simpan</button>
+                <button type="submit" onclick="submitTambahDataFormAbsensiLembur();" class="btn btn-primary send_data">Simpan</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade mt-4" id="modalImportData" tabindex="-1" role="dialog" aria-labelledby="modalImportDataLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalImportDataLabel">Import Data SPT Lembur</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-            <input type='hidden' id='id_data' name="id_data"/>
-            Pilih file excel .xlsx : <input type="file" id="import_data" accept=".xlsx" onchange="filePickedSimpeg(event);">
-            <div style="padding-top: 10px; padding-bottom: 10px;"><a id="import_data_existing"></a></div>
-            Data Json: <textarea id="data-excel" class="cf-select__input"></textarea>
-            <small>Contoh format file excel bisa <a href=<?php echo SIMPEG_PLUGIN_URL.'public/media/simpeg/contoh_import_excel.xlsx'; ?> target="_blank">download disini</a>. <br>Sheet file excel yang akan diimport harus diberi nama <b>data</b>. Untuk kolom nilai angka ditulis tanpa tanda titik.</small>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary submitBtn" onclick="submitImportData()">Simpan</button>
-                <button type="submit" class="components-button btn btn-secondary" data-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -222,111 +137,6 @@ jQuery(document).ready(function(){
         'width': '100%'
     });
 });
-
-function submitVerifikasiLembur(that){
-    if(!jQuery('#status_bendahara').is(':checked')){
-        var ket = jQuery('#keterangan_status_bendahara').val();
-        if(ket == ''){
-            return alert('Keterangan harus diisi jika status ditolak');
-        }
-    }
-    if(confirm('Apakah anda yakin untuk memverifikasi data ini?')){
-        jQuery("#wrap-loading").show();
-        var form = getFormData(jQuery(that).closest('.modal').find('.modal-body form'));
-        jQuery.ajax({
-            method:'post',
-            url:'<?php echo admin_url('admin-ajax.php'); ?>',
-            dataType: 'json',
-            data: {
-                'action': 'verifikasi_spt_lembur',
-                'api_key': jQuery('#api_key').val(),
-                'data': JSON.stringify(form)
-            },
-            success:function(response){
-                jQuery('#wrap-loading').hide();
-                alert(response.message);
-                if(response.status == 'success'){
-                    jQuery('#modalVerifikasiKasubagKeuangan').modal('hide');
-                    get_data_spt_lembur();
-                }
-            }
-        });
-    }
-}
-
-function set_keterangan(that){
-    if(jQuery(that).is(':checked')){
-        jQuery(that).closest('form').find('.keterangan_ditolak').show();
-    }else{
-        jQuery(that).closest('form').find('.keterangan_ditolak').hide();
-    }
-}
-
-function submit_data(id_spt){
-    if(confirm('Apakah anda yakin untuk mengirim data ini ke proses selanjutnya?')){
-        jQuery('#wrap-loading').show();
-        jQuery.ajax({
-            method: 'post',
-            url: '<?php echo admin_url('admin-ajax.php'); ?>',
-            dataType: 'json',
-            data:{
-                'action': 'verifikasi_spt_lembur',
-                'api_key': jQuery('#api_key').val(),
-                'data': JSON.stringify({
-                    id_data: id_spt,
-                    tipe_verifikasi: 'pptk'
-                })
-            },
-            success: function(res){
-                jQuery('#wrap-loading').hide();
-                alert(res.message);
-                if(res.status == 'success'){
-                    get_data_spt_lembur();
-                }
-            }
-        });
-    }
-}
-
-function verifikasi_kasubag_keuangan(id_spt){
-    jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        method: 'post',
-        url: '<?php echo admin_url('admin-ajax.php'); ?>',
-        dataType: 'json',
-        data:{
-            'action': 'get_data_spt_lembur_by_id',
-            'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
-            'id': id_spt,
-        },
-        success: function(res){
-            if(res.status == 'success'){
-                jQuery('#modalVerifikasiKasubagKeuangan input[name="id_data"]').val(res.data.id);
-                jQuery('#modalVerifikasiKasubagKeuangan .nomor_spt').html(res.data.nomor_spt);
-                var total = (+res.data.uang_lembur)+(+res.data.uang_makan);
-                jQuery('#modalVerifikasiKasubagKeuangan .total').html('Rp '+formatRupiah(total));
-                if(res.data.status_ver_bendahara == 1){
-                    jQuery('#status_bendahara').prop('checked', true);
-                }else{
-                    jQuery('#status_bendahara').prop('checked', false);
-                }
-                jQuery('#modalVerifikasiKasubagKeuangan #keterangan_status_bendahara').val(res.data.ket_ver_bendahara);
-                jQuery('#modalVerifikasiKasubagKeuangan').modal('show');
-            }else{
-                alert(res.message);
-            }
-            jQuery('#wrap-loading').hide();
-        }
-    });
-}
-
-function verifikasi_ppk(id_spt){
-    edit_data(id_spt, 'ppk');
-}
-
-function verifikasi_kepala(id_spt){
-    edit_data(id_spt, 'kepala');
-}
 
 function get_skpd(no_loading=false) {
     return new Promise(function(resolve, reject){
@@ -435,7 +245,7 @@ function cek_time(that){
 
             console.log('start_peg_asli, end_peg_asli, start_asli, end_asli', start_peg_asli, end_peg_asli, start_asli, end_asli);
 
-            // jika start pegawai lebih dulu dari start SPT
+            // jika start pegawai lebih dulu dari start Absensi
             if(start_peg < start){
                 var new_val = start_asli+'T'+start_peg_asli.split('T')[1];
                 tr_peg.find('.time-start').val(new_val).trigger('change');
@@ -446,7 +256,7 @@ function cek_time(that){
                 console.log('start_peg > end new_val start_peg', new_val);
             }
 
-            // jika end pegawai lebih lama dari end SPT
+            // jika end pegawai lebih lama dari end Absensi
             if(end_peg > end){
                 var new_val = end_asli+'T'+end_peg_asli.split('T')[1];
                 tr_peg.find('.time-end').val(new_val).trigger('change');
@@ -524,10 +334,6 @@ function html_pegawai(opsi){
                     '</tbody>'+
                 '</table>'+
             '</td>'+
-            '<td style="width: 75px;" class="text-center aksi-pegawai">'+
-                '<button class="tambah-pegawai btn btn-warning btn-sm" onclick="tambah_pegawai(this); return false;"><i class="dashicons dashicons-plus"></i></button>'+
-                '<button class="copy-pegawai btn btn-info btn-sm" onclick="tambah_pegawai(this, 1); return false;"><i class="dashicons dashicons-book"></i></button>'+
-        '</td>'+
         '</tr>';
     return html;
 }
@@ -645,9 +451,9 @@ function set_keterangan(that){
     }
 }
 
-function get_data_spt_lembur(){
-    if(typeof datapencairan_spt_lembur == 'undefined'){
-        window.datapencairan_spt_lembur = jQuery('#management_data_table').on('preXhr.dt', function(e, settings, data){
+function get_data_spt_lembur() {
+    if (typeof datapencairan_spt_lembur == 'undefined') {
+        window.datapencairan_spt_lembur = jQuery('#management_data_table').on('preXhr.dt', function(e, settings, data) {
             jQuery("#wrap-loading").show();
         }).DataTable({
             "processing": true,
@@ -656,34 +462,28 @@ function get_data_spt_lembur(){
                 url: '<?php echo admin_url('admin-ajax.php'); ?>',
                 type: 'post',
                 dataType: 'json',
-                data:{
-                    'action': 'get_datatable_data_spt_lembur',
-                    'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
+                data: {
+                'action': 'get_datatable_data_absensi_lembur',
+                'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
                 }
             },
-            lengthMenu: [[20, 50, 100, -1], [20, 50, 100, "All"]],
-            order: [[0, 'asc']],
-            "aoColumnDefs": [
-                { "bSortable": false, "aTargets": [ 8, 10 ] }
+            lengthMenu: [
+                [20, 50, 100, -1],
+                [20, 50, 100, "All"]
             ],
-            "drawCallback": function( settings ){
+            order: [
+                [0, 'asc']
+            ],
+            "drawCallback": function(settings) {
                 jQuery("#wrap-loading").hide();
             },
             "columns": [
                 {
-                    "data": 'nomor_spt',
+                    "data": '',
                     className: "text-center"
                 },
                 {
                     "data": 'nama_skpd',
-                    className: "text-center"
-                },
-                // {
-                //     "data": 'nama_pegawai',
-                //     className: "text-center"
-                // },
-                {
-                    "data": 'jml_peg',
                     className: "text-center"
                 },
                 {
@@ -707,11 +507,7 @@ function get_data_spt_lembur(){
                     className: "text-center"
                 },
                 {
-                    "data": 'ket_ver_ppk',
-                    className: "text-center"
-                },
-                {
-                    "data": 'status',
+                    "data": '',
                     className: "text-center"
                 },
                 {
@@ -720,7 +516,7 @@ function get_data_spt_lembur(){
                 }
             ]
         });
-    }else{
+    } else {
         datapencairan_spt_lembur.draw();
     }
 }
@@ -750,7 +546,7 @@ function hapus_data(id){
     }
 }
 
-function edit_data(_id, tipe_verifikasi=false){
+function edit_data(_id){
     jQuery('#wrap-loading').show();
     jQuery.ajax({
         method: 'post',
@@ -765,21 +561,6 @@ function edit_data(_id, tipe_verifikasi=false){
             if(res.status == 'success'){
                 jQuery('#ket_ver_ppk').val('').closest('.form-group').hide();
                 jQuery('#ket_ver_kepala').val('').closest('.form-group').hide();
-                jQuery('#tipe_verifikasi').val('');
-                if(res.data.status >= 2){
-                    jQuery('#ket_ver_ppk').val(res.data.ket_ver_ppk).prop('disabled', true).closest('.form-group').show();
-                    if(res.data.status >= 3){
-                        jQuery('#ket_ver_kepala').val(res.data.ket_ver_kepala).prop('disabled', true).closest('.form-group').show();
-                    }
-                }
-                if(tipe_verifikasi){
-                    jQuery('#tipe_verifikasi').val(tipe_verifikasi);
-                    if(tipe_verifikasi == 'ppk'){
-                        jQuery('#ket_ver_ppk').prop('disabled', false);
-                    }else if(tipe_verifikasi == 'kepala'){
-                        jQuery('#ket_ver_kepala').prop('disabled', false);
-                    }
-                }
                 jQuery('#id_data').val(res.data.id).prop('disabled', false);
                 jQuery('#nomor_spt').val(res.data.nomor_spt).prop('disabled', false);
                 jQuery('#tahun_anggaran').val(res.data.tahun_anggaran).prop('disabled', false);
@@ -800,7 +581,7 @@ function edit_data(_id, tipe_verifikasi=false){
                             jQuery('#tahun_anggaran').prop('disabled', false);
                         }
 
-                        // setting waktu SPT setelah get_skpd karena saat get_skpd data waktu direset
+                        // setting waktu Absensi setelah get_skpd karena saat get_skpd data waktu direset
                         jQuery('#waktu_mulai_spt').val(res.data.waktu_mulai_spt).trigger('change').prop('disabled', false);
                         jQuery('#waktu_selesai_spt').val(res.data.waktu_selesai_spt).trigger('change').prop('disabled', false);
                         get_pegawai(true)
@@ -825,8 +606,8 @@ function edit_data(_id, tipe_verifikasi=false){
                                         jQuery('#uang_makan_set_'+id).prop('checked', true).prop('disabled', false);
                                     }
                                 });
-                                jQuery('#modalTambahDataSPTLembur .send_data').show();
-                                jQuery('#modalTambahDataSPTLembur').modal('show');
+                                jQuery('#modalTambahDataAbsensiLembur .send_data').show();
+                                jQuery('#modalTambahDataAbsensiLembur').modal('show');
                                 jQuery('#wrap-loading').hide();
                             }, 1000);
                         });
@@ -853,20 +634,10 @@ function detail_data(_id){
         },
         success: function(res){
             if(res.status == 'success'){
-                jQuery('#ket_ver_ppk').val('').closest('.form-group').hide();
-                jQuery('#ket_ver_kepala').val('').closest('.form-group').hide();
-                if(res.data.status >= 2){
-                    jQuery('#ket_ver_ppk').val(res.data.ket_ver_ppk).prop('disabled', true).closest('.form-group').show();
-                    if(res.data.status >= 3){
-                        jQuery('#ket_ver_kepala').val(res.data.ket_ver_kepala).prop('disabled', true).closest('.form-group').show();
-                    }
-                }
                 jQuery('#id_data').val(res.data.id).prop('disabled', false);
-                jQuery('#nomor_spt').val(res.data.nomor_spt).prop('disabled', true);
                 jQuery('#tahun_anggaran').val(res.data.tahun_anggaran).prop('disabled', true);
                 jQuery('#ket_lembur').val(res.data.ket_lembur).prop('disabled', true);
                 jQuery('#dasar_lembur').val(res.data.dasar_lembur).prop('disabled', true);
-                jQuery('#ket_ver_ppk').val(res.data.ket_ver_ppk).prop('disabled', true);
 
                 get_sbu(true)
                 .then(function(){
@@ -898,8 +669,8 @@ function detail_data(_id){
                                     }
                                 });
                                 jQuery('.aksi-pegawai .btn').hide();
-                                jQuery('#modalTambahDataSPTLembur .send_data').hide();
-                                jQuery('#modalTambahDataSPTLembur').modal('show');
+                                jQuery('#modalTambahDataAbsensiLembur .send_data').hide();
+                                jQuery('#modalTambahDataAbsensiLembur').modal('show');
                                 jQuery('#wrap-loading').hide();
                             }, 1000);
                         });
@@ -916,39 +687,19 @@ function detail_data(_id){
 //show tambah data
 function tambah_data_spt_lembur(){
     jQuery('#id_data').val('');
-    jQuery('#tipe_verifikasi').val('');
-    jQuery('#nomor_spt').val('').prop('disabled', false);
     jQuery('#tahun_anggaran').val('<?php echo date('Y'); ?>').trigger('change').prop('disabled', false);
     jQuery('#id_skpd').val('').trigger('change').prop('disabled', false);
     jQuery('#ket_lembur').val('').prop('disabled', false);
-    jQuery('#dasar_lembur').val('').prop('disabled', false);
-    jQuery('#id_ppk').val('').prop('disabled', false);
-    jQuery('#id_bendahara').val('').prop('disabled', false);
-    jQuery('#ket_ver_ppk').val('').prop('disabled', true).closest('.form-group').hide();
-    jQuery('#ket_ver_kepala').val('').prop('disabled', true).closest('.form-group').hide();
-    jQuery('#status_ver_bendahara').val('').prop('disabled', false);
-    jQuery('#keterangan_status_bendahara').closest('.form-group').hide().prop('disabled', false);
-    jQuery('#status_bendahara').prop('checked', false);
-    jQuery('#keterangan_status_bendahara').val('').prop('disabled', false);
     jQuery('#waktu_mulai_spt').prop('disabled', false);
     jQuery('#waktu_selesai_spt').prop('disabled', false);
-    jQuery('#modalTambahDataSPTLembur .send_data').show();
-    jQuery('#modalTambahDataSPTLembur').modal('show');
-}
-function import_data_spt_lembur(){
-    jQuery('#id_data').val('');
-    jQuery("#import_data").val('');
-    jQuery("#import_data_existing").html('');
-    jQuery("#import_data_existing").attr('target', '_blank');
-    jQuery("#import_data_existing").attr('href', '');
-    jQuery('#modalImportData .send_data').show();
-    jQuery('#modalImportData').modal('show');
+    jQuery('#modalTambahDataAbsensiLembur .send_data').show();
+    jQuery('#modalTambahDataAbsensiLembur').modal('show');
 }
 
-function submitTambahDataFormSPTLembur(){
+function submitTambahDataFormAbsensiLembur(){
     var nomor_spt = jQuery('#nomor_spt').val();
     if(nomor_spt == ''){
-        return alert('Nomor SPT wajib diisi!');
+        return alert('Nomor Absensi wajib diisi!');
     }
     var tahun_anggaran = jQuery('#tahun_anggaran').val();
     if(tahun_anggaran == ''){
@@ -968,11 +719,11 @@ function submitTambahDataFormSPTLembur(){
     }
     var waktu_mulai_spt = jQuery('#waktu_mulai_spt').val();
     if(waktu_mulai_spt == ''){
-        return alert('Tanggal Mulai SPT diisi dulu!');
+        return alert('Tanggal Mulai Absensi diisi dulu!');
     }
     var waktu_selesai_spt = jQuery('#waktu_selesai_spt').val();
     if(waktu_selesai_spt == ''){
-        return alert('Tanggal Selesai SPT diisi dulu!');
+        return alert('Tanggal Selesai Absensi diisi dulu!');
     }
     var pegawai_all = {};
     var error = [];
@@ -1023,20 +774,6 @@ function submitTambahDataFormSPTLembur(){
         console.log('error', error);
         return alert('Kesalahan input pegawai! ( '+error.join(', ')+' )');
     }
-
-    var tipe_verifikasi = jQuery('#tipe_verifikasi').val();
-    if(tipe_verifikasi == 'ppk'){
-        var ket_ver_ppk = jQuery('#ket_ver_ppk').val();
-        if(ket_ver_ppk == ''){
-            return alert('Keterangan verifikasi PPK SKPD diisi dulu!');
-        }
-    }
-    if(tipe_verifikasi == 'kepala'){
-        var ket_ver_kepala = jQuery('#ket_ver_kepala').val();
-        if(ket_ver_kepala == ''){
-            return alert('Keterangan verifikasi Kepala SKPD diisi dulu!');
-        }
-    }
     if(confirm('Apakah anda yakin untuk menyimpan data ini?')){
         jQuery("#wrap-loading").show();
         let form = getFormData(jQuery("#form-spt"));
@@ -1053,7 +790,7 @@ function submitTambahDataFormSPTLembur(){
                 jQuery('#wrap-loading').hide();
                 alert(response.message);
                 if(response.status == 'success'){
-                    jQuery('#modalTambahDataSPTLembur').modal('hide');
+                    jQuery('#modalTambahDataAbsensiLembur').modal('hide');
                     get_data_spt_lembur();
                 }
             }
@@ -1170,36 +907,6 @@ function get_sbu(no_loading = false){
             });
         }else{
             return resolve(data_sbu_global[tahun]);
-        }
-    });
-}
-
-function submitImportData(){
-    var import_data = jQuery('#data-excel').val();
-    if(typeof import_data == 'undefined'){
-        return alert('Upload file dulu!');
-    }
-
-    jQuery('#wrap-loading').show();
-    let tempData = new FormData();
-    tempData.append('action', 'import_data_spt_lembur');
-    tempData.append('api_key', '<?php echo get_option(SIMPEG_APIKEY); ?>');
-    tempData.append('import_data', import_data);
-    jQuery.ajax({
-        method: 'post',
-        url: '<?php echo admin_url('admin-ajax.php'); ?>',
-        dataType: 'json',
-        data: tempData,
-        processData: false,
-        contentType: false,
-        cache: false,
-        success: function(res){
-            jQuery('#wrap-loading').hide();
-            alert(res.message);
-            if(res.status == 'success'){
-                jQuery('#modalImportData').modal('hide');
-                get_data_spt_lembur();
-            }
         }
     });
 }
