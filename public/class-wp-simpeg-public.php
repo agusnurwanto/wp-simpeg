@@ -2372,6 +2372,7 @@ class Wp_Simpeg_Public {
 	            $params = $_REQUEST;
 	            $columns = array( 
 	            	'u.nama_skpd',
+	            	's.user',
 	            	's.jml_peg',
 	            	's.jml_jam',
 	            	's.uang_makan',
@@ -2416,8 +2417,6 @@ class Wp_Simpeg_Public {
 
                 foreach($queryRecords as $recKey => $recVal){
                     $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
-                	$btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
-                    $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Hapus Data"><i class="dashicons dashicons-trash"></i></a>';
 	                $queryRecords[$recKey]['aksi'] = $btn;
 	                $queryRecords[$recKey]['uang_lembur'] = $this->rupiah($recVal['uang_lembur']);
 	                $queryRecords[$recKey]['uang_makan'] = $this->rupiah($recVal['uang_makan']);
@@ -2447,4 +2446,173 @@ class Wp_Simpeg_Public {
 	    }
 	    die(json_encode($return));
 	} 
+
+
+	public function tambah_data_absensi_lembur(){
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil simpan data!',
+	        'error' => array(),
+	        'data' => array()
+	    );
+	    if(!empty($_POST)){
+	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
+	        	$data = json_decode(stripslashes($_POST['data']), true);
+	            if($ret['status'] != 'error' && empty($data['tahun_anggaran'])){
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Pilih Tahun dulu!';
+	            }
+	            if($ret['status'] != 'error' && empty($data['id_skpd'])){
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Pilih SKPD dulu!';
+	            }
+	            if($ret['status'] != 'error' && empty($data['waktu_mulai_spt'])){
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Isi waktu mulai SPT dulu!';
+	            }
+	            if($ret['status'] != 'error' && empty($data['waktu_selesai_spt'])){
+	                $ret['status'] = 'error';
+	                $ret['message'] = 'Isi waktu selesai SPT dulu!';
+	            }
+
+	            if($ret['status'] != 'error' && !empty($data['id_pegawai'])){
+	            	$pesan = array();
+	            	foreach($data['id_pegawai'] as $key => $pegawai){
+	            		if(empty($data['id_pegawai'][$key])){
+	            			$ret['status'] = 'error';
+	            			$pesan[] = 'Nama pegawai no '.$key.' diisi dulu!';
+	            		}
+	            		if(empty($data['waktu_mulai'][$key])){
+	            			$ret['status'] = 'error';
+	            			$pesan[] = 'Waktu mulai pegawai no '.$key.' diisi dulu!';
+	            		}
+	            		if(empty($data['waktu_selesai'][$key])){
+	            			$ret['status'] = 'error';
+	            			$pesan[] = 'Waktu selesai pegawai no '.$key.' diisi dulu!';
+	            		}
+	            	}
+	            	if($ret['status'] == 'error'){
+	            		$ret['message'] = implode(', ', $pesan);
+	            	}
+	            }
+	            if($ret['status'] != 'error'){
+	                $tahun_anggaran = $data['tahun_anggaran'];
+	                $id_skpd = $data['id_skpd'];
+	                $ket_lembur = $data['ket_lembur'];
+	                $waktu_mulai_spt = $data['waktu_mulai_spt'];
+	                $waktu_selesai_spt = $data['waktu_selesai_spt'];
+		            $user_id = um_user( 'ID' );
+		            $user_meta = get_userdata($user_id);
+	                $uang_makan = 0;
+	                $uang_lembur = 0;
+	                $jml_jam = 0;
+	                $jml_peg = array();
+	                $jml_pajak = 0;
+	                $data_opsi_detail = array();
+	                foreach($data['id_pegawai'] as $key => $pegawai){
+	                	$jml_peg[$data['id_pegawai'][$key]] = '';
+	                	$jml_jam += $data['jml_jam_lembur'][$key];
+	                	$jml_pajak += $data['jml_pajak'][$key];
+	                	$uang_lembur += $data['uang_lembur'][$key];
+	                	$uang_makan += $data['uang_makan'][$key];
+	                	$data_opsi_detail[] = array(
+	                		'id' => $data['id_spt_detail'][$key],
+	                		'id_spt' => '',
+							'id_pegawai' => $data['id_pegawai'][$key],
+							'id_standar_harga_lembur' => $data['id_standar_harga_lembur'][$key],
+							'id_standar_harga_makan' => $data['id_standar_harga_makan'][$key],
+							'uang_lembur' => $data['uang_lembur'][$key],
+							'uang_makan' => $data['uang_makan'][$key],
+							'jml_hari' => $data['jml_hari_lembur'][$key],
+							'jml_jam' => $data['jml_jam_lembur'][$key],
+							'jml_pajak' => $data['jml_pajak'][$key],
+							'waktu_mulai' => $data['waktu_mulai'][$key],
+							'waktu_akhir' => $data['waktu_selesai'][$key],
+							'waktu_mulai_hadir' => '',
+							'waktu_akhir_hadir' => '',
+							'tipe_hari' => $data['jenis_hari'][$key],
+							'keterangan' => $data['keterangan'][$key],
+							'file_lampiran' => '',
+							'update_at' => current_time('mysql'),
+							'active' => 1
+	                	);
+	                }
+	                $data_opsi = array(
+	                    'id_skpd'=> $id_skpd,
+	                    'tahun_anggaran'=> $tahun_anggaran,
+	                    'waktu_mulai_spt'=> $data['waktu_mulai_spt'],
+	                    'waktu_selesai_spt'=> $data['waktu_selesai_spt'],
+			            'uang_makan'=> $uang_makan, 
+			            'uang_lembur'=> $uang_lembur, 
+			            'dasar_lembur'=> $dasar_lembur, 
+			            'ket_lembur'=> $ket_lembur, 
+			            'jml_hari'=> $data['jml_hari'], 
+			            'jml_jam'=> $jml_jam, 
+			            'jml_peg'=> count($jml_peg), 
+			            'jml_pajak'=> $jml_pajak,
+	                    'user' => $user_meta->display_name,
+	                    'update_at' => current_time('mysql'),
+						'active' => 1
+	                );
+	                if(!empty($data['id_data'])){
+	                    $wpdb->update('data_absensi_lembur', $data_opsi, array(
+	                        'id' => $data['id_data']
+	                    ));
+	                }else{
+	                	$data_opsi['status'] = 0;
+	                    $cek_id = $wpdb->get_row($wpdb->prepare('
+	                        SELECT
+	                            id,
+	                            active
+	                        FROM data_absensi_lembur
+	                        WHERE tahun_anggaran=%d
+	                    ', $tahun_anggaran), ARRAY_A);
+	                    if(empty($cek_id)){
+	                        $cek = $wpdb->insert('data_absensi_lembur', $data_opsi);
+	                        if(!empty($cek)){
+	                        	$data['id_data'] = $wpdb->insert_id;
+	                        }
+	                    }else{
+	                        if($cek_id['active'] == 0){
+	                        	$data['id_data'] = $cek_id['id'];
+	                            $wpdb->update('data_absensi_lembur', $data_opsi, array(
+	                                'id' => $cek_id['id']
+	                            ));
+	                        }else{
+	                            $ret['status'] = 'error';
+	                            $ret['message'] = 'Gagal disimpan.';
+	                        }
+	                    }
+	                }
+	            }
+	            if($ret['status'] != 'error'){
+                    $wpdb->update('data_spt_lembur_detail', array('active' => 0), array(
+                        'id_spt' => $data['id_data']
+                    ));
+	            	foreach($data_opsi_detail as $opsi){
+	            		$opsi['id_spt'] = $data['id_data'];
+	                    if(empty($opsi['id'])){
+	                        $wpdb->insert('data_spt_lembur_detail', $opsi);
+	                    }else{
+                            $wpdb->update('data_spt_lembur_detail', $opsi, array(
+                                'id' => $opsi['id']
+                            ));
+                        }
+                        if(!empty($wpdb->last_error)){
+                        	$ret['error'][] = $wpdb->last_error;
+                        }
+	            	}
+	            }
+	        }else{
+	            $ret['status']  = 'error';
+	            $ret['message'] = 'Api key tidak ditemukan!';
+	        }
+	    }else{
+	        $ret['status']  = 'error';
+	        $ret['message'] = 'Format Salah!';
+	    }
+
+	    die(json_encode($ret));
+	}
 }
