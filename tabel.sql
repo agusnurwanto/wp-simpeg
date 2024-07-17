@@ -159,7 +159,7 @@ CREATE TABLE `data_spt_lembur_detail` (
 
 CREATE TABLE `data_absensi_lembur` (
   `id` int(11) NOT NULL auto_increment,
-  `tahun_anggaran` year DEFAULT 2024,
+  `tahun_anggaran` year(4) DEFAULT 2023,
   `id_skpd` int(11) NOT NULL,
   `jml_peg` int(11) DEFAULT NULL,
   `jml_jam` int(11) DEFAULT NULL,
@@ -167,9 +167,36 @@ CREATE TABLE `data_absensi_lembur` (
   `uang_lembur` double DEFAULT NULL,
   `jml_pajak` double DEFAULT NULL,
   `ket_lembur` text DEFAULT NULL,
-  `dokumen` text DEFAULT NULL,
   `user` text DEFAULT NULL,
+  `waktu_mulai_spt` date NOT NULL,
+  `waktu_selesai_spt` date NOT NULL,
+  `jml_hari` int(11) DEFAULT NULL,
+  `dasar_lembur` text DEFAULT NULL
+  `file_lampiran` text DEFAULT NULL,
+  `status` tinyint(4) DEFAULT 3 COMMENT '0=belum diverifikasi, 1=disetujui kasubag keuangan, 2=disetujui ppk, 3=selesai',
   `update_at` datetime NOT NULL,
   `active` tinyint(4) DEFAULT '1' COMMENT '0=hapus, 1=aktif',
+  PRIMARY KEY  (id)
+);
+
+CREATE TABLE `data_absensi_lembur_detail` (
+  `id` int(11) NOT NULL auto_increment,
+  `id_pegawai` int(11) NOT NULL,
+  `id_standar_harga_lembur` int(11) NOT NULL,
+  `id_standar_harga_makan` int(11) NOT NULL,
+  `waktu_mulai` datetime DEFAULT NULL,
+  `waktu_akhir` datetime DEFAULT NULL,
+  `waktu_mulai_hadir` datetime DEFAULT NULL,
+  `waktu_akhir_hadir` datetime DEFAULT NULL,
+  `tipe_hari` enum('1','2') DEFAULT '1' COMMENT '1=hari libur, 2=hari kerja',
+  `keterangan` text DEFAULT NULL,
+  `file_lampiran` text DEFAULT NULL,
+  `update_at` datetime NOT NULL,
+  `active` tinyint(4) DEFAULT 1 COMMENT '0=hapus, 1=aktif',
+  `uang_lembur` double DEFAULT NULL,
+  `uang_makan` double DEFAULT NULL,
+  `jml_hari` int(11) DEFAULT NULL,
+  `jml_jam` int(11) DEFAULT NULL,
+  `jml_pajak` double DEFAULT NULL,
   PRIMARY KEY  (id)
 );
