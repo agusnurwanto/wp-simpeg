@@ -19,19 +19,6 @@ $skpd = $wpdb->get_row(
     ARRAY_A
 );
 
-$pegawai = $wpdb->get_row(
-    $wpdb->prepare("
-    SELECT 
-        *
-    FROM data_pegawai_lembur
-    WHERE id_skpd=%d
-      AND tahun=%d
-      AND id = %d
-      AND active = 1
-", $input['id_skpd'], $input['tahun_anggaran'], $input['id']),
-    ARRAY_A
-);
-
 $idtahun = $wpdb->get_results("select distinct tahun_anggaran from data_unit_lembur", ARRAY_A);
 $tahun = "<option value='-1'>Pilih Tahun</option>";
 foreach($idtahun as $val){
@@ -390,6 +377,7 @@ function get_pegawai(no_loading=false) {
                     'action' : 'get_pegawai_simpeg',
                     'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
                     'id_skpd': id_skpd,
+                    id: "<?php echo $input['id']; ?>",
                     'tahun_anggaran': jQuery('#tahun_anggaran').val()
                 },
                 dataType: 'json',
@@ -676,7 +664,12 @@ function tambah_data_absensi_lembur(){
     jQuery('#tahun_anggaran').val('<?php echo date('Y'); ?>').trigger('change').prop('disabled', false);
     jQuery('#id_skpd').val('<?php echo $input['id_skpd']; ?>').trigger('change').hide();
     get_pegawai(true)
+    // jQuery('#id_pegawai_1').val('<?php echo $input['id']; ?>').trigger('change');
     jQuery('#ket_lembur').val('').prop('disabled', false);
+    jQuery('#uang_makan').val('0').prop('disabled', true);
+    jQuery('#uang_lembur').val('0').prop('disabled', true);
+    jQuery('#sbu_makan').val('').prop('disabled', false);
+    jQuery('#sbu_lembur').val('').prop('disabled', false);
     jQuery('#waktu_mulai_spt').trigger('change').prop('disabled', true);
     jQuery('#waktu_selesai_spt').trigger('change').prop('disabled', true);
     jQuery('#lampiran').val('').show();

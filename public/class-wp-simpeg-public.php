@@ -183,6 +183,13 @@ class Wp_Simpeg_Public {
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-pegawai-lembur.php';
     }
 
+    public function laporan_bulanan_absensi($atts){
+        if(!empty($_GET) && !empty($_GET['post'])){
+            return '';
+        }
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-bulanan-absensi.php';
+    }
+
 	function get_simpeg_map_url()
 	{
 		$api_googlemap = get_option('_crb_google_api_simpeg');
@@ -242,7 +249,6 @@ class Wp_Simpeg_Public {
 
 	    die(json_encode($ret));
 	}
-
 	public function get_pegawai_simpeg(){
 	    global $wpdb;
 	    $ret = array(
@@ -251,19 +257,20 @@ class Wp_Simpeg_Public {
 	        'data' => array()
 	    );
 	    if(!empty($_POST)){
-	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
-	        	$tahun_anggaran = $_POST['tahun_anggaran'];
+	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option(SIMPEG_APIKEY)) {
+	            $tahun_anggaran = $_POST['tahun_anggaran'];
 	            $ret['data'] = $wpdb->get_results($wpdb->prepare('
 	                SELECT 
 	                    *
 	                FROM data_pegawai_lembur
 	                WHERE id_skpd=%d
-	                	AND active=1
-	                	AND tahun=%d
-	            ', $_POST['id_skpd'], $tahun_anggaran), ARRAY_A);
+	                    AND active=1
+	                    AND tahun=%d
+	                    AND id=%d
+	            ', $_POST['id_skpd'], $tahun_anggaran, $_POST['id']), ARRAY_A);
 	            $html = '<option value="">Pilih Pegawai</option>';
 	            foreach($ret['data'] as $pegawai){
-	            	$html .= '<option golongan="'.$pegawai['kode_gol'].'" value="'.$pegawai['id'].'">'.$pegawai['gelar_depan'].' '.$pegawai['nama'].' '.$pegawai['gelar_belakang'].' ( ID = '.$pegawai['id'].') </option>';
+	                $html .= '<option golongan="'.$pegawai['kode_gol'].'" value="'.$pegawai['id'].'">'.$pegawai['gelar_depan'].' '.$pegawai['nama'].' '.$pegawai['gelar_belakang'].' (ID = '.$pegawai['id'].')</option>';
 	            }
 	            $ret['html'] = $html;
 	        }else{

@@ -179,6 +179,13 @@ class Wp_Simpeg_Admin {
 			'no_key' => 1,
 			'post_status' => 'private'
 		));
+		$laporan_bulanan_absensi = $this->functions->generatePage(array(
+			'nama_page' => 'Laporan Bulanan Absensi',
+			'content' => '[laporan_bulanan_absensi]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
 		$laporan_spt_lembur = $this->functions->generatePage(array(
 			'nama_page' => 'Laporan Surat Perintah Tugas',
 			'content' => '[laporan_spt_lembur]',
