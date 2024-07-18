@@ -2380,6 +2380,41 @@ class Wp_Simpeg_Public {
 		}
 		die(json_encode($ret));
 	}
+	public function get_pegawai_absensi_simpeg(){
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil get data!',
+	        'data' => array()
+	    );
+	    if(!empty($_POST)){
+	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option(SIMPEG_APIKEY)) {
+	            $tahun_anggaran = $_POST['tahun_anggaran'];
+	            $ret['data'] = $wpdb->get_results($wpdb->prepare('
+	                SELECT 
+	                    *
+	                FROM data_pegawai_lembur
+	                WHERE id_skpd=%d
+	                    AND active=1
+	                    AND tahun=%d
+	                    AND id=%d
+	            ', $_POST['id_skpd'], $tahun_anggaran, $_POST['id']), ARRAY_A);
+	            $html = '<option value="">Pilih Pegawai</option>';
+	            foreach($ret['data'] as $pegawai){
+	                $html .= '<option golongan="'.$pegawai['kode_gol'].'" value="'.$pegawai['id'].'">'.$pegawai['gelar_depan'].' '.$pegawai['nama'].' '.$pegawai['gelar_belakang'].' (ID = '.$pegawai['id'].')</option>';
+	            }
+	            $ret['html'] = $html;
+	        }else{
+	            $ret['status']  = 'error';
+	            $ret['message'] = 'Api key tidak ditemukan!';
+	        }
+	    }else{
+	        $ret['status']  = 'error';
+	        $ret['message'] = 'Format Salah!';
+	    }
+
+	    die(json_encode($ret));
+	}
 
 	public function get_data_absensi_lembur_by_id(){
 	    global $wpdb;
@@ -2481,6 +2516,8 @@ class Wp_Simpeg_Public {
 
                 foreach($queryRecords as $recKey => $recVal){
                     $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
+                    $btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
+                    $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-trash"></i></a>';
 	                $queryRecords[$recKey]['aksi'] = $btn;
 					$queryRecords[$recKey]['file_lampiran'] = '<a href="' . SIMPEG_PLUGIN_URL . 'public/media/simpeg/' . $recVal['file_lampiran'] . '" target="_blank">' . $recVal['file_lampiran'] . '</a>';
 	                $queryRecords[$recKey]['uang_lembur'] = $this->rupiah($recVal['uang_lembur']);
@@ -2695,6 +2732,30 @@ class Wp_Simpeg_Public {
 		}
 
 		wp_send_json($ret);
+	}
+
+	public function hapus_data_absensi_lembur_by_id(){
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil hapus data!',
+	        'data' => array()
+	    );
+	    if(!empty($_POST)){
+	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
+	            $ret['data'] = $wpdb->update('data_absensi_lembur', array('active' => 0), array(
+	                'id' => $_POST['id']
+	            ));
+	        }else{
+	            $ret['status']  = 'error';
+	            $ret['message'] = 'Api key tidak ditemukan!';
+	        }
+	    }else{
+	        $ret['status']  = 'error';
+	        $ret['message'] = 'Format Salah!';
+	    }
+
+	    die(json_encode($ret));
 	}
 
 }
