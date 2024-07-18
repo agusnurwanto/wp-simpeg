@@ -248,3 +248,202 @@ function filePickedSimpeg(oEvent) {
 
     reader.readAsBinaryString(oFile);
 }
+
+
+function cari_alamat_simpeg(text) {
+    if(text){
+        var alamat = text;
+    }else{
+        var alamat = jQuery('#cari-alamat-simpeg-input').val();
+    }
+    if(typeof google == 'undefined'){
+        return setTimeout(function(){
+            cari_alamat_simpeg(text);
+        }, 1000)
+    }
+    geocoder = new google.maps.Geocoder();
+    geocoder.geocode( { 'address': alamat}, function(results, status) {
+        if (status == 'OK') {
+            console.log('results', results);
+            map.setCenter(results[0].geometry.location);
+            map.setZoom(15);
+            jQuery([document.documentElement, document.body]).animate({
+                scrollTop: jQuery("#map-canvas-simpeg").offset().top
+            }, 500);
+        } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+        }
+    });
+}
+
+function setCenterSimpeg(lng, ltd, maker=false, data, noCenter=false){
+    var lokasi_aset = new google.maps.LatLng(lng, ltd);
+
+    // center lokasi
+    if(!noCenter){
+        map.setCenter(lokasi_aset);
+        map.setZoom(15);
+        jQuery([document.documentElement, document.body]).animate({
+            scrollTop: jQuery("#map-canvas-simpeg").offset().top
+        }, 500);
+    }
+
+    // menampilkan maker
+    if(maker){
+        if(typeof evm == 'undefined'){
+            window.evm = {};
+        }
+        if(typeof data == 'object'){
+            data = JSON.stringify(data);
+        }
+        if(typeof evm[data] != 'undefined'){
+            evm[data].setMap(null);
+        }
+        // Menampilkan Marker
+        evm[data] = new google.maps.Marker({
+            position: lokasi_aset,
+            map,
+            draggable: false,
+            title: 'Lokasi Map'
+        });
+
+        if(typeof infoWindow == 'undefined'){
+            window.infoWindow = {};
+        }
+        infoWindow[data] = new google.maps.InfoWindow({
+            content: data
+        });
+
+        google.maps.event.addListener(evm[data], 'click', function(event) {
+            infoWindow[data].setPosition(event.latLng);
+            infoWindow[data].open(map);
+        });
+    }
+}
+
+jQuery(document).ready(function(){
+    var search = ''
+        +'<div class="input-group" style="margin-bottom: 5px; display: block;">'
+            +'<div class="input-group-prepend">'
+                +'<input class="form-control" id="cari-alamat-simpeg-input" type="text" placeholder="Kotak pencarian alamat">'
+                +'<button class="btn btn-success" id="cari-alamat-simpeg" type="button"><i class="dashicons dashicons-search"></i></button>'
+            +'</div>'
+        +'</div>';
+    jQuery("#map-canvas-simpeg").before(search);
+    jQuery("#cari-alamat-simpeg").on('click', function(){
+        cari_alamat_simpeg();
+    });
+    jQuery("#cari-alamat-simpeg-input").on('keyup', function (e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            cari_alamat_simpeg();
+        }
+    });
+});
+
+function initMapSimpeg() {
+    // Lokasi Center Map
+    var lokasi_aset = new google.maps.LatLng(maps_center_simpeg['lat'], maps_center_simpeg['lng']);
+    // Setting Map
+    var mapOptions = {
+        zoom: 13,
+        center: lokasi_aset,
+        mapTypeId: google.maps.MapTypeId.HYBRID
+    };
+    // Membuat Map
+    window.map = new google.maps.Map(document.getElementById("map-canvas-simpeg"), mapOptions);
+    window.chartWindow = {};
+    window.chartRenderWindow = {};
+    window.chartWindowDtks = {};
+    window.chartRenderWindowDtks = {};
+    window.infoWindow = {};
+
+    // Membuat Shape
+    maps_all_simpeg.map(function(data, i){
+        // console.log(data.coor);
+        data.coor.map(function(coor, ii){
+            var bidang1 = new google.maps.Polygon({
+                map: map,
+                paths: coor,
+                strokeColor: data.color,
+                strokeOpacity: 0.5,
+                strokeWeight: 2,
+                fillColor: data.color,
+                fillOpacity: 0.3
+            });
+            var index = data.index;
+            chartWindow[index] = data.chart;
+            chartWindowDtks[index] = data.chart_dtks;
+
+            // Menampilkan Informasi Data
+            var contentString = data.html;
+            infoWindow[index] = new google.maps.InfoWindow({
+                content: contentString
+            });
+            google.maps.event.addListener(bidang1, 'click', function(event) {
+                infoWindow[index].setPosition(event.latLng);
+                infoWindow[index].open(map);
+
+                var id = "chart-"+index;
+                if(!chartRenderWindow[id]){
+                    // menampilkan chart
+                    setTimeout(function(){
+                        if(!chartWindow[index]){
+                            return;
+                        }
+
+                        console.log('index, chartWindow[index]', index, chartWindow[index]);
+                        chartRenderWindow[id] = new Chart(document.getElementById(id).getContext('2d'), {
+                            type: "pie",
+                            data: {
+                                labels: chartWindow[index].label,
+                                datasets: [
+                                    {
+                                        label: "",
+                                        data: chartWindow[index].data,
+                                        backgroundColor: chartWindow[index].color
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: {
+                                        position: "bottom",
+                                        labels: {
+                                            font: {
+                                                size: 16
+                                            }
+                                        }
+                                    },
+                                    tooltip: {
+                                        bodyFont: {
+                                            size: 16
+                                        },
+                                        backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                        boxPadding: 5
+                                    },
+                                    datalabels: {
+                                        formatter: (value, ctx) => {
+                                            let sum = 0;
+                                            let dataArr = ctx.chart.data.datasets[0].data;
+                                            dataArr.map(data => {
+                                                sum += data;
+                                            });
+                                            let percentage = ((value / sum) * 100).toFixed(2)+"%";
+                                            console.log('percentage, dataArr',value, percentage, dataArr);
+                                            return percentage;
+                                        },
+                                        color: '#000',
+                                    }
+                                }
+                            },
+                            plugins: [ChartDataLabels]
+                        });
+                    }, 500);
+                }else{
+                    chartRenderWindow[id].update();
+                }
+            });
+        });
+    })
+}

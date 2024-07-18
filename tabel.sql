@@ -174,6 +174,8 @@ CREATE TABLE `data_absensi_lembur` (
   `dasar_lembur` text DEFAULT NULL
   `file_lampiran` text DEFAULT NULL,
   `status` tinyint(4) DEFAULT 3 COMMENT '0=belum diverifikasi, 1=disetujui kasubag keuangan, 2=disetujui ppk, 3=selesai',
+  `lat` text DEFAULT NULL,
+  `lng` text DEFAULT NULL,
   `update_at` datetime NOT NULL,
   `active` tinyint(4) DEFAULT '1' COMMENT '0=hapus, 1=aktif',
   PRIMARY KEY  (id)

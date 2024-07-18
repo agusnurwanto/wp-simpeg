@@ -183,6 +183,33 @@ class Wp_Simpeg_Public {
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-pegawai-lembur.php';
     }
 
+	function get_simpeg_map_url()
+	{
+		$api_googlemap = get_option('_crb_google_api_simpeg');
+		$api_googlemap = "https://maps.googleapis.com/maps/api/js?key=$api_googlemap&callback=initMapSiks&libraries=places&libraries=drawing";
+		return $api_googlemap;
+	}
+
+	public function crb_get_gmaps_api_key_simpeg($value = '')
+	{
+		return get_option('_crb_google_api_simpeg');
+	}
+
+	public function get_center()
+	{
+		$center_map_default = get_option('_crb_google_map_center_simpeg');
+		$ret = array(
+			'lat' => 0,
+			'lng' => 0
+		);
+		if (!empty($center_map_default)) {
+			$center_map_default = explode(',', $center_map_default);
+			$ret['lat'] = $center_map_default[0];
+			$ret['lng'] = $center_map_default[1];
+		}
+		return $ret;
+	}
+
 	public function get_skpd_simpeg(){
 	    global $wpdb;
 	    $ret = array(
@@ -1821,7 +1848,6 @@ class Wp_Simpeg_Public {
 			and nip='".$user_meta->data->user_login."' OR nik='".$user_meta->data->user_login."'
 			", ARRAY_A
 		);
-			$menu_absen = ''; 
 		foreach ($pegawai as $peg) {
 			if(
 				in_array("pegawai", $user_meta->roles)
@@ -1834,7 +1860,10 @@ class Wp_Simpeg_Public {
 						'show_header' => 1,
 						'post_status' => 'private'
 					));
-					$menu_absen = '<li style="display: inline-block"> <a style="margin-left: 10px;" href="'.$menu_absensi_pegawai_lembur['url'].'" target="_blank" class="btn btn-info">Absensi Pegawai</a></li>';
+					echo '
+					<ul class="aksi-lembur text-center">
+						<li style="list-style: none; display: inline-block"><a href="'.$menu_absensi_pegawai_lembur['url'].'" target="_blank" class="btn btn-info">Menu Absensi</a></li>
+					</ul>';
 				}else{
 					echo 'User ID pegawai tidak ditemukan!';
 				}
@@ -1872,7 +1901,7 @@ class Wp_Simpeg_Public {
 				echo '
 				<ul class="aksi-lembur text-center">
 					<li style="list-style: none; display: inline-block"><a href="'.$input_spt_lembur['url'].'" target="_blank" class="btn btn-info">SPT Lembur</a></li>
-					'.$menu_spj.''.$menu_absen.'
+					'.$menu_spj.'
 				</ul>';
 			}else{
 				echo 'User ID pegawai tidak ditemukan!';
@@ -2404,6 +2433,9 @@ class Wp_Simpeg_Public {
 	            	's.jml_pajak',
 	            	's.ket_lembur',
 	            	's.file_lampiran',
+	            	's.lat',
+	            	's.lng',
+	            	's.update_at',
 	              	's.id'
 	            );
 	            $where = $sqlTot = $sqlRec = "";
@@ -2443,6 +2475,7 @@ class Wp_Simpeg_Public {
                 foreach($queryRecords as $recKey => $recVal){
                     $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
 	                $queryRecords[$recKey]['aksi'] = $btn;
+					$queryRecords[$recKey]['file_lampiran'] = '<a href="' . SIMPEG_PLUGIN_URL . 'public/media/simpeg/' . $recVal['file_lampiran'] . '" target="_blank">' . $recVal['file_lampiran'] . '</a>';
 	                $queryRecords[$recKey]['uang_lembur'] = $this->rupiah($recVal['uang_lembur']);
 	                $queryRecords[$recKey]['uang_makan'] = $this->rupiah($recVal['uang_makan']);
 	                $queryRecords[$recKey]['jml_pajak'] = $this->rupiah($recVal['jml_pajak']);
@@ -2534,6 +2567,8 @@ class Wp_Simpeg_Public {
 					$ket_lembur = $data['ket_lembur'];
 					$waktu_mulai_spt = $data['waktu_mulai_spt'];
 					$waktu_selesai_spt = $data['waktu_selesai_spt'];
+					$latitude = $data['lat'];
+					$longitude = $data['lng'];
 					$user_id = um_user('ID');
 					$user_meta = get_userdata($user_id);
 					$uang_makan = 0;
@@ -2584,6 +2619,9 @@ class Wp_Simpeg_Public {
 						'jml_jam' => $jml_jam,
 						'jml_peg' => count($jml_peg),
 						'jml_pajak' => $jml_pajak,
+						'file_lampiran' => '',
+						'lng' => $longitude,
+						'lat' => $latitude,
 						'user' => $user_meta->display_name,
 						'update_at' => current_time('mysql'),
 						'active' => 1
@@ -2595,8 +2633,8 @@ class Wp_Simpeg_Public {
 					if ($ret['status'] != 'error' && !empty($_FILES['lampiran'])) {
 						$upload = CustomTraitSimpeg::uploadFileSimpeg($_POST['api_key'], $path, $_FILES['lampiran'], ['jpg', 'jpeg', 'png', 'pdf']);
 						if ($upload['status'] == true) {
-							$data['file_lampiran'] = $upload['filename'];
-							$cek_file['file_lampiran'] = $data['file_lampiran'];
+							$data_opsi['file_lampiran'] = $upload['filename'];
+							$cek_file['file_lampiran'] = $data_opsi['file_lampiran'];
 						} else {
 							$ret['status'] = 'error';
 							$ret['message'] = $upload['message'];

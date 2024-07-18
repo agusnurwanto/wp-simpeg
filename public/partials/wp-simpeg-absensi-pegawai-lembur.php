@@ -3,7 +3,8 @@ global $wpdb;
 
 $input = shortcode_atts(array(
     'tahun_anggaran' => '2022',
-    'id_skpd' => ''
+    'id_skpd' => '',
+    'id' => ''
 ), $atts);
 
 $skpd = $wpdb->get_row(
@@ -15,6 +16,19 @@ $skpd = $wpdb->get_row(
       AND tahun_anggaran=%d
       AND active = 1
 ", $input['id_skpd'], $input['tahun_anggaran']),
+    ARRAY_A
+);
+
+$pegawai = $wpdb->get_row(
+    $wpdb->prepare("
+    SELECT 
+        *
+    FROM data_pegawai_lembur
+    WHERE id_skpd=%d
+      AND tahun=%d
+      AND id = %d
+      AND active = 1
+", $input['id_skpd'], $input['tahun_anggaran'], $input['id']),
     ARRAY_A
 );
 
@@ -56,6 +70,7 @@ $disabled = 'disabled';
                         <th class="text-center">Total Pajak</th>
                         <th class="text-center">Keterangan Lembur</th>
                         <th class="text-center">Foto Kegiatan</th>
+                        <th class="text-center">Created at</th>
                         <th class="text-center" style="width: 35px;">Aksi</th>
                     </tr>
                 </thead>
@@ -151,6 +166,7 @@ jQuery(document).ready(function(){
     jQuery('#secondary').parent().remove();
     
     get_data_absensi_lembur();
+    window.global_file_upload = "<?php echo SIMPEG_PLUGIN_URL . 'public/media/simpeg/'; ?>";
 });
 
 function get_skpd(no_loading=false) {
@@ -473,6 +489,10 @@ function get_data_absensi_lembur() {
                     className: "text-center"
                 },
                 {
+                    "data": 'update_at',
+                    className: "text-center"
+                },
+                {
                     "data": 'aksi',
                     className: "text-center"
                 }
@@ -607,7 +627,7 @@ function detail_data(_id){
                 .then(function(){
                     get_skpd(true)
                     .then(function(){
-                        jQuery('#id_skpd').val(res.data.id_skpd).trigger('change').prop('disabled', true);
+                        jQuery('#id_skpd').val(res.data.id_skpd).trigger('change').prop('disabled', true).hide();
                         jQuery('#waktu_mulai_spt').val(res.data.waktu_mulai_spt).trigger('change').prop('disabled', true);
                         jQuery('#waktu_selesai_spt').val(res.data.waktu_selesai_spt).trigger('change').prop('disabled', true);
                         get_pegawai(true)
@@ -632,6 +652,8 @@ function detail_data(_id){
                                         jQuery('#uang_makan_set_'+id).prop('checked', true).prop('disabled', true);
                                     }
                                 });
+                                jQuery('#lampiran').val('').hide();
+                                jQuery('#file_lampiran_existing').attr('href', global_file_upload + res.data.file_lampiran).html(res.data.file_lampiran).show().prop('disabled', true);
                                 jQuery('.aksi-pegawai .btn').hide();
                                 jQuery('#modalTambahDataAbsensiLembur .send_data').hide();
                                 jQuery('#modalTambahDataAbsensiLembur').modal('show');
