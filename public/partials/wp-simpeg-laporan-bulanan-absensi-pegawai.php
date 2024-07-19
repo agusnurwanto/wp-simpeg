@@ -307,10 +307,6 @@ foreach($absensi_lembur as $peg){
     <select style="margin-left: 10px;" name="tahun" id="tahun">
         <?php echo $select_tahun; ?>
     </select>
-    <label style="margin-left: 10px;" for="pegawai">Pegawai:</label>
-    <select style="width: 400px;" name="pegawai" id="pegawai">
-        <?php echo $select_pegawai; ?>
-    </select>
     <button style="margin-left: 10px; height: 45px; width: 75px;" onclick="submit();" class="btn btn-sm btn-primary">Cari</button>
 </div>
 
@@ -406,7 +402,7 @@ function submit(){
             return alert('pegawai tidak boleh kosong!');
         }
         var url = window.location.href;
-        url = url.split('?')[0]+'?tahun='+tahun+'&bulan='+bulan+'&id='+pegawai;
+        url = url.split('?')[0]+'?tahun='+tahun+'&bulan='+bulan+'&id='+<?php echo $input['id']; ?>;
         location.href = url;
     }
 </script>

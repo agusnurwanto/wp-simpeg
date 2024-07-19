@@ -7,7 +7,7 @@ trait CustomTraitSimpeg {
 		string $path = '', 
 		array $file = array(), 
 		array $ext = array(),
-		int $maxSize = 1048576, // default 1MB
+		int $maxSize = 5000000, // default 1MB
 		string $nama_file = ''
 	)
 	{

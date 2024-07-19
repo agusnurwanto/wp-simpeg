@@ -130,7 +130,7 @@ $disabled = 'disabled';
                         <input type="file" name="file" class="form-control-file" id="lampiran" accept="application/pdf, .png, .jpg, .jpeg">
                         <div style="padding-top: 10px; padding-bottom: 10px;"><a id="file_lampiran_existing"></a></div>
                     </div>
-                    <div><small>Upload file maksimal 1 Mb, berformat .pdf .png .jpg .jpeg</small></div>
+                    <div><small>Upload file maksimal 5 Mb, berformat .pdf .png .jpg .jpeg</small></div>
                     <div class="form-group">
                         <label>Keterangan</label>
                         <textarea class="form-control" id="ket_lembur" name="ket_lembur"></textarea>
@@ -431,6 +431,7 @@ function get_data_absensi_lembur() {
                 data: {
                 'action': 'get_datatable_data_absensi_lembur',
                 'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
+                'id': '<?php echo $input['id']; ?>',
                 }
             },
             lengthMenu: [

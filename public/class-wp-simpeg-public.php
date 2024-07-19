@@ -190,6 +190,13 @@ class Wp_Simpeg_Public {
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-bulanan-absensi.php';
     }
 
+    public function laporan_bulanan_absensi_pegawai($atts){
+        if(!empty($_GET) && !empty($_GET['post'])){
+            return '';
+        }
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-bulanan-absensi-pegawai.php';
+    }
+
 	function get_simpeg_map_url()
 	{
 		$api_googlemap = get_option('_crb_google_api_simpeg');
@@ -266,8 +273,7 @@ class Wp_Simpeg_Public {
 	                WHERE id_skpd=%d
 	                    AND active=1
 	                    AND tahun=%d
-	                    AND id=%d
-	            ', $_POST['id_skpd'], $tahun_anggaran, $_POST['id']), ARRAY_A);
+	            ', $_POST['id_skpd'], $tahun_anggaran), ARRAY_A);
 	            $html = '<option value="">Pilih Pegawai</option>';
 	            foreach($ret['data'] as $pegawai){
 	                $html .= '<option golongan="'.$pegawai['kode_gol'].'" value="'.$pegawai['id'].'">'.$pegawai['gelar_depan'].' '.$pegawai['nama'].' '.$pegawai['gelar_belakang'].' (ID = '.$pegawai['id'].')</option>';
@@ -1808,24 +1814,23 @@ class Wp_Simpeg_Public {
 	public function pilih_tahun_anggaran_lembur()
 	{
 		global $wpdb;
-		$tahun_aktif = false;
-		$class_hide = '';
-		if (!empty($_GET) && !empty($_GET['tahun'])) {
-			$tahun_aktif = $_GET['tahun'];
-			$class_hide = 'display: none;';
-		}
-		$tahun = $wpdb->get_results('select tahun_anggaran from data_unit_lembur group by tahun_anggaran', ARRAY_A);
-		echo "
-		<h5 class='text-center' style='" . $class_hide . "'>PILIH TAHUN ANGGARAN</h5>
-		<ul class='daftar-tahun-lembur text-center' style='margin: 0 0 10px 0;'>";
-		foreach ($tahun as $k => $v) {
-			$class = 'btn-primary';
-			if ($tahun_aktif == $v['tahun_anggaran']) {
-				$class = 'btn-success';
-			}
-			echo "<li><a href='?tahun=" . $v['tahun_anggaran'] . "' class='btn " . $class . "'>" . $v['tahun_anggaran'] . "</a></li>";
-		}
-		echo "</ul>";
+	    $tahun_aktif = false;
+	    $class_hide = '';
+	    if (!empty($_GET) && !empty($_GET['tahun'])) {
+	        $tahun_aktif = $_GET['tahun'];
+	    }
+	    $tahun = $wpdb->get_results('select tahun_anggaran from data_unit_lembur group by tahun_anggaran', ARRAY_A);
+	    echo "
+	    <h5 class='text-center'>PILIH TAHUN ANGGARAN</h5>
+	    <ul class='daftar-tahun-lembur text-center' style='margin: 0 0 10px 0;'>";
+	    foreach ($tahun as $k => $v) {
+	        $class = 'btn-primary';
+	        if ($tahun_aktif == $v['tahun_anggaran']) {
+	            $class = 'btn-success';
+	        }
+	        echo "<li><a href='?tahun=" . $v['tahun_anggaran'] . "' class='btn " . $class . "'>" . $v['tahun_anggaran'] . "</a></li>";
+	    }
+	    echo "</ul>";
 	}
 
 	function menu_spt_lembur(){
@@ -1860,6 +1865,7 @@ class Wp_Simpeg_Public {
 				in_array("pegawai", $user_meta->roles)
 			){
 				$id_pegawai_lembur = get_user_meta($user_id, 'id_pegawai_lembur');
+				$menu_laporan_absensi = '';
 				if(!empty($id_pegawai_lembur)){
 					$menu_absensi_pegawai_lembur = $this->functions->generatePage(array(
 						'nama_page' => 'Menu Absensi Pegawai Lembur '.$peg['id'].' '.$peg['id_skpd'].' '.$_GET['tahun'],
@@ -1867,9 +1873,17 @@ class Wp_Simpeg_Public {
 						'show_header' => 1,
 						'post_status' => 'private'
 					));
+					$menu_laporan = $this->functions->generatePage(array(
+						'nama_page' => 'Laporan Bulanan Absensi Pegawai '.$peg['id'],
+						'content' => '[laporan_bulanan_absensi_pegawai id='.$peg['id'].']',
+						'show_header' => 1,
+						'post_status' => 'private'
+					));
+					$menu_laporan_absensi = '<li style="display: inline-block"> <a style="margin-left: 10px;" href="'.$menu_laporan['url'].'" target="_blank" class="btn btn-info">Menu Laporan Absensi</a></li>';
 					echo '
 					<ul class="aksi-lembur text-center">
 						<li style="list-style: none; display: inline-block"><a href="'.$menu_absensi_pegawai_lembur['url'].'" target="_blank" class="btn btn-info">Menu Absensi</a></li>
+						'.$menu_laporan_absensi.'
 					</ul>';
 				}else{
 					echo 'User ID pegawai tidak ditemukan!';

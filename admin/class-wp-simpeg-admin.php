@@ -223,6 +223,7 @@ class Wp_Simpeg_Admin {
 	        	->set_html( '
 				<h5>HALAMAN TERKAIT</h5>
             	<ol>
+            		<li><a target="_blank" href="'.$laporan_bulanan_absensi['url'].'">Laporan Bulanan Absensi Pegawai</a></li>
             		<li><a target="_blank" href="'.$laporan_bulanan_lembur['url'].'">'.$laporan_bulanan_lembur['title'].'</a></li>
             		<li><a target="_blank" href="'.$laporan_spt_lembur['url'].'">'.$laporan_spt_lembur['title'].'</a></li>
             		<li><a target="_blank" href="'.$laporan_pegawai_lembur['url'].'">'.$laporan_pegawai_lembur['title'].'</a></li>
