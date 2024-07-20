@@ -171,7 +171,7 @@ CREATE TABLE `data_absensi_lembur` (
   `waktu_mulai_spt` date NOT NULL,
   `waktu_selesai_spt` date NOT NULL,
   `jml_hari` int(11) DEFAULT NULL,
-  `dasar_lembur` text DEFAULT NULL
+  `dasar_lembur` text DEFAULT NULL,
   `file_lampiran` text DEFAULT NULL,
   `status` tinyint(4) DEFAULT 3 COMMENT '0=belum diverifikasi, 1=disetujui kasubag keuangan, 2=disetujui ppk, 3=selesai',
   `lat` text DEFAULT NULL,

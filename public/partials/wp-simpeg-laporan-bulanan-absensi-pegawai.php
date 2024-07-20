@@ -290,7 +290,7 @@ foreach($absensi_lembur as $peg){
     }
 </style>
 <div id="wrap-action"></div>
-<div class="text-center" style="margin-top: 30px;">
+<div class="text-center" style="margin-top: 30px; width: 500px; margin: 30px auto;">
     <label for="bulan">Bulan:  </label>
     <select style="margin-left: 10px;" name="bulan" id="bulan">
         <?php
@@ -307,7 +307,7 @@ foreach($absensi_lembur as $peg){
     <select style="margin-left: 10px;" name="tahun" id="tahun">
         <?php echo $select_tahun; ?>
     </select>
-    <button style="margin-left: 10px; height: 45px; width: 75px;" onclick="submit();" class="btn btn-sm btn-primary">Cari</button>
+    <button style="margin-top: 10px; height: 45px; width: 75px;" onclick="submit();" class="btn btn-sm btn-primary">Cari</button>
 </div>
 
 <h3 style="margin-top: 20px;" class="text-center">Laporan Absensi<br>Bulan <?php echo $namaBulan[$input['bulan']]; ?> Tahun <?php echo $input['tahun']; ?></h3 style="margin-top: 20px;">

@@ -190,12 +190,13 @@ class Wp_Simpeg_Public {
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-bulanan-absensi.php';
     }
 
-    public function laporan_bulanan_absensi_pegawai($atts){
-        if(!empty($_GET) && !empty($_GET['post'])){
-            return '';
-        }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-bulanan-absensi-pegawai.php';
-    }
+   public function laporan_bulanan_absensi_pegawai($atts){
+       if(!empty($_GET) && !empty($_GET['post'])){
+           return '';
+       }
+       require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-bulanan-absensi-pegawai.php';
+   }
+
 
 	function get_simpeg_map_url()
 	{
@@ -273,7 +274,8 @@ class Wp_Simpeg_Public {
 	                WHERE id_skpd=%d
 	                    AND active=1
 	                    AND tahun=%d
-	            ', $_POST['id_skpd'], $tahun_anggaran), ARRAY_A);
+	                    AND id=%d
+	            ', $_POST['id_skpd'], $tahun_anggaran, $_POST['id']), ARRAY_A);
 	            $html = '<option value="">Pilih Pegawai</option>';
 	            foreach($ret['data'] as $pegawai){
 	                $html .= '<option golongan="'.$pegawai['kode_gol'].'" value="'.$pegawai['id'].'">'.$pegawai['gelar_depan'].' '.$pegawai['nama'].' '.$pegawai['gelar_belakang'].' (ID = '.$pegawai['id'].')</option>';
@@ -1814,23 +1816,24 @@ class Wp_Simpeg_Public {
 	public function pilih_tahun_anggaran_lembur()
 	{
 		global $wpdb;
-	    $tahun_aktif = false;
-	    $class_hide = '';
-	    if (!empty($_GET) && !empty($_GET['tahun'])) {
-	        $tahun_aktif = $_GET['tahun'];
-	    }
-	    $tahun = $wpdb->get_results('select tahun_anggaran from data_unit_lembur group by tahun_anggaran', ARRAY_A);
-	    echo "
-	    <h5 class='text-center'>PILIH TAHUN ANGGARAN</h5>
-	    <ul class='daftar-tahun-lembur text-center' style='margin: 0 0 10px 0;'>";
-	    foreach ($tahun as $k => $v) {
-	        $class = 'btn-primary';
-	        if ($tahun_aktif == $v['tahun_anggaran']) {
-	            $class = 'btn-success';
-	        }
-	        echo "<li><a href='?tahun=" . $v['tahun_anggaran'] . "' class='btn " . $class . "'>" . $v['tahun_anggaran'] . "</a></li>";
-	    }
-	    echo "</ul>";
+		$tahun_aktif = false;
+		$class_hide = '';
+		if (!empty($_GET) && !empty($_GET['tahun'])) {
+			$tahun_aktif = $_GET['tahun'];
+			$class_hide = 'display: none;';
+		}
+		$tahun = $wpdb->get_results('select tahun_anggaran from data_unit_lembur group by tahun_anggaran', ARRAY_A);
+		echo "
+		<h5 class='text-center' style='" . $class_hide . "'>PILIH TAHUN ANGGARAN</h5>
+		<ul class='daftar-tahun-lembur text-center' style='margin: 0 0 10px 0;'>";
+		foreach ($tahun as $k => $v) {
+			$class = 'btn-primary';
+			if ($tahun_aktif == $v['tahun_anggaran']) {
+				$class = 'btn-success';
+			}
+			echo "<a href='?tahun=" . $v['tahun_anggaran'] . "' class='btn " . $class . "'>" . $v['tahun_anggaran'] . "</a>";
+		}
+		echo "</ul>";
 	}
 
 	function menu_spt_lembur(){
@@ -1864,8 +1867,8 @@ class Wp_Simpeg_Public {
 			if(
 				in_array("pegawai", $user_meta->roles)
 			){
-				$id_pegawai_lembur = get_user_meta($user_id, 'id_pegawai_lembur');
 				$menu_laporan_absensi = '';
+				$id_pegawai_lembur = get_user_meta($user_id, 'id_pegawai_lembur');
 				if(!empty($id_pegawai_lembur)){
 					$menu_absensi_pegawai_lembur = $this->functions->generatePage(array(
 						'nama_page' => 'Menu Absensi Pegawai Lembur '.$peg['id'].' '.$peg['id_skpd'].' '.$_GET['tahun'],
@@ -1873,13 +1876,14 @@ class Wp_Simpeg_Public {
 						'show_header' => 1,
 						'post_status' => 'private'
 					));
-					$menu_laporan = $this->functions->generatePage(array(
-						'nama_page' => 'Laporan Bulanan Absensi Pegawai '.$peg['id'],
-						'content' => '[laporan_bulanan_absensi_pegawai id='.$peg['id'].']',
-						'show_header' => 1,
-						'post_status' => 'private'
-					));
-					$menu_laporan_absensi = '<li style="display: inline-block"> <a style="margin-left: 10px;" href="'.$menu_laporan['url'].'" target="_blank" class="btn btn-info">Menu Laporan Absensi</a></li>';
+
+                    $menu_laporan = $this->functions->generatePage(array(
+                            'nama_page' => 'Laporan Absensi Pegawai '.$peg['id'],
+                            'content' => '[laporan_bulanan_absensi_pegawai id='.$peg['id'].']',
+                            'show_header' => 1,
+                            'post_status' => 'private'
+                    ));
+                    $menu_laporan_absensi = '<li style="display: inline-block"> <a style="margin-left: 10px;" href="'.$menu_laporan['url'].'" target="_blank" class="btn btn-info">Menu Laporan Absensi</a></li>';
 					echo '
 					<ul class="aksi-lembur text-center">
 						<li style="list-style: none; display: inline-block"><a href="'.$menu_absensi_pegawai_lembur['url'].'" target="_blank" class="btn btn-info">Menu Absensi</a></li>
@@ -2507,12 +2511,18 @@ class Wp_Simpeg_Public {
 	            	SELECT 
 	            		".implode(', ', $columns)." 
 	            	FROM `data_absensi_lembur` s
-	            	LEFT JOIN data_unit_lembur as u on s.id_skpd=u.id_skpd
+				    INNER JOIN data_absensi_lembur_detail d on d.id_spt = s.id
+				        AND s.active = d.active
+				    INNER JOIN data_pegawai_lembur p on d.id_pegawai = p.id
+				        AND p.active = d.active
+				        AND p.tahun = s.tahun_anggaran
+	            	INNER JOIN data_unit_lembur as u on s.id_skpd=u.id_skpd
 	            		AND s.tahun_anggaran=u.tahun_anggaran
 	            		AND s.active=u.active";
-	            $where_first = " WHERE 1=1 AND s.active=1";
-	            $sqlTot .= $sql_tot.$where_first;
-	            $sqlRec .= $sql.$where_first;
+	            $where_first = " WHERE s.active=1 ";
+	            $sqlTot = $sql_tot.$where_first;
+	            $where_first .= "AND p.id=".$_POST['id'];
+	            $sqlRec = $sql.$where_first;
 	            if(isset($where) && $where != '') {
 	                $sqlTot .= $where;
 	                $sqlRec .= $where;
