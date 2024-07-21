@@ -274,8 +274,7 @@ class Wp_Simpeg_Public {
 	                WHERE id_skpd=%d
 	                    AND active=1
 	                    AND tahun=%d
-	                    AND id=%d
-	            ', $_POST['id_skpd'], $tahun_anggaran, $_POST['id']), ARRAY_A);
+	            ', $_POST['id_skpd'], $tahun_anggaran), ARRAY_A);
 	            $html = '<option value="">Pilih Pegawai</option>';
 	            foreach($ret['data'] as $pegawai){
 	                $html .= '<option golongan="'.$pegawai['kode_gol'].'" value="'.$pegawai['id'].'">'.$pegawai['gelar_depan'].' '.$pegawai['nama'].' '.$pegawai['gelar_belakang'].' (ID = '.$pegawai['id'].')</option>';
@@ -2687,7 +2686,6 @@ class Wp_Simpeg_Public {
 						'jml_jam' => $jml_jam,
 						'jml_peg' => count($jml_peg),
 						'jml_pajak' => $jml_pajak,
-						'file_lampiran' => '',
 						'lng' => $longitude,
 						'lat' => $latitude,
 						'user' => $user_meta->display_name,
@@ -2726,7 +2724,8 @@ class Wp_Simpeg_Public {
 								FROM data_absensi_lembur 
 								WHERE id=%d
 							', $data['id_data']), ARRAY_A);
-							if ($file_lama['file_lampiran'] != $data['file_lampiran'] && is_file($path . $file_lama['file_lampiran'])) {
+							if ($file_lama['file_lampiran'] != $data_opsi['file_lampiran'] 
+								&& is_file($path . $file_lama['file_lampiran'])) {
 								unlink($path . $file_lama['file_lampiran']);
 							}
 							$wpdb->update('data_absensi_lembur', $data_opsi, array('id' => $data['id_data']));

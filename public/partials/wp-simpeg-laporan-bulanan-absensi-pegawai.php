@@ -307,11 +307,11 @@ foreach($absensi_lembur as $peg){
     <select style="margin-left: 10px;" name="tahun" id="tahun">
         <?php echo $select_tahun; ?>
     </select>
-    <button style="margin-top: 10px; height: 45px; width: 75px;" onclick="submit();" class="btn btn-sm btn-primary">Cari</button>
+    <button style="margin: 10px; height: 45px; width: 75px;" onclick="submit();" class="btn btn-sm btn-primary">Cari</button>
 </div>
 
 <h3 style="margin-top: 20px;" class="text-center">Laporan Absensi<br>Bulan <?php echo $namaBulan[$input['bulan']]; ?> Tahun <?php echo $input['tahun']; ?></h3 style="margin-top: 20px;">
-<div id="cetak" title="Laporan MONEV RENJA" style="padding: 5px; overflow: auto; max-height: 80vh;">
+<div id="cetak" style="padding: 5px; overflow: auto; max-height: 80vh;">
     <table id="tabel-absensi-pegawai" cellpadding="2" cellspacing="0" contenteditable="false">
         <thead>
             <tr>
