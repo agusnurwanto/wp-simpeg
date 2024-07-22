@@ -650,8 +650,13 @@ function tambah_data_absensi_lembur(){
     jQuery('#id_data').val('');
     jQuery('#tahun_anggaran').val('<?php echo date('Y'); ?>').trigger('change').prop('disabled', false);
     jQuery('#id_skpd').val('<?php echo $input['id_skpd']; ?>').trigger('change').hide();
-    get_pegawai_absensi(true)
-    // jQuery('#id_pegawai_1').val('<?php echo $input['id']; ?>').trigger('change');
+    get_pegawai_absensi(true).then(function(){
+        jQuery('#uang_makan').val('0').prop('disabled', true);
+        jQuery('#uang_lembur').val('0').prop('disabled', true);
+        jQuery('#sbu_makan').val('').prop('disabled', false);
+        jQuery('#sbu_lembur').val('').prop('disabled', false);
+        jQuery('#id_pegawai_1').val('<?php echo $input['id']; ?>').trigger('change');
+    })
     jQuery('#ket_lembur').val('').prop('disabled', false);
     jQuery('#waktu_mulai_spt').trigger('change').prop('disabled', true);
     jQuery('#waktu_selesai_spt').trigger('change').prop('disabled', true);
@@ -661,6 +666,33 @@ function tambah_data_absensi_lembur(){
     jQuery('#modalTambahDataAbsensiLembur .send_data').show();
     jQuery('#modalTambahDataAbsensiLembur').modal('show');
 }
+
+//show tambah data
+// function tambah_data_absensi_lembur(){
+//     jQuery('#id_data').val('');
+//     jQuery('#tahun_anggaran').val('<?php echo date('Y'); ?>').trigger('change').prop('disabled', false);
+//     jQuery('#id_skpd').val('<?php echo $input['id_skpd']; ?>').trigger('change').hide();
+//     get_pegawai_absensi(true).then(function(){
+//         jQuery('#jenis_hari_1').prop('disabled', false);
+//         jQuery('#waktu_mulai_1').prop('disabled', false);
+//         jQuery('#waktu_selesai_1').prop('disabled', false);
+//         jQuery('#jumlah_jam_1').prop('disabled', false);
+//         jQuery('#uang_lembur_1').val('0').prop('disabled', true);
+//         jQuery('#uang_makan_1').val('0').prop('disabled', true);
+//         jQuery('#pajak_1').prop('disabled', true);
+//         jQuery('#sbu_makan_1').val('').prop('disabled', false);
+//         jQuery('#sbu_lembur_1').val('').prop('disabled', false);
+//         jQuery('#id_pegawai_1').val('<?php echo $input['id']; ?>').trigger('change');
+//     })
+//     jQuery('#ket_lembur').val('').prop('disabled', false);
+//     jQuery('#waktu_mulai_spt').trigger('change').prop('disabled', true);
+//     jQuery('#waktu_selesai_spt').trigger('change').prop('disabled', true);
+//     jQuery('#lampiran').val('').show();
+//     jQuery('#file_lampiran_existing').hide();
+//     jQuery('#file_lampiran_existing').closest('.form-group').find('input').show();
+//     jQuery('#modalTambahDataAbsensiLembur .send_data').show();
+//     jQuery('#modalTambahDataAbsensiLembur').modal('show');
+// }
 
 function submitTambahDataFormAbsensiLembur(){
     var tahun_anggaran = jQuery('#tahun_anggaran').val();
