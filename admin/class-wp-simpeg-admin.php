@@ -186,6 +186,13 @@ class Wp_Simpeg_Admin {
 			'no_key' => 1,
 			'post_status' => 'private'
 		));
+		$laporan_bulanan_absensi_all = $this->functions->generatePage(array(
+			'nama_page' => 'Laporan Bulanan Absensi Pegawai',
+			'content' => '[laporan_bulanan_absensi_all]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
 		$laporan_spt_lembur = $this->functions->generatePage(array(
 			'nama_page' => 'Laporan Surat Perintah Tugas',
 			'content' => '[laporan_spt_lembur]',
@@ -223,7 +230,8 @@ class Wp_Simpeg_Admin {
 	        	->set_html( '
 				<h5>HALAMAN TERKAIT</h5>
             	<ol>
-            		<li><a target="_blank" href="'.$laporan_bulanan_absensi['url'].'">Laporan Bulanan Absensi Pegawai</a></li>
+            		<li><a target="_blank" href="'.$laporan_bulanan_absensi['url'].'">Laporan Bulanan Absensi per Pegawai</a></li>
+            		<li><a target="_blank" href="'.$laporan_bulanan_absensi_all['url'].'">Laporan Bulanan Absensi Pegawai per SKPD</a></li>
             		<li><a target="_blank" href="'.$laporan_bulanan_lembur['url'].'">'.$laporan_bulanan_lembur['title'].'</a></li>
             		<li><a target="_blank" href="'.$laporan_spt_lembur['url'].'">'.$laporan_spt_lembur['title'].'</a></li>
             		<li><a target="_blank" href="'.$laporan_pegawai_lembur['url'].'">'.$laporan_pegawai_lembur['title'].'</a></li>

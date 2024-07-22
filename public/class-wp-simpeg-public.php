@@ -197,6 +197,13 @@ class Wp_Simpeg_Public {
        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-bulanan-absensi-pegawai.php';
    }
 
+   public function laporan_bulanan_absensi_all($atts){
+       if(!empty($_GET) && !empty($_GET['post'])){
+           return '';
+       }
+       require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-bulanan-absensi-all-pegawai.php';
+   }
+
 
 	function get_simpeg_map_url()
 	{
