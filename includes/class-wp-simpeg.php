@@ -242,6 +242,7 @@ class Wp_Simpeg {
 		add_shortcode('laporan_bulanan_absensi', array($plugin_public, 'laporan_bulanan_absensi'));
 		add_shortcode('laporan_bulanan_absensi_pegawai', array($plugin_public, 'laporan_bulanan_absensi_pegawai'));
 		add_shortcode('laporan_bulanan_absensi_all', array($plugin_public, 'laporan_bulanan_absensi_all'));
+		add_shortcode('input_absensi_pegawai', array($plugin_public, 'input_absensi_pegawai'));
 
 		$this->loader->add_filter('carbon_fields_map_field_api_key',  $plugin_public, 'crb_get_gmaps_api_key_simpeg');
 

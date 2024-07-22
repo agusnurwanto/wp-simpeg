@@ -165,6 +165,13 @@ class Wp_Simpeg_Admin {
 			'no_key' => 1,
 			'post_status' => 'private'
 		));
+		$input_absensi_pegawai = $this->functions->generatePage(array(
+			'nama_page' => 'Input Absensi Pegawai',
+			'content' => '[input_absensi_pegawai]',
+			'show_header' => 1,
+			'no_key' => 1,
+			'post_status' => 'private'
+		));
 		$management_data_sbu_lembur = $this->functions->generatePage(array(
 			'nama_page' => 'Management Data SBU Lembur',
 			'content' => '[management_data_sbu_lembur]',
@@ -235,6 +242,8 @@ class Wp_Simpeg_Admin {
             		<li><a target="_blank" href="'.$laporan_bulanan_lembur['url'].'">'.$laporan_bulanan_lembur['title'].'</a></li>
             		<li><a target="_blank" href="'.$laporan_spt_lembur['url'].'">'.$laporan_spt_lembur['title'].'</a></li>
             		<li><a target="_blank" href="'.$laporan_pegawai_lembur['url'].'">'.$laporan_pegawai_lembur['title'].'</a></li>
+            		
+            		<li><a target="_blank" href="'.$input_absensi_pegawai['url'].'">'.$input_absensi_pegawai['title'].'</a></li>
             		<li><a target="_blank" href="'.$input_spt_lembur['url'].'">'.$input_spt_lembur['title'].'</a></li>
             		<li><a target="_blank" href="'.$input_spj_lembur['url'].'">'.$input_spj_lembur['title'].'</a></li>
             	</ol>

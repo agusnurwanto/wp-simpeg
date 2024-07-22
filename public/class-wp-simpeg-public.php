@@ -155,6 +155,7 @@ class Wp_Simpeg_Public {
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-input-spj-lembur.php';
     }
 
+
     public function menu_absensi_pegawai_lembur($atts){
         if(!empty($_GET) && !empty($_GET['post'])){
             return '';
@@ -204,6 +205,12 @@ class Wp_Simpeg_Public {
        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-bulanan-absensi-all-pegawai.php';
    }
 
+    public function input_absensi_pegawai($atts){
+        if(!empty($_GET) && !empty($_GET['post'])){
+            return '';
+        }
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-input-absensi-pegawai.php';
+    }
 
 	function get_simpeg_map_url()
 	{
