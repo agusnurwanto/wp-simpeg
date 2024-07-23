@@ -806,7 +806,7 @@ function get_uang_lembur(that){
     var waktu_mulai = jQuery('#waktu_mulai_'+id).val();
     var waktu_selesai = jQuery('#waktu_selesai_'+id).val();
     var jam = (new Date(waktu_selesai)).getTime() - (new Date(waktu_mulai)).getTime();
-    jam = Math.floor(jam / (1000 * 60 * 60));
+    jam = Math.floor(jam / (1000 * 30 * 60));
     var jenis_hari = jQuery('#jenis_hari_'+id).val();
     jQuery('#uang_lembur_'+id).val(0);
     jQuery('#uang_makan_'+id).val(0);
