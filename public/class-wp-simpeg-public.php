@@ -2510,6 +2510,7 @@ class Wp_Simpeg_Public {
 	            	's.status_ver_admin', 
 	            	's.ket_ver_admin',
 	            	'p.nama_lengkap',
+	            	's.created_at',
 	              	's.id'
 	            );
 	            $where = $sqlTot = $sqlRec = "";
