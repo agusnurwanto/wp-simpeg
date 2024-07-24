@@ -2562,7 +2562,7 @@ class Wp_Simpeg_Public {
                         $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-primary" onclick="submit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Submit Data"><i class="dashicons dashicons-migrate"></i></a>';
 	                    if ($recVal['status_ver_admin'] == '0'){
 	                        $pesan = '<br><b>Keterangan:</b> '.$recVal['ket_ver_admin']; 
-	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">SPT Ditolak</span>'.$pesan;
+	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Absensi Ditolak</span>'.$pesan;
 	                    }else{
 	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit</span>';
 	                    }
