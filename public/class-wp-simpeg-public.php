@@ -1879,6 +1879,7 @@ class Wp_Simpeg_Public {
 		foreach ($pegawai as $peg) {
 			if(
 				in_array("pegawai", $user_meta->roles)
+				|| in_array("administrator", $user_meta->roles)
 			){
 				$menu_laporan_absensi = '';
 				$id_pegawai_lembur = get_user_meta($user_id, 'id_pegawai_lembur');
