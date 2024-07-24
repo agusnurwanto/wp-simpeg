@@ -148,6 +148,7 @@ $absensi_lembur = $wpdb->get_results($wpdb->prepare('
     WHERE s.tahun_anggaran = %d
         AND p.id = %d
         AND d.active = 1
+        AND s.status = 2
         AND MONTH(s.update_at) = %d
 ', $input['tahun'], $input['id'], $input['bulan']), ARRAY_A);
 

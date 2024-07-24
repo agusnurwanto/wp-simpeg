@@ -109,6 +109,7 @@ $lap_bulanan_pegawai = $wpdb->get_results($wpdb->prepare('
     WHERE s.tahun_anggaran=%d
         and s.id_skpd=%d
         and d.active=1
+        AND s.status = 2
     order by p.nama ASC
 ', $input['tahun'], $input['id_skpd']), ARRAY_A);
 $data_all = array();

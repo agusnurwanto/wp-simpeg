@@ -165,13 +165,6 @@ class Wp_Simpeg_Admin {
 			'no_key' => 1,
 			'post_status' => 'private'
 		));
-		$input_absensi_pegawai = $this->functions->generatePage(array(
-			'nama_page' => 'Input Absensi Pegawai',
-			'content' => '[input_absensi_pegawai]',
-			'show_header' => 1,
-			'no_key' => 1,
-			'post_status' => 'private'
-		));
 		$management_data_sbu_lembur = $this->functions->generatePage(array(
 			'nama_page' => 'Management Data SBU Lembur',
 			'content' => '[management_data_sbu_lembur]',
@@ -227,7 +220,19 @@ class Wp_Simpeg_Admin {
 			$api_key = $this->functions->generateRandomString();
 			update_option(SIMPEG_APIKEY, $api_key);
 		}
-
+		global $wpdb;
+		$get_tahun = $wpdb->get_results('select tahun_anggaran from data_unit_lembur group by tahun_anggaran order by tahun_anggaran ASC', ARRAY_A);
+		$get_data = '';
+		foreach ($get_tahun as $k => $v){
+			$input_absensi_pegawai = $this->functions->generatePage(array(
+				'nama_page' => 'Input Absensi Pegawai | ' . $v['tahun_anggaran'],
+				'content' => '[input_absensi_pegawai tahun_anggaran="' . $v["tahun_anggaran"] . '"]',
+				'show_header' => 1,
+				'no_key' => 1,
+				'post_status' => 'private'
+			));
+		$get_data .= '<li><a target="_blank" href="' . $input_absensi_pegawai['url'] . '">' . $input_absensi_pegawai['title'] . '</a></li>';
+		}
 		$basic_options_container = Container::make( 'theme_options', __( 'SIMPEG Options' ) )
 			->set_page_menu_position( 4 )
 			->add_fields( array(
@@ -237,13 +242,9 @@ class Wp_Simpeg_Admin {
 	        	->set_html( '
 				<h5>HALAMAN TERKAIT</h5>
             	<ol>
-            		<li><a target="_blank" href="'.$laporan_bulanan_absensi['url'].'">Laporan Bulanan Absensi per Pegawai</a></li>
-            		<li><a target="_blank" href="'.$laporan_bulanan_absensi_all['url'].'">Laporan Bulanan Absensi Pegawai per SKPD</a></li>
             		<li><a target="_blank" href="'.$laporan_bulanan_lembur['url'].'">'.$laporan_bulanan_lembur['title'].'</a></li>
             		<li><a target="_blank" href="'.$laporan_spt_lembur['url'].'">'.$laporan_spt_lembur['title'].'</a></li>
-            		<li><a target="_blank" href="'.$laporan_pegawai_lembur['url'].'">'.$laporan_pegawai_lembur['title'].'</a></li>
-            		
-            		<li><a target="_blank" href="'.$input_absensi_pegawai['url'].'">'.$input_absensi_pegawai['title'].'</a></li>
+	            		<li><a target="_blank" href="'.$laporan_pegawai_lembur['url'].'">'.$laporan_pegawai_lembur['title'].'</a></li>     		
             		<li><a target="_blank" href="'.$input_spt_lembur['url'].'">'.$input_spt_lembur['title'].'</a></li>
             		<li><a target="_blank" href="'.$input_spj_lembur['url'].'">'.$input_spj_lembur['title'].'</a></li>
             	</ol>
@@ -286,7 +287,9 @@ class Wp_Simpeg_Admin {
 					<h5>HALAMAN TERKAIT</h5>
 	            	<ol>
 	            		<li><a target="_blank" href="'.$management_data_pegawai['url'].'">'.$management_data_pegawai['title'].'</a></li>
-	            		<li><a target="_blank" href="'.$management_data_absensi['url'].'">'.$management_data_absensi['title'].'</a></li>
+	            		'.$get_data.'
+	            		<li><a target="_blank" href="'.$laporan_bulanan_absensi['url'].'">Laporan Bulanan Absensi per Pegawai</a></li>
+	            		<li><a target="_blank" href="'.$laporan_bulanan_absensi_all['url'].'">Laporan Bulanan Absensi Pegawai per SKPD</a></li>
 	            	</ol>
 		        	' ),
 		        Field::make( 'html', 'crb_simpeg_pegawai_upload_html' )

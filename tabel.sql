@@ -173,15 +173,12 @@ CREATE TABLE `data_absensi_lembur` (
   `jml_hari` int(11) DEFAULT NULL,
   `dasar_lembur` text DEFAULT NULL,
   `file_lampiran` text DEFAULT NULL,
-  `status` tinyint(4) DEFAULT 0 COMMENT '0=belum diverifikasi, 1=disetujui admin, 2=selesai',
+  `status` tinyint(4) DEFAULT 3 COMMENT '0=belum diverifikasi, 1=disetujui kasubag keuangan, 2=disetujui ppk, 3=selesai',
   `lat` text DEFAULT NULL,
   `lng` text DEFAULT NULL,
-  `status_ver_admin` tinyint(4) DEFAULT NULL COMMENT '0=ditolak, 1=disetujui',
-  `ket_ver_admin` text DEFAULT NULL,
+  `created_at` datetime NOT NULL,
   `update_at` datetime NOT NULL,
   `active` tinyint(4) DEFAULT '1' COMMENT '0=hapus, 1=aktif',
-  `jenis_user` varchar(50) DEFAULT NULL,
-  `update_user` text DEFAULT NULL,
   PRIMARY KEY  (id)
 );
 
@@ -204,7 +201,5 @@ CREATE TABLE `data_absensi_lembur_detail` (
   `jml_hari` int(11) DEFAULT NULL,
   `jml_jam` int(11) DEFAULT NULL,
   `jml_pajak` double DEFAULT NULL,
-  `jenis_user` varchar(50) DEFAULT NULL,
-  `update_user` text DEFAULT NULL,
   PRIMARY KEY  (id)
 );

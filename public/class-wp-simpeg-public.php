@@ -2509,6 +2509,7 @@ class Wp_Simpeg_Public {
 	            	's.status',
 	            	's.status_ver_admin', 
 	            	's.ket_ver_admin',
+	            	'p.nama_lengkap',
 	              	's.id'
 	            );
 	            $where = $sqlTot = $sqlRec = "";
@@ -2766,6 +2767,7 @@ class Wp_Simpeg_Public {
 							$wpdb->update('data_absensi_lembur', $data_opsi, array('id' => $data['id_data']));
 							$ret['message'] = 'Berhasil update data!';
 						} else {
+                        	$data_opsi['created_at'] = current_time('mysql');
 							$wpdb->insert('data_absensi_lembur', $data_opsi);
 							$data['id_data'] = $wpdb->insert_id;
 						}
@@ -2859,7 +2861,6 @@ class Wp_Simpeg_Public {
                     $absensi_detail_all = array();
                     foreach ($absensi_detail as $detail) {
                         $absensi_detail_all[] = array(
-                            'jenis_user' => 'pegawai',
                             'id' => $id,
                             'id_pegawai' => $detail['id_pegawai'],
                             'id_standar_harga_lembur' => $detail['id_standar_harga_lembur'],
@@ -2880,12 +2881,12 @@ class Wp_Simpeg_Public {
                     }
 
                     $option_absensi = array(
-                        'jenis_user' => 'pegawai',
                         'id' => $id,
                         'waktu_mulai_spt' => $absensi['waktu_mulai_spt'],
                         'waktu_selesai_spt' => $absensi['waktu_selesai_spt'],
                         'tahun_anggaran' => $absensi['tahun_anggaran'],
                         'id_skpd' => $absensi['id_skpd'],
+                        'user' => $absensi['user'],
                         'jml_hari' => $absensi['jml_hari'],
                         'jml_peg' => $absensi['jml_peg'],
                         'jml_jam' => $absensi['jml_jam'],
@@ -2893,32 +2894,35 @@ class Wp_Simpeg_Public {
                         'uang_lembur' => $absensi['uang_lembur'],
                         'jml_pajak' => $absensi['jml_pajak'],
                         'ket_lembur' => $absensi['ket_lembur'],
+                        'file_lampiran' => $absensi['file_lampiran'],
+                        'created_at' => $absensi['created_at'],
                         'update_user' => $user_meta->display_name,
                         'update_at' => current_time('mysql')
                     );
 
-                    if ($tipe_verifikasi == 'pegawai' && (in_array('pegawai', $user_meta->roles) || in_array('administrator', $user_meta->roles))) {
-                        $option_absensi['jenis_user'] = $tipe_verifikasi;
-
+                    if (
+                        $tipe_verifikasi == 'pegawai' && (
+                            in_array("pegawai", $user_meta->roles) ||
+                            in_array("administrator", $user_meta->roles)
+                        )
+                    ) {
                         $wpdb->delete('data_absensi_lembur', array(
                             'id' => $id,
-                            'jenis_user' => $option_absensi['jenis_user']
                         ));
 
                         $wpdb->insert('data_absensi_lembur', $option_absensi);
 
                         $wpdb->delete('data_absensi_lembur_detail', array(
                             'id' => $id,
-                            'jenis_user' => $option_absensi['jenis_user']
                         ));
 
                         foreach ($absensi_detail_all as $detail) {
-                            $detail['jenis_user'] = $option_absensi['jenis_user'];
                             $wpdb->insert('data_absensi_lembur_detail', $detail);
                         }
 
                         $wpdb->update('data_absensi_lembur', array(
-                            'status' => 1 // status Absensi menjadi verifikasi admin
+                            'status' => 1, // status Absensi menjadi verifikasi admin
+                            'update_at' => current_time('mysql')
                         ), array(
                             'id' => $id
                         ));
@@ -2944,7 +2948,8 @@ class Wp_Simpeg_Public {
                             $options = array(
                                 'status' => $status_absensi,
                                 'status_ver_admin' => $status_ver,
-                                'ket_ver_admin' => $data['keterangan_status_admin']
+                                'ket_ver_admin' => $data['keterangan_status_admin'],
+                                'update_at' => current_time('mysql')
                             );
 
                             $wpdb->update('data_absensi_lembur', $options, array(
@@ -2977,5 +2982,125 @@ class Wp_Simpeg_Public {
     }
 }
 
+	    
+	public function get_datatable_data_absensi_lembur_admin(){
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil get data!',
+	        'data'  => array()
+	    );
 
+	    if(!empty($_POST)){
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
+	            $user_id = um_user( 'ID' );
+	            $user_meta = get_userdata($user_id);
+	            $params = $columns = $totalRecords = $data = array();
+	            $params = $_REQUEST;
+	            $columns = array( 
+	            	'u.nama_skpd',
+	            	's.jml_peg',
+	            	's.jml_jam',
+	            	's.uang_makan',
+	            	's.uang_lembur',
+	            	's.jml_pajak',
+	            	's.ket_lembur',
+	            	's.file_lampiran',
+	            	's.update_at',
+	            	's.created_at',
+	            	's.status',
+	            	's.status_ver_admin', 
+	            	's.ket_ver_admin',
+	              	's.id'
+	            );
+	            $where = $sqlTot = $sqlRec = "";
+
+	            if( !empty($params['search']['value']) ) { 
+	                $where .=" OR u.nama_skpd LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
+	                $where .=" OR s.ket_lembur LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
+	            }
+
+	            // getting total number records without any search
+	            $sql_tot = "SELECT count(id) as jml FROM `data_absensi_lembur` s";
+	            $sql = "
+	            	SELECT 
+	            		".implode(', ', $columns)." 
+	            	FROM `data_absensi_lembur` s
+	            	LEFT JOIN data_unit_lembur as u on s.id_skpd=u.id_skpd
+	            		AND s.tahun_anggaran=u.tahun_anggaran
+	            		AND s.active=u.active";
+	            $where_first = " WHERE 1=1 AND s.active=1";
+	            $sqlTot .= $sql_tot.$where_first;
+	            $sqlRec .= $sql.$where_first;
+	            if(isset($where) && $where != '') {
+	                $sqlTot .= $where;
+	                $sqlRec .= $where;
+	            }
+
+                $limit = '';
+                if($params['length'] != -1){
+                    $limit = "  LIMIT ".$wpdb->prepare('%d', $params['start'])." ,".$wpdb->prepare('%d', $params['length']);
+                }
+                $sqlRec .=  " ORDER BY ". $columns[$params['order'][0]['column']]."   ".str_replace("'", '', $wpdb->prepare('%s', $params['order'][0]['dir'])).$limit;
+
+                $queryTot = $wpdb->get_results($sqlTot, ARRAY_A);
+                $totalRecords = $queryTot[0]['jml'];
+                $queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
+
+                $is_admin = in_array("administrator", $user_meta->roles);
+
+                foreach($queryRecords as $recKey => $recVal){
+                    $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
+					if($recVal['status'] == 0){
+	                    $btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
+	                    $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-trash"></i></a>';	        
+                        $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-primary" onclick="submit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Submit Data"><i class="dashicons dashicons-migrate"></i></a>';          
+	                    if ($recVal['status_ver_admin'] == '0'){
+	                        $pesan = '<br><b>Keterangan:</b> '.$recVal['ket_ver_admin']; 
+	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Absensi Ditolak</span>'.$pesan;
+	                    }else{
+	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit</span>';
+	                    }
+	                }else if($recVal['status'] == 1) {
+	                	if($is_admin) {
+	                    	$btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-success" onclick="verifikasi_admin(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Admin"><i class="dashicons dashicons-yes"></i></a>';
+	                    	$btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
+                    		$btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-trash"></i></a>';
+	                	}
+		                $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Menunggu verifikasi Admin</span>';
+	                }elseif($recVal['status'] == 2) {
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Selesai</span>';
+	                }else{
+	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Not Found</span>';
+	                }
+	                $queryRecords[$recKey]['aksi'] = $btn;
+					$queryRecords[$recKey]['file_lampiran'] = '<a href="' . SIMPEG_PLUGIN_URL . 'public/media/simpeg/' . $recVal['file_lampiran'] . '" target="_blank">' . $recVal['file_lampiran'] . '</a>';
+	                $queryRecords[$recKey]['uang_lembur'] = $this->rupiah($recVal['uang_lembur']);
+	                $queryRecords[$recKey]['uang_makan'] = $this->rupiah($recVal['uang_makan']);
+	                $queryRecords[$recKey]['jml_pajak'] = $this->rupiah($recVal['jml_pajak']);
+	            }
+	     
+	            $json_data = array(
+	                "draw"            => intval( $params['draw'] ),   
+	                "recordsTotal"    => intval( $totalRecords ),  
+	                "recordsFiltered" => intval($totalRecords),
+	                "data"            => $queryRecords,
+	                "sql"             => $sqlRec
+	            );
+
+	            die(json_encode($json_data));
+	        }else{
+	            $return = array(
+	                'status' => 'error',
+	                'message'   => 'Api Key tidak sesuai!'
+	            );
+	        }
+	    }else{
+	        $return = array(
+	            'status' => 'error',
+	            'message'   => 'Format tidak sesuai!'
+	        );
+	    }
+	    die(json_encode($return));
+	} 
 }
