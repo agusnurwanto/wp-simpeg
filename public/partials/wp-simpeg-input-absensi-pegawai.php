@@ -42,8 +42,8 @@ if(in_array("administrator", $user_meta->roles)){
             <table id="management_data_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                 <thead>
                     <tr>
+                        <th class="text-center">Nama Pegawai</th>
                         <th class="text-center">Nama SKPD</th>
-                        <th class="text-center">Jumlah Pegawai</th>
                         <th class="text-center">Jumlah Jam</th>
                         <th class="text-center">Uang Makan</th>
                         <th class="text-center">Uang Lembur</th>
@@ -623,11 +623,11 @@ function get_data_absensi_lembur() {
             },
             "columns": [
                 {
-                    "data": 'nama_skpd',
+                    "data": 'nama_lengkap',
                     className: "text-center"
                 },
                 {
-                    "data": 'jml_peg',
+                    "data": 'nama_skpd',
                     className: "text-center"
                 },
                 {

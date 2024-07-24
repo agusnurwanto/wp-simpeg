@@ -2981,8 +2981,7 @@ class Wp_Simpeg_Public {
         die(json_encode($ret));
     }
 }
-
-	    
+    
 	public function get_datatable_data_absensi_lembur_admin(){
 	    global $wpdb;
 	    $ret = array(
@@ -3011,6 +3010,7 @@ class Wp_Simpeg_Public {
 	            	's.status',
 	            	's.status_ver_admin', 
 	            	's.ket_ver_admin',
+	            	'p.nama_lengkap',
 	              	's.id'
 	            );
 	            $where = $sqlTot = $sqlRec = "";
@@ -3026,7 +3026,12 @@ class Wp_Simpeg_Public {
 	            	SELECT 
 	            		".implode(', ', $columns)." 
 	            	FROM `data_absensi_lembur` s
-	            	LEFT JOIN data_unit_lembur as u on s.id_skpd=u.id_skpd
+				    INNER JOIN data_absensi_lembur_detail d on d.id_spt = s.id
+				        AND s.active = d.active
+				    INNER JOIN data_pegawai_lembur p on d.id_pegawai = p.id
+				        AND p.active = d.active
+				        AND p.tahun = s.tahun_anggaran
+	            	INNER JOIN data_unit_lembur as u on s.id_skpd=u.id_skpd
 	            		AND s.tahun_anggaran=u.tahun_anggaran
 	            		AND s.active=u.active";
 	            $where_first = " WHERE 1=1 AND s.active=1";
