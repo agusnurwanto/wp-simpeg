@@ -2876,6 +2876,7 @@ class Wp_Simpeg_Public {
                             'waktu_mulai_hadir' => $detail['waktu_mulai_hadir'],
                             'waktu_akhir_hadir' => $detail['waktu_akhir_hadir'],
                             'tipe_hari' => $detail['tipe_hari'],
+                            'id_spt' => $detail['id_spt'],
                             'update_user' => $user_meta->display_name,
                             'update_at' => current_time('mysql')
                         );
