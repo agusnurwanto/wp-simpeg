@@ -47,8 +47,9 @@ if(in_array("administrator", $user_meta->roles)){
                         <th class="text-center">Waktu Mulai</th>
                         <th class="text-center">Waktu Akhir</th>
                         <th class="text-center">Jumlah Jam</th>
+                        <th class="text-center">Total Nilai</th>
                         <th class="text-center">Keterangan Lembur</th>
-                        <th class="text-center">Foto Kegiatan</th>
+                        <th class="text-center" style="width: 250px;">Foto Kegiatan</th>
                         <th class="text-center">Created at</th>
                         <th class="text-center">Update at</th>
                         <th class="text-center">Status</th>
@@ -611,8 +612,8 @@ function get_data_absensi_lembur() {
                 }
             },
             lengthMenu: [
-                [20, 50, 100, -1],
-                [20, 50, 100, "All"]
+                [10, 25, 50, 100, -1],
+                [10, 25, 50, 100, "All"]
             ],
             order: [
                 [0, 'asc']
@@ -639,6 +640,10 @@ function get_data_absensi_lembur() {
                 },
                 {
                     "data": 'jml_jam',
+                    className: "text-center"
+                },
+                {
+                    "data": 'total_nilai',
                     className: "text-center"
                 },
                 {

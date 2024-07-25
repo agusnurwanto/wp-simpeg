@@ -166,6 +166,7 @@ CREATE TABLE `data_absensi_lembur` (
   `uang_makan` double DEFAULT NULL,
   `uang_lembur` double DEFAULT NULL,
   `jml_pajak` double DEFAULT NULL,
+  `total_nilai` double DEFAULT NULL,
   `ket_lembur` text DEFAULT NULL,
   `user` text DEFAULT NULL,
   `waktu_mulai_spt` date NOT NULL,

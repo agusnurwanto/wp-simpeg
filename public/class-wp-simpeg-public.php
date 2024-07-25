@@ -2507,6 +2507,7 @@ class Wp_Simpeg_Public {
 	            	's.file_lampiran',
 	            	's.update_at',
 	            	's.status',
+	            	's.total_nilai',
 	            	's.status_ver_admin', 
 	            	's.ket_ver_admin',
 	            	'p.nama_lengkap',
@@ -2549,7 +2550,7 @@ class Wp_Simpeg_Public {
                 if($params['length'] != -1){
                     $limit = "  LIMIT ".$wpdb->prepare('%d', $params['start'])." ,".$wpdb->prepare('%d', $params['length']);
                 }
-                $sqlRec .=  " ORDER BY ". $columns[$params['order'][0]['column']]."   ".str_replace("'", '', $wpdb->prepare('%s', $params['order'][0]['dir'])).$limit;
+            	$sqlRec .=  " ORDER BY s.created_at DESC".$limit;
 
                 $queryTot = $wpdb->get_results($sqlTot, ARRAY_A);
                 $totalRecords = $queryTot[0]['jml'];
@@ -2557,6 +2558,8 @@ class Wp_Simpeg_Public {
                 $is_admin = in_array("administrator", $user_meta->roles);
 
                 foreach($queryRecords as $recKey => $recVal){
+                	$queryRecords[$recKey]['total_nilai'] = $recVal['uang_makan'] + $recVal['uang_lembur'] - $recVal['jml_pajak'];
+
                     $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
 					if($recVal['status'] == 0){
                     $btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
@@ -2581,10 +2584,11 @@ class Wp_Simpeg_Public {
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Not Found</span>';
 	                }
 	                $queryRecords[$recKey]['aksi'] = $btn;
-	                $queryRecords[$recKey]['file_lampiran'] = '<a href="' . SIMPEG_PLUGIN_URL . 'public/media/simpeg/' . $recVal['file_lampiran'] . '" target="_blank"><img src="' . SIMPEG_PLUGIN_URL . 'public/media/simpeg/' . $recVal['file_lampiran'] . '" alt="' . $recVal['file_lampiran'] . '" style="max-width:50%;height:auto;"></a>';
+	                $queryRecords[$recKey]['file_lampiran'] = '<a href="' . SIMPEG_PLUGIN_URL . 'public/media/simpeg/' . $recVal['file_lampiran'] . '" target="_blank"><img src="' . SIMPEG_PLUGIN_URL . 'public/media/simpeg/' . $recVal['file_lampiran'] . '" alt="' . $recVal['file_lampiran'] . '" style="max-width:100%;height:auto;"></a>';
 	                $queryRecords[$recKey]['uang_lembur'] = $this->rupiah($recVal['uang_lembur']);
 	                $queryRecords[$recKey]['uang_makan'] = $this->rupiah($recVal['uang_makan']);
 	                $queryRecords[$recKey]['jml_pajak'] = $this->rupiah($recVal['jml_pajak']);
+	                $queryRecords[$recKey]['total_nilai'] = $this->rupiah($queryRecords[$recKey]['total_nilai']);
 	            }
 	     
 	            $json_data = array(
@@ -3013,6 +3017,7 @@ class Wp_Simpeg_Public {
 	            	's.created_at',
 	            	's.status',
 	            	's.status_ver_admin', 
+	            	's.total_nilai', 
 	            	's.ket_ver_admin',
 	            	'p.nama_lengkap',
 	            	'd.waktu_mulai',
@@ -3052,7 +3057,7 @@ class Wp_Simpeg_Public {
                 if($params['length'] != -1){
                     $limit = "  LIMIT ".$wpdb->prepare('%d', $params['start'])." ,".$wpdb->prepare('%d', $params['length']);
                 }
-                $sqlRec .=  " ORDER BY ". $columns[$params['order'][0]['column']]."   ".str_replace("'", '', $wpdb->prepare('%s', $params['order'][0]['dir'])).$limit;
+            	$sqlRec .=  " ORDER BY s.created_at DESC".$limit;
 
                 $queryTot = $wpdb->get_results($sqlTot, ARRAY_A);
                 $totalRecords = $queryTot[0]['jml'];
@@ -3061,6 +3066,7 @@ class Wp_Simpeg_Public {
                 $is_admin = in_array("administrator", $user_meta->roles);
 
                 foreach($queryRecords as $recKey => $recVal){
+                	$queryRecords[$recKey]['total_nilai'] = $recVal['uang_makan'] + $recVal['uang_lembur'] - $recVal['jml_pajak'];
                     $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
 					if($recVal['status'] == 0){
 	                    $btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
@@ -3090,6 +3096,7 @@ class Wp_Simpeg_Public {
 	                $queryRecords[$recKey]['uang_lembur'] = $this->rupiah($recVal['uang_lembur']);
 	                $queryRecords[$recKey]['uang_makan'] = $this->rupiah($recVal['uang_makan']);
 	                $queryRecords[$recKey]['jml_pajak'] = $this->rupiah($recVal['jml_pajak']);
+	                $queryRecords[$recKey]['total_nilai'] = $this->rupiah($queryRecords[$recKey]['total_nilai']);
 	            }
 	     
 	            $json_data = array(
