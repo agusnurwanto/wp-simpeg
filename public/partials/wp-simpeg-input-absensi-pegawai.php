@@ -44,10 +44,9 @@ if(in_array("administrator", $user_meta->roles)){
                     <tr>
                         <th class="text-center">Nama Pegawai</th>
                         <th class="text-center">Nama SKPD</th>
+                        <th class="text-center">Waktu Mulai</th>
+                        <th class="text-center">Waktu Akhir</th>
                         <th class="text-center">Jumlah Jam</th>
-                        <th class="text-center">Uang Makan</th>
-                        <th class="text-center">Uang Lembur</th>
-                        <th class="text-center">Total Pajak</th>
                         <th class="text-center">Keterangan Lembur</th>
                         <th class="text-center">Foto Kegiatan</th>
                         <th class="text-center">Created at</th>
@@ -631,19 +630,15 @@ function get_data_absensi_lembur() {
                     className: "text-center"
                 },
                 {
+                    "data": 'waktu_mulai',
+                    className: "text-center"
+                },
+                {
+                    "data": 'waktu_akhir',
+                    className: "text-center"
+                },
+                {
                     "data": 'jml_jam',
-                    className: "text-center"
-                },
-                {
-                    "data": 'uang_makan',
-                    className: "text-center"
-                },
-                {
-                    "data": 'uang_lembur',
-                    className: "text-center"
-                },
-                {
-                    "data": 'jml_pajak',
                     className: "text-center"
                 },
                 {

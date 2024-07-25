@@ -40,7 +40,7 @@ $disabled = 'disabled';
 <div class="cetak">
     <div style="padding: 10px;margin:0 0 3rem 0;">
         <input type="hidden" value="<?php echo get_option( SIMPEG_APIKEY ); ?>" id="api_key">
-        <h1 class="text-center" style="margin:3rem;">Input Data Absensi Pegawai<br> Tahun <?php echo $input['tahun_anggaran']; ?></h1>
+        <h2 class="text-center" style="margin:3rem;">Input Data Absensi Pegawai<br> Tahun <?php echo $input['tahun_anggaran']; ?><br><?php echo $skpd['nama_skpd']; ?></h2>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_data_absensi_lembur();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
             </div>
@@ -50,15 +50,12 @@ $disabled = 'disabled';
                 <thead>
                     <tr>
                         <th class="text-center">Nama Pegawai</th>
-                        <th class="text-center">SKPD</th>
+                        <th class="text-center">Waktu Mulai</th>
+                        <th class="text-center">Waktu Selesai</th>
                         <th class="text-center">Jumlah Jam</th>
-                        <th class="text-center">Uang Makan</th>
-                        <th class="text-center">Uang Lembur</th>
-                        <th class="text-center">Total Pajak</th>
+                        <!-- <th class="text-center">Total Uang</th> -->
                         <th class="text-center">Keterangan Lembur</th>
                         <th class="text-center">Foto Kegiatan</th>
-                        <th class="text-center">Created at</th>
-                        <th class="text-center">Update at</th>
                         <th class="text-center">Status</th>
                         <th class="text-center" style="width: 35px;">Aksi</th>
                     </tr>
@@ -585,23 +582,15 @@ function get_data_absensi_lembur() {
                     className: "text-center"
                 },
                 {
-                    "data": 'nama_skpd',
+                    "data": 'waktu_mulai',
+                    className: "text-center"
+                },
+                {
+                    "data": 'waktu_akhir',
                     className: "text-center"
                 },
                 {
                     "data": 'jml_jam',
-                    className: "text-center"
-                },
-                {
-                    "data": 'uang_makan',
-                    className: "text-center"
-                },
-                {
-                    "data": 'uang_lembur',
-                    className: "text-center"
-                },
-                {
-                    "data": 'jml_pajak',
                     className: "text-center"
                 },
                 {
@@ -610,14 +599,6 @@ function get_data_absensi_lembur() {
                 },
                 {
                     "data": 'file_lampiran',
-                    className: "text-center"
-                },
-                {
-                    "data": 'created_at',
-                    className: "text-center"
-                },
-                {
-                    "data": 'update_at',
                     className: "text-center"
                 },
                 {

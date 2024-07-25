@@ -2511,6 +2511,8 @@ class Wp_Simpeg_Public {
 	            	's.ket_ver_admin',
 	            	'p.nama_lengkap',
 	            	's.created_at',
+	            	'd.waktu_mulai',
+	            	'd.waktu_akhir',
 	              	's.id'
 	            );
 	            $where = $sqlTot = $sqlRec = "";
@@ -2579,7 +2581,7 @@ class Wp_Simpeg_Public {
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Not Found</span>';
 	                }
 	                $queryRecords[$recKey]['aksi'] = $btn;
-					$queryRecords[$recKey]['file_lampiran'] = '<a href="' . SIMPEG_PLUGIN_URL . 'public/media/simpeg/' . $recVal['file_lampiran'] . '" target="_blank">' . $recVal['file_lampiran'] . '</a>';
+	                $queryRecords[$recKey]['file_lampiran'] = '<a href="' . SIMPEG_PLUGIN_URL . 'public/media/simpeg/' . $recVal['file_lampiran'] . '" target="_blank"><img src="' . SIMPEG_PLUGIN_URL . 'public/media/simpeg/' . $recVal['file_lampiran'] . '" alt="' . $recVal['file_lampiran'] . '" style="max-width:50%;height:auto;"></a>';
 	                $queryRecords[$recKey]['uang_lembur'] = $this->rupiah($recVal['uang_lembur']);
 	                $queryRecords[$recKey]['uang_makan'] = $this->rupiah($recVal['uang_makan']);
 	                $queryRecords[$recKey]['jml_pajak'] = $this->rupiah($recVal['jml_pajak']);
@@ -3013,6 +3015,8 @@ class Wp_Simpeg_Public {
 	            	's.status_ver_admin', 
 	            	's.ket_ver_admin',
 	            	'p.nama_lengkap',
+	            	'd.waktu_mulai',
+	            	'd.waktu_akhir',
 	              	's.id'
 	            );
 	            $where = $sqlTot = $sqlRec = "";
@@ -3076,12 +3080,13 @@ class Wp_Simpeg_Public {
 	                	}
 		                $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Menunggu verifikasi Admin</span>';
 	                }elseif($recVal['status'] == 2) {
+	                    $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-success" onclick="verifikasi_admin(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Admin"><i class="dashicons dashicons-yes"></i></a>';
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Selesai</span>';
 	                }else{
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Not Found</span>';
 	                }
 	                $queryRecords[$recKey]['aksi'] = $btn;
-					$queryRecords[$recKey]['file_lampiran'] = '<a href="' . SIMPEG_PLUGIN_URL . 'public/media/simpeg/' . $recVal['file_lampiran'] . '" target="_blank">' . $recVal['file_lampiran'] . '</a>';
+	                $queryRecords[$recKey]['file_lampiran'] = '<a href="' . SIMPEG_PLUGIN_URL . 'public/media/simpeg/' . $recVal['file_lampiran'] . '" target="_blank"><img src="' . SIMPEG_PLUGIN_URL . 'public/media/simpeg/' . $recVal['file_lampiran'] . '" alt="' . $recVal['file_lampiran'] . '" style="max-width:100%;height:auto;"></a>';
 	                $queryRecords[$recKey]['uang_lembur'] = $this->rupiah($recVal['uang_lembur']);
 	                $queryRecords[$recKey]['uang_makan'] = $this->rupiah($recVal['uang_makan']);
 	                $queryRecords[$recKey]['jml_pajak'] = $this->rupiah($recVal['jml_pajak']);

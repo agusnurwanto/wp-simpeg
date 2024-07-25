@@ -231,6 +231,8 @@ class Wp_Simpeg {
 		$this->loader->add_action('wp_ajax_verifikasi_absensi_lembur', $plugin_public, 'verifikasi_absensi_lembur');
 
 		$this->loader->add_action('wp_ajax_get_datatable_data_absensi_lembur_admin', $plugin_public, 'get_datatable_data_absensi_lembur_admin');
+		$this->loader->add_action('wp_ajax_submit_verify_absensi', $plugin_public, 'submit_verify_absensi');
+		$this->loader->add_action('wp_ajax_get_data_absensi_lembur_verify', $plugin_public, 'get_data_absensi_lembur_verify');
 
 		add_shortcode('management_data_pegawai_simpeg', array($plugin_public, 'management_data_pegawai_simpeg'));
 		add_shortcode('management_data_sbu_lembur', array($plugin_public, 'management_data_sbu_lembur'));
