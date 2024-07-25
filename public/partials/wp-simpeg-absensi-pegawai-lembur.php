@@ -701,9 +701,9 @@ function edit_data(_id){
                                     jQuery('#waktu_selesai_'+id).val(b.waktu_akhir).trigger('change').prop('disabled', false);
                                     jQuery('#keterangan_'+id).val(b.keterangan).prop('disabled', true);
                                     if(b.id_standar_harga_makan == '0'){
-                                        jQuery('#uang_makan_set_'+id).prop('checked', false).prop('disabled', true);
+                                        jQuery('#uang_makan_set_'+id).prop('checked', false).prop('disabled', false);
                                     }else{
-                                        jQuery('#uang_makan_set_'+id).prop('checked', true).prop('disabled', true);
+                                        jQuery('#uang_makan_set_'+id).prop('checked', true).prop('disabled', false);
                                     }
                                 });
                                 jQuery('#file_lampiran_existing').attr('href', global_file_upload + res.data.file_lampiran).html(res.data.file_lampiran).show();
@@ -927,7 +927,7 @@ function get_uang_lembur(that){
     var waktu_mulai = jQuery('#waktu_mulai_'+id).val();
     var waktu_selesai = jQuery('#waktu_selesai_'+id).val();
     var jam = (new Date(waktu_selesai)).getTime() - (new Date(waktu_mulai)).getTime();
-    jam = Math.floor(jam / (1000 * 60 * 30));
+    jam = Math.round(jam / (1000 * 60 * 60));
     var jenis_hari = jQuery('#jenis_hari_'+id).val();
     jQuery('#uang_lembur_'+id).val(0);
     jQuery('#uang_makan_'+id).val(0);
