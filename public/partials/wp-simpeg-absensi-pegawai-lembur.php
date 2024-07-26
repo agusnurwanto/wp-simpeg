@@ -798,19 +798,19 @@ function tambah_data_absensi_lembur(){
         jQuery('#uang_lembur').val('0').prop('disabled', true);
         jQuery('#sbu_makan').val('').prop('disabled', false);
         jQuery('#sbu_lembur').val('').prop('disabled', false);
-        jQuery('#id_pegawai_1').val('<?php echo $input['id']; ?>').trigger('change');
+        jQuery('#id_pegawai_1').val('<?php echo $input['id']; ?>').trigger('change').prop('disabled', false);
     })
     jQuery('#keterangan_status_admin').closest('.form-group').hide().prop('disabled', false);
     jQuery('#id_admin').val('').prop('disabled', false);
     jQuery('#status_ver_admin').val('').prop('disabled', false);
     jQuery('#status_admin').prop('checked', false);
     jQuery('#keterangan_status_admin').val('').prop('disabled', false);
-    jQuery('#ket_lembur').val('').prop('disabled', false).hide();
+    jQuery('#ket_lembur').closest('.form-group').val('').prop('disabled', false).hide();
     jQuery('#waktu_mulai_spt').trigger('change').prop('disabled', true);
     jQuery('#waktu_selesai_spt').trigger('change').prop('disabled', true);
-    jQuery('#lampiran').val('').hide();
-    jQuery('#file_lampiran_existing').hide();
-    jQuery('#file_lampiran_existing').closest('.form-group').find('input').show();
+    jQuery('#lampiran').closest('.form-group').val('').hide();
+    jQuery('#file_lampiran_existing').closest('.form-group').hide();
+    jQuery('#file_lampiran_existing').closest('.form-group').find('input').hide();
     jQuery('#modalTambahDataAbsensiLembur .send_data').show();
     jQuery('#modalTambahDataAbsensiLembur').modal('show');
 }
