@@ -2645,10 +2645,6 @@ class Wp_Simpeg_Public {
 					$ret['status'] = 'error';
 					$ret['message'] = 'Isi waktu selesai SPT dulu!';
 				}
-				if ($ret['status'] != 'error' && empty($data['id_data']) && empty($_FILES['lampiran'])) {
-					$ret['status'] = 'error';
-					$ret['message'] = 'Lampiran tidak boleh kosong!';
-				}
 
 				if ($ret['status'] != 'error' && !empty($data['id_pegawai'])) {
 					$pesan = array();
