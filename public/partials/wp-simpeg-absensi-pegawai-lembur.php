@@ -773,9 +773,7 @@ function edit_data(_id){
                                     jQuery('#file_lampiran_existing').closest('.form-group').find('input').show();
                                 }
 
-                                if (res.data.ket_lembur) {
-                                    jQuery('#ket_lembur').val(res.data.ket_lembur).prop('disabled', false).show();
-                                }
+                                jQuery('#ket_lembur').val(res.data.ket_lembur).prop('disabled', false).show();
                                 jQuery('#modalTambahDataAbsensiLembur .send_data').show();
                                 jQuery('#modalTambahDataAbsensiLembur').modal('show');
                                 jQuery('#wrap-loading').hide();
