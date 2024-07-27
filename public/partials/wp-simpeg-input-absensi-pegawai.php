@@ -120,13 +120,13 @@ if(in_array("administrator", $user_meta->roles)){
                         <tbody>
                         </tbody>
                     </table>
-                    <div class="form-group" style="display: none;">
+                    <div class="form-group">
                         <label for="">Foto Kegiatan</label>
                         <input type="file" name="file" class="form-control-file" id="lampiran" accept="application/pdf, .png, .jpg, .jpeg">
                         <div style="padding-top: 10px; padding-bottom: 10px;"><a id="file_lampiran_existing"></a></div>
-                        <div><small>Upload file maksimal 5 Mb, berformat .pdf .png .jpg .jpeg</small></div>
                     </div>
-                    <div class="form-group" style="display: none;">
+                    <div><small>Upload file maksimal 5 Mb, berformat .pdf .png .jpg .jpeg</small></div>
+                    <div class="form-group">
                         <label>Keterangan</label>
                         <textarea class="form-control" id="ket_lembur" name="ket_lembur"></textarea>
                     </div>
@@ -748,24 +748,9 @@ function edit_data(_id){
                                         jQuery('#uang_makan_set_'+id).prop('checked', true).prop('disabled', false);
                                     }
                                 });
-
-                                jQuery("#modalTambahDataAbsensiLembur #lampiran").val("").closest('.form-group').show();
-                                jQuery("#modalTambahDataAbsensiLembur #ket_lembur").val("").closest('.form-group').show();
-                                if (res.data.file_lampiran) {
-                                    var fileLink = global_file_upload + res.data.file_lampiran;
-                                    jQuery('#file_lampiran_existing')
-                                        .attr('href', fileLink)
-                                        .html(res.data.file_lampiran)
-                                        .show()
-                                        .prop('disabled', false);
-                                    jQuery('#file_lampiran_existing').closest('.form-group').show();
-                                    jQuery('#lampiran').val('').show();
-                                } else {
-                                    jQuery('#file_lampiran_existing').hide();
-                                    jQuery('#file_lampiran_existing').closest('.form-group').find('input').show();
-                                }
-
-                                jQuery('#ket_lembur').val(res.data.ket_lembur).prop('disabled', false).show();
+                                jQuery('#file_lampiran_existing').attr('href', global_file_upload + res.data.file_lampiran).html(res.data.file_lampiran).show();
+                                jQuery('#lampiran').val('').show();
+                                jQuery('#ket_lembur').val(res.data.ket_lembur).prop('disabled', false);
                                 jQuery('#modalTambahDataAbsensiLembur .send_data').show();
                                 jQuery('#modalTambahDataAbsensiLembur').modal('show');
                                 jQuery('#wrap-loading').hide();
@@ -853,7 +838,7 @@ function tambah_data_absensi_lembur(){
     jQuery('#id_data').val('');
     jQuery('#tahun_anggaran').val('<?php echo date('Y'); ?>').trigger('change').prop('disabled', false);
     jQuery('#id_skpd').val('').trigger('change').prop('disabled', false);
-    jQuery('#ket_lembur').closest('.form-group').val('').prop('disabled', false).hide();
+    jQuery('#ket_lembur').val('').prop('disabled', false);
     jQuery('#id_admin').val('').prop('disabled', false);
     jQuery('#status_ver_admin').val('').prop('disabled', false);
     jQuery('#keterangan_status_admin').closest('.form-group').hide().prop('disabled', false);
@@ -861,9 +846,9 @@ function tambah_data_absensi_lembur(){
     jQuery('#keterangan_status_admin').val('').prop('disabled', false);
     jQuery('#waktu_mulai_spt').prop('disabled', false);
     jQuery('#waktu_selesai_spt').prop('disabled', false);
-    jQuery('#lampiran').closest('.form-group').val('').hide();
-    jQuery('#file_lampiran_existing').closest('.form-group').hide();
-    jQuery('#file_lampiran_existing').closest('.form-group').find('input').hide();
+    jQuery('#lampiran').val('').show();
+    jQuery('#file_lampiran_existing').hide();
+    jQuery('#file_lampiran_existing').closest('.form-group').find('input').show();
     jQuery('#modalTambahDataAbsensiLembur .send_data').show();
     jQuery('#modalTambahDataAbsensiLembur').modal('show');
 }
@@ -891,6 +876,11 @@ function submitTambahDataFormAbsensiLembur(){
         return alert('Tanggal Selesai Absensi diisi dulu!');
     }
     var lampiran = jQuery('#lampiran')[0].files[0];
+    if (id_data == '') {
+        if (typeof lampiran == 'undefined') {
+            return alert('Upload file lampiran dulu!');
+        }
+    }
     var pegawai_all = {};
     var error = [];
     jQuery('#daftar_pegawai tbody tr').map(function(i, b){
@@ -969,14 +959,30 @@ function submitTambahDataFormAbsensiLembur(){
     }
 }
 
-function get_uang_lembur(that){
+function get_uang_lembur(that) {
     var id = jQuery(that).closest('tr').attr('data-id');
-    var golongan = jQuery('#id_pegawai_'+id+' option:selected').attr('golongan');
-    var waktu_mulai = jQuery('#waktu_mulai_'+id).val();
-    var waktu_selesai = jQuery('#waktu_selesai_'+id).val();
+    var golongan = jQuery('#id_pegawai_' + id + ' option:selected').attr('golongan');
+    var waktu_mulai = jQuery('#waktu_mulai_' + id).val();
+    var waktu_selesai = jQuery('#waktu_selesai_' + id).val();
     var jam = (new Date(waktu_selesai)).getTime() - (new Date(waktu_mulai)).getTime();
     jam = Math.round(jam / (1000 * 60 * 60));
-    var jenis_hari = jQuery('#jenis_hari_'+id).val();
+    var jenis_hari = jQuery('#jenis_hari_' + id).val();
+
+    var max_jam = 8;
+    var warning_message = "";
+    if (jenis_hari == 2) {
+        max_jam = 3;
+        warning_message = "Jam pada hari kerja tidak boleh lebih dari 3 jam.";
+    } else {
+        warning_message = "Jam pada hari libur tidak boleh lebih dari 8 jam.";
+    }
+
+    if (jam > max_jam) {
+        alert(warning_message);
+        jQuery('#waktu_selesai_' + id).val(waktu_mulai);
+        jam = 0;
+    }
+    
     jQuery('#uang_lembur_'+id).val(0);
     jQuery('#uang_makan_'+id).val(0);
     if(isNaN(jam)){
