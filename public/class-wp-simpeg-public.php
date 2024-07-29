@@ -3121,5 +3121,137 @@ class Wp_Simpeg_Public {
 	        );
 	    }
 	    die(json_encode($return));
-	} 
+	}
+
+	public function submit_verify_absensi()
+{
+    global $wpdb;
+    $return = array(
+        'status' => 'success',
+        'message' => 'Data verifikasi berhasil disimpan!',
+        'data'  => array()
+    );
+
+    $user_id = um_user('ID');
+    $user_meta = get_userdata($user_id);
+
+    if (!empty($_POST)) {
+        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(SIMPEG_APIKEY)) {
+            if ($_POST['verify_absensi'] != '' && !empty($_POST['id'])) {
+                if (in_array("administrator", $user_meta->roles)) {
+                    if (($_POST['verify_absensi'] == 0) && empty($_POST['reason_verify_absensi'])) {
+                        $return = array(
+                            'status' => 'error',
+                            'message' => 'Alasan ditolak tidak boleh kosong!'
+                        );
+
+                        die(json_encode($return));
+                    }
+
+                    $verify_absensi = trim(htmlspecialchars($_POST['verify_absensi']));
+                    $reason_verify_absensi = trim(htmlspecialchars($_POST['reason_verify_absensi']));
+                    $id = trim(htmlspecialchars($_POST['id']));
+
+                    $data_absensi = $wpdb->get_results($wpdb->prepare("
+                        SELECT 
+                            status, 
+                            status_ver_admin, 
+                            ket_ver_admin
+                        FROM data_absensi_lembur 
+                        WHERE id = %d
+                    ", $id), ARRAY_A);
+
+                    $opsi_absensi = array();
+                    $opsi_absensi['update_at'] = current_datetime()->format('Y-m-d H:i:s');
+
+                    if ($verify_absensi) {
+                        $opsi_absensi['status'] = '2';
+                        $opsi_absensi['status_ver_admin'] = 'done';
+                        $return['message'] = 'Berhasil setujui absensi!';
+                    } else {
+                        $opsi_absensi['status'] = '0';
+                        $opsi_absensi['status_ver_admin'] = 'rejected';
+                        $opsi_absensi['ket_ver_admin'] = (!empty($reason_verify_absensi)) ? $reason_verify_absensi . " " . $data_absensi[0]['ket_ver_admin'] : $data_absensi[0]['ket_ver_admin'];
+                        $return['message'] = 'Berhasil tolak absensi!';
+                    }
+
+                    $where_absensi = array(
+                        'id' => $id
+                    );
+
+                    $wpdb->update('data_absensi_lembur', $opsi_absensi, $where_absensi);
+
+                    $return['status'] = 'success';
+                } else {
+                    $return = array(
+                        'status' => 'error',
+                        'message' => 'User tidak diijinkan!'
+                    );
+                }
+            } else {
+                $return = array(
+                    'status' => 'error',
+                    'message' => 'Harap diisi semua, tidak boleh ada yang kosong!'
+                );
+            }
+        } else {
+            $return = array(
+                'status' => 'error',
+                'message' => 'Api Key tidak sesuai!'
+            );
+        }
+    } else {
+        $return = array(
+            'status' => 'error',
+            'message' => 'Format tidak sesuai!'
+        );
+    }
+    die(json_encode($return));
+}
+
+
+
+	public function get_data_absensi_lembur_verify()
+	{
+		global $wpdb;
+
+		$return = array(
+			'status' => 'success',
+			'data'	=> array()
+		);
+
+		if (!empty($_POST)) {
+			if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option('_crb_api_key_extension')) {
+				$user_id = um_user('ID');
+				$user_meta = get_userdata($user_id);
+
+				$data_absensi = $wpdb->get_row(
+					$wpdb->prepare("
+					SELECT 
+						ket_ver_admin
+					FROM data_absensi_lembur 
+					WHERE id=%d
+				", $_POST['id'])
+				);
+
+				$return = array(
+					'status' => 'success',
+					'role' => $user_meta->roles[0],
+					'data' => $data_absensi,
+				);
+			} else {
+				$return = array(
+					'status' => 'error',
+					'message'	=> 'Api Key tidak sesuai!'
+				);
+			}
+		} else {
+			$return = array(
+				'status' => 'error',
+				'message'	=> 'Format tidak sesuai!'
+			);
+		}
+		die(json_encode($return));
+	}
+ 
 }

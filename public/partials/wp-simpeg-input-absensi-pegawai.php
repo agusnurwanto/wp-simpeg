@@ -138,7 +138,7 @@ if(in_array("administrator", $user_meta->roles)){
             </div>
         </div>
     </div>
-</div>
+</div><!-- 
 
 <div class="modal fade mt-4" id="modalVerifikasiAdmin" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -168,7 +168,27 @@ if(in_array("administrator", $user_meta->roles)){
             </div>
         </div>
     </div>
+</div> -->
+
+
+
+<div class="modal fade" id="verifikasiAdmin" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="verifikasiAdminLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
 </div>
+
 <script type="text/javascript" src="<?php echo SIMPEG_PLUGIN_URL; ?>admin/js/jszip.js"></script>
 <script type="text/javascript" src="<?php echo SIMPEG_PLUGIN_URL; ?>admin/js/xlsx.js"></script>
 <script>    
@@ -184,32 +204,111 @@ jQuery(document).ready(function(){
     });
 });
 
-function submitVerifikasiLembur(that){
-    if(!jQuery('#status_admin').is(':checked')){
-        var ket = jQuery('#keterangan_status_admin').val();
-        if(ket == ''){
-            return alert('Keterangan harus diisi jika status ditolak');
-        }
-    }
-    if(confirm('Apakah anda yakin untuk memverifikasi data ini?')){
-        jQuery("#wrap-loading").show();
-        var form = getFormData(jQuery(that).closest('.modal').find('.modal-body form'));
+function get_data_verify(id) {
+    return new Promise(function(resolve, reject) {
+        jQuery('#wrap-loading').show();
         jQuery.ajax({
-            method:'post',
-            url:'<?php echo admin_url('admin-ajax.php'); ?>',
-            dataType: 'json',
+            url: ajax.url,
+            type: "post",
             data: {
-                'action': 'verifikasi_absensi_lembur',
-                'api_key': jQuery('#api_key').val(),
-                'data': JSON.stringify(form)
+                "action": "get_data_absensi_lembur_verify",
+                "api_key": jQuery("#api_key").val(),
+                "id": id
             },
-            success:function(response){
-                jQuery('#wrap-loading').hide();
-                alert(response.message);
-                if(response.status == 'success'){
-                    jQuery('#modalVerifikasiAdmin').modal('hide');
-                    get_data_absensi_lembur();
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    let ket_ver_admin = '';
+                    if (res.role === 'administrator') {
+                        if (res.data.keterangan_status_admin != null) {
+                            ket_ver_admin += '<ol>';
+                            res.data.keterangan_status_admin.split(' | ').map(function(b, i) {
+                                ket_ver_admin += '<li>' + b + '</li>';
+                            });
+                            ket_ver_admin += '</ol>';
+                        }
+                    }
+                    let html = "" +
+                        "<tr class='catatan-verify-ssh' style='display:none'>" +
+                        "<td colspan='2'>" +
+                        "<label for='ket_ver_admin' style='display:inline-block;'>Alasan " + "</label><br><span class='medium-bold-2' id='ket_ver_admin'>" + ket_ver_admin + "</span>" +
+                        "</td>" +
+                        "</tr>";
+                    jQuery(".add-desc-verify-ssh").after(html);
                 }
+                jQuery('#wrap-loading').hide();
+                resolve();
+            }
+        });
+    })
+}
+
+function verifikasi_admin(id) {
+    jQuery('#verifikasiAdmin').modal('show');
+    jQuery("#verifikasiAdminLabel").html("Verifikasi Absensi");
+    jQuery("#verifikasiAdmin .modal-dialog").removeClass("modal-lg modal-xl");
+    jQuery("#verifikasiAdmin .modal-dialog").addClass("modal-sm");
+    jQuery("#verifikasiAdmin .modal-body").html("" +
+        "<div class='verify-admin'><table>" +
+        "<tr>" +
+        "<td><input class='verify-absensi' id='verify-absensi-yes' name='verify_absensi' value='2' type='radio' checked><label for='verify-absensi-yes'>Setuju</label></td>" +
+        "<td><input class='verify-absensi' id='verify-absensi-no' name='verify_absensi' value='0' type='radio'><label for='verify-absensi-no'>Tolak</label></td>" +
+        "</tr>" +
+        "<tr class='add-desc-verify-absensi' style='display:none;'>" +
+        "<td colspan='2'><label for='alasan_verify_absensi' style='display:inline-block;'>Alasan</label><textarea id='alasan_verify_absensi'></textarea></td>" +
+        "</tr>" +
+        "</div>");
+    jQuery("#verifikasiAdmin .modal-footer").html("<button style='margin: 0 0 2rem 0.5rem;border-radius:0.2rem;' class='btn_submit_verify_absensi' onclick='submit_verify_absensi(" + id + ")'>Simpan</button>");
+    jQuery("#verify-absensi-no").on("click", function() {
+        var check = jQuery(this).is(':checked');
+        if (check) {
+            jQuery(".add-desc-verify-absensi").show();
+            jQuery(".catatan-verify-absensi").show();
+        }
+    });
+    jQuery("#verify-absensi-yes").on("click", function() {
+        var check = jQuery(this).is(':checked');
+        if (check) {
+            jQuery(".add-desc-verify-absensi").hide();
+            jQuery(".catatan-verify-absensi").hide();
+        }
+    });
+
+    get_data_verify(id);
+}
+
+function submit_verify_absensi(id) {
+    var verify_absensi = jQuery("input[name='verify_absensi']:checked").val();
+    var reason_verify_absensi = jQuery("#alasan_verify_absensi").val();
+    if (verify_absensi == 0 && reason_verify_absensi.trim() == '') {
+        alert('Alasan ditolak tidak boleh kosong.');
+        return false;
+    } else {
+        jQuery("#wrap-loading").show();
+        jQuery.ajax({
+            url: "<?php echo admin_url('admin-ajax.php'); ?>",
+            type: 'post',
+            data: {
+                'action': 'submit_verify_absensi',
+                'api_key': jQuery("#api_key").val(),
+                'verify_absensi': verify_absensi,
+                'reason_verify_absensi': reason_verify_absensi,
+                'id': id
+            },
+            dataType: 'json',
+            beforeSend: function() {
+                jQuery('.btn_submit_verify_absensi').attr("disabled", "disabled");
+            },
+            success: function(response) {
+                jQuery("#wrap-loading").hide();
+                if (response.status == 'success') {
+                    alert(response.message);
+                    jQuery('#verifikasiAdmin').modal('hide');
+                    data_absensi_lembur.draw();
+                } else {
+                    alert("GAGAL! " + response.message);
+                }
+                jQuery('.submitBtn').removeAttr("disabled");
             }
         });
     }
@@ -239,35 +338,6 @@ function submit_data(id){
             }
         });
     }
-}
-
-function verifikasi_admin(id){
-    jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        method: 'post',
-        url: '<?php echo admin_url('admin-ajax.php'); ?>',
-        dataType: 'json',
-        data:{
-            'action': 'get_data_absensi_lembur_by_id',
-            'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
-            'id': id,
-        },
-        success: function(res){
-            if(res.status == 'success'){
-                jQuery('#modalVerifikasiAdmin input[name="id_data"]').val(res.data.id);
-                if(res.data.status_ver_admin == 1){
-                    jQuery('#status_admin').prop('checked', true);
-                }else{
-                    jQuery('#status_admin').prop('checked', false);
-                }
-                jQuery('#modalVerifikasiAdmin #keterangan_status_admin').val(res.data.ket_ver_admin).prop('disabled', false);
-                jQuery('#modalVerifikasiAdmin').modal('show');
-            }else{
-                alert(res.message);
-            }
-            jQuery('#wrap-loading').hide();
-        }
-    });
 }
 
 function get_skpd(no_loading=false) {
