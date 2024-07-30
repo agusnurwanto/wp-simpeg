@@ -322,14 +322,31 @@ function setCenterSimpeg(lng, ltd, maker=false, data, noCenter=false){
 }
 
 jQuery(document).ready(function(){
-	var loading = ''
-		+'<div id="wrap-loading">'
-	        +'<div class="lds-hourglass"></div>'
-	        +'<div id="persen-loading"></div>'
-	    +'</div>';
-	if(jQuery('#wrap-loading').length == 0){
-		jQuery('body').prepend(loading);
-	}
+	 var loading =
+        "" +
+        '<div id="wrap-loading">' +
+        '<div class="lds-hourglass"></div>' +
+        '<div id="persen-loading"></div>' +
+        "</div>";
+    if (jQuery("#wrap-loading").length == 0) {
+        jQuery("body").prepend(loading);
+    }
+     var search = ''
+        +'<div class="input-group" style="margin-bottom: 5px; display: block;">'
+            +'<div class="input-group-prepend">'
+                +'<input class="form-control" id="cari-alamat-simpeg-input" type="text" placeholder="Kotak pencarian alamat">'
+                +'<button class="btn btn-success" id="cari-alamat-simpeg" type="button"><i class="dashicons dashicons-search"></i></button>'
+            +'</div>'
+        +'</div>';
+    jQuery("#map-canvas-simpeg").before(search);
+    jQuery("#cari-alamat-simpeg").on('click', function(){
+        cari_alamat_simpeg();
+    });
+    jQuery("#cari-alamat-simpeg-input").on('keyup', function (e) {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+            cari_alamat_simpeg();
+        }
+    });
 });
 
 function initMapSimpeg() {

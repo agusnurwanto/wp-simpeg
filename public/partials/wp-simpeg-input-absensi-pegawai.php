@@ -348,10 +348,6 @@ function get_skpd(no_loading=false) {
             alert('Tahun anggaran tidak boleh kosong!');
             return resolve();
         }
-        
-        if(!no_loading){
-            jQuery("#wrap-loading").show();
-        }
 
         var today = new Date();
         today = today.toJSON().split('T')[0].split('-');
@@ -366,6 +362,9 @@ function get_skpd(no_loading=false) {
             global_response_skpd = {};
         }
         if(!global_response_skpd[tahun]){
+            if(!no_loading){
+                jQuery("#wrap-loading").show();
+            }
             jQuery.ajax({
                 url: '<?php echo admin_url('admin-ajax.php'); ?>',
                 type:'post',
@@ -590,13 +589,13 @@ function get_pegawai(no_loading=false) {
             jQuery('#daftar_pegawai tbody').html('');
             return;
         }
-        if(!no_loading){
-            jQuery("#wrap-loading").show();
-        }
         if(typeof global_response_pegawai == 'undefined'){
             global_response_pegawai = {};
         }
         if(!global_response_pegawai[id_skpd]){
+            if(!no_loading){
+                jQuery("#wrap-loading").show();
+            }
             jQuery.ajax({
                 url: '<?php echo admin_url('admin-ajax.php'); ?>',
                 type:'post',
@@ -785,6 +784,7 @@ function edit_data(_id){
             'id': _id,
         },
         success: function(res){
+            jQuery('#wrap-loading').hide();
             if(res.status == 'success'){
                 jQuery('#id_data').val(res.data.id).prop('disabled', false);
                 jQuery('#tahun_anggaran').val(res.data.tahun_anggaran).prop('disabled', true);
@@ -823,7 +823,6 @@ function edit_data(_id){
                                 jQuery('#ket_lembur').val(res.data.ket_lembur).prop('disabled', false);
                                 jQuery('#modalTambahDataAbsensiLembur .send_data').show();
                                 jQuery('#modalTambahDataAbsensiLembur').modal('show');
-                                jQuery('#wrap-loading').hide();
                             }, 1000);
                         });
                     });
@@ -901,8 +900,6 @@ function detail_data(_id){
     });
 }
 
-<?php if($can_tambah_data): ?>
-
 //show tambah data
 function tambah_data_absensi_lembur(){
     jQuery('#id_data').val('');
@@ -917,12 +914,11 @@ function tambah_data_absensi_lembur(){
     jQuery('#waktu_mulai_spt').prop('disabled', false);
     jQuery('#waktu_selesai_spt').prop('disabled', false);
     jQuery('#lampiran').val('').show();
-    jQuery('#file_lampiran_existing').hide();
+    jQuery('#file_lampiran_existing').val('').hide();
     jQuery('#file_lampiran_existing').closest('.form-group').find('input').show();
     jQuery('#modalTambahDataAbsensiLembur .send_data').show();
     jQuery('#modalTambahDataAbsensiLembur').modal('show');
 }
-<?php endif; ?>
 
 function submitTambahDataFormAbsensiLembur(){
     var tahun_anggaran = jQuery('#tahun_anggaran').val();
