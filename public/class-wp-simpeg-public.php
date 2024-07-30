@@ -1879,6 +1879,7 @@ class Wp_Simpeg_Public {
 		foreach ($pegawai as $peg) {
 			if(
 				in_array("pegawai", $user_meta->roles)
+			|| in_array("admin_absensi", $user_meta->roles)
 			){
 				$menu_laporan_absensi = '';
 				$id_pegawai_lembur = get_user_meta($user_id, 'id_pegawai_lembur');
@@ -1891,12 +1892,24 @@ class Wp_Simpeg_Public {
 					));
 
                     $menu_laporan = $this->functions->generatePage(array(
-                            'nama_page' => 'Laporan Absensi Pegawai '.$peg['id'],
-                            'content' => '[laporan_bulanan_absensi_pegawai id='.$peg['id'].']',
-                            'show_header' => 1,
-                            'post_status' => 'private'
+                        'nama_page' => 'Laporan Absensi Pegawai '.$peg['id'],
+                        'content' => '[laporan_bulanan_absensi_pegawai id='.$peg['id'].']',
+                        'show_header' => 1,
+                        'post_status' => 'private'
                     ));
                     $menu_laporan_absensi = '<li style="display: inline-block"> <a style="margin-left: 10px;" href="'.$menu_laporan['url'].'" target="_blank" class="btn btn-info">Menu Laporan Absensi</a></li>';
+					$menu_input_admin = '';
+					if(
+						in_array("kasubag_keuangan", $user_meta->roles)
+					){
+						$input_absensi_pegawai_admin = $this->functions->generatePage(array(
+							'nama_page' => 'Input Absensi Pegawai '.$peg['id_skpd'].' '.$_GET['tahun'],
+							'content' => '[input_absensi_pegawai id_skpd='.$peg['id_skpd'].' tahun_anggaran='.$_GET['tahun'].']',
+							'show_header' => 1,
+							'post_status' => 'private'
+						));
+						$menu_input_admin .= '<li><a target="_blank" href="' . $input_absensi_pegawai_admin['url'] . '">' . $input_absensi_pegawai_admin['title'] . '</a></li>';
+					}
 					echo '
 					<ul class="aksi-lembur text-center">
 						<li style="list-style: none; display: inline-block"><a href="'.$menu_absensi_pegawai_lembur['url'].'" target="_blank" class="btn btn-info">Menu Absensi</a></li>
@@ -2748,6 +2761,7 @@ class Wp_Simpeg_Public {
 							$ret['status'] = 'error';
 							$ret['message'] = $upload['message'];
 						}
+						// print_r($upload); die();
 					}
 
 					if ($ret['status'] == 'error') {
@@ -2767,8 +2781,11 @@ class Wp_Simpeg_Public {
 								FROM data_absensi_lembur 
 								WHERE id=%d
 							', $data['id_data']), ARRAY_A);
-							if ($file_lama['file_lampiran'] != $data_opsi['file_lampiran']
-                            	&& is_file($path . $file_lama['file_lampiran'])) {
+							if(
+								!empty($_FILES['lampiran'])
+								&& $file_lama['file_lampiran'] != $data_opsi['file_lampiran']
+                            	&& is_file($path . $file_lama['file_lampiran'])
+                            ) {
 								unlink($path . $file_lama['file_lampiran']);
 							}
 							$wpdb->update('data_absensi_lembur', $data_opsi, array('id' => $data['id_data']));

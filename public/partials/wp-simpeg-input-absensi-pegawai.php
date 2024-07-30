@@ -1038,6 +1038,11 @@ function get_uang_lembur(that) {
     jam = Math.round(jam / (1000 * 60 * 60));
     var jenis_hari = jQuery('#jenis_hari_' + id).val();
 
+    jQuery('#uang_lembur_'+id).val(0);
+    jQuery('#uang_makan_'+id).val(0);
+    if(isNaN(jam)){
+        jam = 0;
+    }
     var max_jam = 8;
     var warning_message = "";
     if (jenis_hari == 2) {
@@ -1053,11 +1058,6 @@ function get_uang_lembur(that) {
         jam = 0;
     }
     
-    jQuery('#uang_lembur_'+id).val(0);
-    jQuery('#uang_makan_'+id).val(0);
-    if(isNaN(jam)){
-        jam = 0;
-    }
     jQuery('#jumlah_jam_'+id).html(jam+' jam');
     jQuery('#jml_jam_lembur_'+id).val(jam);
     jQuery('#jml_hari_lembur_'+id).val(jam);
