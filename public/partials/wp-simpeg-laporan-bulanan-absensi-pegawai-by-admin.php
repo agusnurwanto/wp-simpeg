@@ -1,18 +1,9 @@
-<?php 
-// If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-    die;
-}
+<?php
 global $wpdb;
-$user_id = um_user( 'ID' );
-$user_meta = get_userdata($user_id);
-$disabled = 'disabled';
-if(in_array("administrator", $user_meta->roles)){
-    $disabled = '';
-}
+
 $input = shortcode_atts( array(
     'tahun' => date('Y'),
-    'id_skpd' => 0,
+    'id_skpd' => '',
     'id' => '',
     'bulan' => date('m')*1
 ), $atts );
@@ -29,6 +20,18 @@ if(!empty($_GET) && !empty($_GET['bulan'])){
 if(!empty($_GET) && !empty($_GET['id'])){
     $input['id'] = $_GET['id'];
 } 
+
+$skpd = $wpdb->get_row(
+    $wpdb->prepare("
+    SELECT 
+        nama_skpd
+    FROM data_unit_lembur
+    WHERE id_skpd=%d
+      AND tahun_anggaran=%d
+      AND active = 1
+", $input['id_skpd'], $input['tahun']),
+    ARRAY_A
+);
 
 $tahun = $wpdb->get_results('
     SELECT 
@@ -63,8 +66,9 @@ $pegawai = $wpdb->get_results($wpdb->prepare('
         *
     FROM data_pegawai_lembur
     WHERE tahun=%d
+        AND id_skpd=%d
         AND active=1
-', $input['tahun']), ARRAY_A);
+', $input['tahun'], $input['id_skpd']), ARRAY_A);
 $select_pegawai = '<option value="">Pilih Pegawai</option>';
 foreach($pegawai as $get_peg){
     $selected = '';
@@ -315,7 +319,7 @@ foreach($absensi_lembur as $peg){
     <button style="margin-left: 10px; height: 45px; width: 75px;" onclick="submit();" class="btn btn-sm btn-primary">Cari</button>
 </div>
 
-<h3 style="margin-top: 20px;" class="text-center">Laporan Absensi<br>Bulan <?php echo $namaBulan[$input['bulan']]; ?> Tahun <?php echo $input['tahun']; ?></h3 style="margin-top: 20px;">
+<h3 style="margin-top: 20px;" class="text-center">Laporan Absensi<br><?php echo $skpd['nama_skpd']; ?><br>Bulan <?php echo $namaBulan[$input['bulan']]; ?> Tahun <?php echo $input['tahun']; ?></h3 style="margin-top: 20px;">
 <div id="cetak" style="padding: 5px; overflow: auto; max-height: 80vh;">
     <table id="tabel-absensi-pegawai" cellpadding="2" cellspacing="0" contenteditable="false">
         <thead>

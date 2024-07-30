@@ -233,6 +233,8 @@ class Wp_Simpeg {
 		$this->loader->add_action('wp_ajax_get_datatable_data_absensi_lembur_admin', $plugin_public, 'get_datatable_data_absensi_lembur_admin');
 		$this->loader->add_action('wp_ajax_submit_verify_absensi', $plugin_public, 'submit_verify_absensi');
 		$this->loader->add_action('wp_ajax_get_data_absensi_lembur_verify', $plugin_public, 'get_data_absensi_lembur_verify');
+		$this->loader->add_action('wp_ajax_get_pegawai_absensi_simpeg_by_admin', $plugin_public, 'get_pegawai_absensi_simpeg_by_admin');
+		$this->loader->add_action('wp_ajax_get_datatable_data_absensi_lembur_by_admin', $plugin_public, 'get_datatable_data_absensi_lembur_by_admin');
 
 		add_shortcode('management_data_pegawai_simpeg', array($plugin_public, 'management_data_pegawai_simpeg'));
 		add_shortcode('management_data_sbu_lembur', array($plugin_public, 'management_data_sbu_lembur'));
@@ -248,6 +250,9 @@ class Wp_Simpeg {
 		add_shortcode('laporan_bulanan_absensi_all', array($plugin_public, 'laporan_bulanan_absensi_all'));
 		add_shortcode('laporan_bulanan_absensi_pegawai', array($plugin_public, 'laporan_bulanan_absensi_pegawai'));
 		add_shortcode('input_absensi_pegawai', array($plugin_public, 'input_absensi_pegawai'));
+		add_shortcode('input_absensi_pegawai_by_admin', array($plugin_public, 'input_absensi_pegawai_by_admin'));
+		add_shortcode('laporan_bulanan_skpd_by_admin', array($plugin_public, 'laporan_bulanan_skpd_by_admin'));
+		add_shortcode('laporan_bulanan_pegawai_by_admin', array($plugin_public, 'laporan_bulanan_pegawai_by_admin'));
 
 		$this->loader->add_filter('carbon_fields_map_field_api_key',  $plugin_public, 'crb_get_gmaps_api_key_simpeg');
 

@@ -1,18 +1,9 @@
-<?php 
-// If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) {
-    die;
-}
+<?php
 global $wpdb;
-$user_id = um_user( 'ID' );
-$user_meta = get_userdata($user_id);
-$disabled = 'disabled';
-if(in_array("administrator", $user_meta->roles)){
-    $disabled = '';
-}
+
 $input = shortcode_atts( array(
     'tahun' => date('Y'),
-    'id_skpd' => 0,
+    'id_skpd' => '',
     'bulan' => date('m')*1
 ), $atts );
 
@@ -44,8 +35,9 @@ $skpd = $wpdb->get_results($wpdb->prepare('
         *
     FROM data_unit_lembur
     WHERE tahun_anggaran=%d
+        AND id_skpd=%d
         AND active=1
-', $input['tahun']), ARRAY_A);
+', $input['tahun'], $input['id_skpd']), ARRAY_A);
 $select_skpd = '<option value="">Pilih SKPD</option>';
 foreach($skpd as $get_skpd){
     $select = $get_skpd['id_skpd'] == $input['id_skpd'] ? 'selected' : '';
@@ -94,6 +86,7 @@ $lap_bulanan_pegawai = $wpdb->get_results($wpdb->prepare('
         s.tahun_anggaran,
         s.id_skpd,
         s.jml_jam,
+        s.update_at,
         s.jml_pajak,
         p.gelar_depan,
         p.nama,
@@ -263,7 +256,7 @@ foreach($data_all as $peg_all){
     </select>
     <button style="margin-left: 10px; height: 45px; width: 75px;"onclick="sumbitBulanTahun();" class="btn btn-sm btn-primary">Cari</button>
 </div>
-<<h3 style="margin-top: 20px;" class="text-center">Laporan Absensi per SKPD<br>Bulan <?php echo $namaBulan[$input['bulan']]; ?> Tahun <?php echo $input['tahun']; ?></h3 style="margin-top: 20px;">
+<<h3 style="margin-top: 20px;" class="text-center">Laporan Absensi<br>Bulan <?php echo $namaBulan[$input['bulan']]; ?> Tahun <?php echo $input['tahun']; ?></h3 style="margin-top: 20px;">
 <div id="cetak" style="padding: 5px; overflow: auto; max-height: 80vh;">
     <table id="tabel-absensi-pegawai-per-skpd" cellpadding="2" cellspacing="0" contenteditable="false">
         <thead>

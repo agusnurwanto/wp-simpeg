@@ -143,36 +143,6 @@ $disabled = 'disabled';
         </div>
     </div>
 </div>
-
-<div class="modal fade mt-4" id="modalVerifikasiAdmin" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Verifikasi oleh Admin</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <input type='hidden' name="id_data"/>
-                    <input type='hidden' name='tipe_verifikasi' value="admin"/>
-                    <div class="form-group">
-                        <label class="form-check-label"><input value="1" type="checkbox" id="status_admin" name="status_admin"> Disetujui (Anggaran Tersedia)</label>
-                    </div>
-                    <div class="form-group keterangan_ditolak">
-                        <label>Keterangan</label>
-                        <textarea class="form-control" id="keterangan_status_admin" name="keterangan_status_admin"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="submit" onclick="submitVerifikasiLembur(this);" class="btn btn-primary send_data">Simpan</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
 <script type="text/javascript" src="<?php echo SIMPEG_PLUGIN_URL; ?>admin/js/jszip.js"></script>
 <script type="text/javascript" src="<?php echo SIMPEG_PLUGIN_URL; ?>admin/js/xlsx.js"></script>
 <script>    
@@ -184,37 +154,6 @@ jQuery(document).ready(function(){
     get_data_absensi_lembur();
     window.global_file_upload = "<?php echo SIMPEG_PLUGIN_URL . 'public/media/simpeg/'; ?>";
 });
-
-function submitVerifikasiLembur(that){
-    if(!jQuery('#status_admin').is(':checked')){
-        var ket = jQuery('#keterangan_status_admin').val();
-        if(ket == ''){
-            return alert('Keterangan harus diisi jika status ditolak');
-        }
-    }
-    if(confirm('Apakah anda yakin untuk memverifikasi data ini?')){
-        jQuery("#wrap-loading").show();
-        var form = getFormData(jQuery(that).closest('.modal').find('.modal-body form'));
-        jQuery.ajax({
-            method:'post',
-            url:'<?php echo admin_url('admin-ajax.php'); ?>',
-            dataType: 'json',
-            data: {
-                'action': 'verifikasi_absensi_lembur',
-                'api_key': jQuery('#api_key').val(),
-                'data': JSON.stringify(form)
-            },
-            success:function(response){
-                jQuery('#wrap-loading').hide();
-                alert(response.message);
-                if(response.status == 'success'){
-                    jQuery('#modalVerifikasiAdmin').modal('hide');
-                    get_data_absensi_lembur();
-                }
-            }
-        });
-    }
-}
 
 function submit_data(id){
     if(confirm('Apakah anda yakin untuk mengirim data ini ke proses selanjutnya?')){
@@ -250,35 +189,6 @@ function set_keterangan(that){
     }
 }
 
-function verifikasi_admin(id){
-    jQuery('#wrap-loading').show();
-    jQuery.ajax({
-        method: 'post',
-        url: '<?php echo admin_url('admin-ajax.php'); ?>',
-        dataType: 'json',
-        data:{
-            'action': 'get_data_absensi_lembur_by_id',
-            'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
-            'id': id,
-        },
-        success: function(res){
-            if(res.status == 'success'){
-                jQuery('#modalVerifikasiAdmin input[name="id_data"]').val(res.data.id);
-                if(res.data.status_ver_admin == 1){
-                    jQuery('#status_admin').prop('checked', true);
-                }else{
-                    jQuery('#status_admin').prop('checked', false);
-                }
-                jQuery('#modalVerifikasiAdmin #keterangan_status_admin').val(res.data.ket_ver_admin);
-                jQuery('#modalVerifikasiAdmin').modal('show');
-            }else{
-                alert(res.message);
-            }
-            jQuery('#wrap-loading').hide();
-        }
-    });
-}
-
 function get_skpd(no_loading=false) {
     return new Promise(function(resolve, reject){
         var tahun = jQuery('#tahun_anggaran').val();
@@ -286,10 +196,6 @@ function get_skpd(no_loading=false) {
             jQuery('#id_skpd').html('').trigger('change');
             alert('Tahun anggaran tidak boleh kosong!');
             return resolve();
-        }
-        
-        if(!no_loading){
-            jQuery("#wrap-loading").show();
         }
 
         var today = new Date();
@@ -305,6 +211,9 @@ function get_skpd(no_loading=false) {
             global_response_skpd = {};
         }
         if(!global_response_skpd[tahun]){
+            if(!no_loading){
+                jQuery("#wrap-loading").show();
+            }
             jQuery.ajax({
                 url: '<?php echo admin_url('admin-ajax.php'); ?>',
                 type:'post',
@@ -486,13 +395,13 @@ function get_pegawai_absensi(no_loading=false) {
             jQuery('#daftar_pegawai tbody').html('');
             return;
         }
-        if(!no_loading){
-            jQuery("#wrap-loading").show();
-        }
         if(typeof global_response_pegawai == 'undefined'){
             global_response_pegawai = {};
         }
-        if(!global_response_pegawai[id_skpd]){
+        if(!global_response_pegawai[id_skpd]){ 
+            if(!no_loading){
+                jQuery("#wrap-loading").show();
+            }
             jQuery.ajax({
                 url: '<?php echo admin_url('admin-ajax.php'); ?>',
                 type:'post',
@@ -812,7 +721,7 @@ function submitTambahDataFormAbsensiLembur(){
     }
     var ket_lembur = jQuery('#ket_lembur').val();
     if(ket_lembur == ''){
-        return alert('Keterangan lembur diisi dulu!');
+        return alert('Keterangan diisi dulu!');
     }
     var waktu_mulai_spt = jQuery('#waktu_mulai_spt').val();
     if(waktu_mulai_spt == ''){
