@@ -153,7 +153,7 @@ $absensi_lembur = $wpdb->get_results($wpdb->prepare('
         AND p.id = %d
         AND d.active = 1
         AND s.status = 2
-        AND MONTH(s.update_at) = %d
+        AND MONTH(s.created_at) = %d
 ', $input['tahun'], $input['id'], $input['bulan']), ARRAY_A);
 
 // print_r($absensi_lembur);die($wpdb->last_query);

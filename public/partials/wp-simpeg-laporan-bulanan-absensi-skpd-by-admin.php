@@ -103,7 +103,7 @@ $lap_bulanan_pegawai = $wpdb->get_results($wpdb->prepare('
         and s.id_skpd=%d
         and d.active=1
         AND s.status = 2
-        AND MONTH(s.update_at)= %d
+        AND MONTH(s.created_at)= %d
     order by p.nama ASC
 ', $input['tahun'], $input['id_skpd'], $input['bulan']), ARRAY_A);
 $data_all = array();
