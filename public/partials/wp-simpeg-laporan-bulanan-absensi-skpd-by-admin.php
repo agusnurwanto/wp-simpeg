@@ -254,7 +254,7 @@ foreach($data_all as $peg_all){
     <select style="width: 400px;" name="skpd" id="skpd">
         <?php echo $select_skpd; ?>
     </select>
-    <button style="margin-left: 10px; height: 45px; width: 75px;"onclick="sumbitBulanTahun(); return false;" class="btn btn-sm btn-primary">Cari</button>
+    <button style="margin-left: 10px; height: 45px; width: 75px;" onclick="sumbitBulanTahun(); return false;" class="btn btn-sm btn-primary">Cari</button>
 </div>
 <<h3 style="margin-top: 20px;" class="text-center">Laporan Absensi<br>Bulan <?php echo $namaBulan[$input['bulan']]; ?> Tahun <?php echo $input['tahun']; ?></h3 style="margin-top: 20px;">
 <div id="cetak" style="padding: 5px; overflow: auto; max-height: 80vh;">
@@ -330,8 +330,5 @@ foreach($data_all as $peg_all){
     url = updateURLParameter(url, 'bulan', bulan);
     url = updateURLParameter(url, 'id_skpd', skpd);
     location.href = url;
-        var url = window.location.href;
-        url = url.split('?')[0]+'?tahun='+tahun+'&bulan='+bulan+'&id_skpd='+skpd;
-        location.href = url;
-    }
+}
 </script>
