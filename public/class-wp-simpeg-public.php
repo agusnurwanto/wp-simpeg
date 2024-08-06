@@ -1917,8 +1917,8 @@ class Wp_Simpeg_Public {
 			        ));
 
 			        $menu_laporan = $this->functions->generatePage(array(
-			            'nama_page' => 'Laporan Absensi Pegawai ' . $peg['id'],
-			            'content' => '[laporan_bulanan_absensi_pegawai id=' . $peg['id'] . ']',
+			            'nama_page' => 'Laporan Absensi Pegawai ' . $peg['id'].' '.$_GET['tahun'],
+			            'content' => '[laporan_bulanan_absensi_pegawai id=' . $peg['id'].' tahun_anggaran='.$_GET['tahun'].']',
 			            'show_header' => 1,
 			            'post_status' => 'private'
 			        ));

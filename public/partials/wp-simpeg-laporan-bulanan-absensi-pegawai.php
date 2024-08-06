@@ -58,22 +58,6 @@ $namaBulan = array(
     12 => 'Desember'
 );
 
-$pegawai = $wpdb->get_results($wpdb->prepare('
-    SELECT 
-        *
-    FROM data_pegawai_lembur
-    WHERE tahun=%d
-        AND active=1
-', $input['tahun']), ARRAY_A);
-$select_pegawai = '<option value="">Pilih Pegawai</option>';
-foreach($pegawai as $get_peg){
-    $selected = '';
-    if($get_peg['id'] == $input['id']){
-        $selected = 'selected';
-    }
-    $select_pegawai .= '<option value="'.$get_peg['id'].'" '.$selected.'>'.$get_peg['gelar_depan'].' '.$get_peg['nama'].' '.$get_peg['gelar_belakang'].'</option>';
-}
-
 $set_peg = $wpdb->get_row($wpdb->prepare('
     SELECT 
         *
@@ -238,7 +222,7 @@ foreach($absensi_lembur as $peg){
             <td class="atas kanan bawah text-right">'.$this->rupiah($total_pajak).'</td>
             <td class="atas kanan bawah text-right">'.$this->rupiah($penerimaan_bersih).'</td>
             <td class="atas kanan bawah text-center">'.$peg['ket_lembur'].'</td>
-            <td class="atas kanan bawah text-center">'.$peg['created_at_absensi'].'</td>
+            <td class="atas kanan bawah text-center">'.$peg['created_at'].'</td>
             <td class="atas kanan bawah"><a href="'.SIMPEG_PLUGIN_URL.'public/media/simpeg/'.$peg['file_lampiran'].'" target="_blank">Foto Kegiatan</a></td>
         </tr>
     ';
@@ -388,19 +372,14 @@ jQuery(document).ready(function(){
     // penyesuaian thema wp full width page
     jQuery('.mg-card-box').parent().removeClass('col-md-8').addClass('col-md-12');
     jQuery('#secondary').parent().remove();
-    
-    jQuery('#pegawai').select2();
 });
 function submit(){
     var tahun = jQuery('#tahun').val();
     var bulan = jQuery('#bulan').val();
-    var pegawai = jQuery('#pegawai').val();
     if(tahun == ''){
         return alert('Tahun tidak boleh kosong!');
     }else if(bulan == ''){
         return alert('Bulan tidak boleh kosong!');
-    }else if(pegawai == ''){
-        return alert('pegawai tidak boleh kosong!');
     }
     var url = window.location.href;
     url = updateURLParameter(url, 'tahun', tahun);
