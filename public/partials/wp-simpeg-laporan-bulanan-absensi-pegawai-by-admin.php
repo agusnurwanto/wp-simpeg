@@ -242,7 +242,7 @@ foreach($absensi_lembur as $peg){
             <td class="atas kanan bawah text-right">'.$this->rupiah($total_pajak).'</td>
             <td class="atas kanan bawah text-right">'.$this->rupiah($penerimaan_bersih).'</td>
             <td class="atas kanan bawah text-center">'.$peg['ket_lembur'].'</td>
-            <td class="atas kanan bawah text-center">'.$peg['created_at_absensi'].'</td>
+            <td class="atas kanan bawah text-center">'.$peg['created_at'].'</td>
             <td class="atas kanan bawah"><a href="'.SIMPEG_PLUGIN_URL.'public/media/simpeg/'.$peg['file_lampiran'].'" target="_blank">Foto Kegiatan</a></td>
         </tr>
     ';
