@@ -242,7 +242,7 @@ foreach($absensi_lembur as $peg){
             <td class="atas kanan bawah text-right">'.$this->rupiah($total_pajak).'</td>
             <td class="atas kanan bawah text-right">'.$this->rupiah($penerimaan_bersih).'</td>
             <td class="atas kanan bawah text-center">'.$peg['ket_lembur'].'</td>
-            <td class="atas kanan bawah text-center">'.$peg['update_at_absensi'].'</td>
+            <td class="atas kanan bawah text-center">'.$peg['created_at_absensi'].'</td>
             <td class="atas kanan bawah"><a href="'.SIMPEG_PLUGIN_URL.'public/media/simpeg/'.$peg['file_lampiran'].'" target="_blank">Foto Kegiatan</a></td>
         </tr>
     ';
@@ -295,7 +295,7 @@ foreach($absensi_lembur as $peg){
     }
 </style>
 <div id="wrap-action"></div>
-<div class="text-center" style="margin-top: 30px;">
+<div class="text-center" style="max-width: 700px; margin: auto; margin-top: 30px;">
     <label for="bulan">Bulan:  </label>
     <select style="margin-left: 10px;" name="bulan" id="bulan">
         <?php
@@ -313,10 +313,10 @@ foreach($absensi_lembur as $peg){
         <?php echo $select_tahun; ?>
     </select>
     <label style="margin-left: 10px;" for="pegawai">Pegawai:</label>
-    <select style="width: 400px;" name="pegawai" id="pegawai">
+    <select style="width: 450px;" name="pegawai" id="pegawai">
         <?php echo $select_pegawai; ?>
     </select>
-    <button style="margin-left: 10px; height: 45px; width: 75px;" onclick="submit();" class="btn btn-sm btn-primary">Cari</button>
+    <button style="margin-left: 10px; height: 45px; width: 75px; margin-top: 10px;" onclick="submit(); return false;" class="btn btn-sm btn-primary">Cari</button>
 </div>
 
 <h3 style="margin-top: 20px;" class="text-center">Laporan Absensi<br><?php echo $skpd['nama_skpd']; ?><br>Bulan <?php echo $namaBulan[$input['bulan']]; ?> Tahun <?php echo $input['tahun']; ?></h3 style="margin-top: 20px;">
@@ -400,18 +400,20 @@ jQuery(document).ready(function(){
     jQuery('#pegawai').select2();
 });
 function submit(){
-        var tahun = jQuery('#tahun').val();
-        var bulan = jQuery('#bulan').val();
-        var pegawai = jQuery('#pegawai').val();
-        if(tahun == ''){
-            return alert('Tahun tidak boleh kosong!');
-        }else if(bulan == ''){
-            return alert('Bulan tidak boleh kosong!');
-        }else if(pegawai == ''){
-            return alert('pegawai tidak boleh kosong!');
-        }
-        var url = window.location.href;
-        url = url.split('?')[0]+'?tahun='+tahun+'&bulan='+bulan+'&id='+pegawai;
-        location.href = url;
+    var tahun = jQuery('#tahun').val();
+    var bulan = jQuery('#bulan').val();
+    var pegawai = jQuery('#pegawai').val();
+    if(tahun == ''){
+        return alert('Tahun tidak boleh kosong!');
+    }else if(bulan == ''){
+        return alert('Bulan tidak boleh kosong!');
+    }else if(pegawai == ''){
+        return alert('pegawai tidak boleh kosong!');
     }
+    var url = window.location.href;
+    url = updateURLParameter(url, 'tahun', tahun);
+    url = updateURLParameter(url, 'bulan', bulan);
+    url = updateURLParameter(url, 'id', pegawai);
+    location.href = url;
+}
 </script>

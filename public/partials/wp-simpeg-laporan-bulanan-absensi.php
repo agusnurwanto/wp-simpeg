@@ -291,7 +291,7 @@ foreach($absensi_lembur as $peg){
     }
 </style>
 <div id="wrap-action"></div>
-<div class="text-center" style="margin-top: 30px;">
+<div class="text-center" style="max-width: 700px; margin: auto; margin-top: 30px;">
     <label for="bulan">Bulan:  </label>
     <select style="margin-left: 10px;" name="bulan" id="bulan">
         <?php
@@ -308,8 +308,8 @@ foreach($absensi_lembur as $peg){
     <select style="margin-left: 10px;" name="tahun" id="tahun">
         <?php echo $select_tahun; ?>
     </select>
-    <label style="margin-left: 10px;" for="pegawai">Pegawai:</label>
-    <select style="width: 400px;" name="pegawai" id="pegawai">
+    <label style="margin-left: 10px;margin-top: 30px;" for="pegawai">Pegawai:</label>
+    <select style="width: 450px;" name="pegawai" id="pegawai">
         <?php echo $select_pegawai; ?>
     </select>
     <button style="margin-left: 10px; height: 45px; width: 75px;" onclick="submit();" class="btn btn-sm btn-primary">Cari</button>
