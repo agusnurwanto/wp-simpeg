@@ -315,16 +315,21 @@ foreach($data_all as $peg_all){
         jQuery('#skpd').select2();
     });
     function sumbitBulanTahun(){
-        var tahun = jQuery('#tahun').val();
-        var bulan = jQuery('#bulan').val();
-        var skpd = jQuery('#skpd').val();
-        if(tahun == ''){
-            return alert('Tahun tidak boleh kosong!');
-        }else if(bulan == ''){
-            return alert('Bulan tidak boleh kosong!');
-        }else if(skpd == ''){
-            return alert('SKPD tidak boleh kosong!');
-        }
+    var tahun = jQuery('#tahun').val();
+    var bulan = jQuery('#bulan').val();
+    var skpd = jQuery('#skpd').val();
+    if(tahun == ''){
+        return alert('Tahun tidak boleh kosong!');
+    }else if(bulan == ''){
+        return alert('Bulan tidak boleh kosong!');
+    }else if(skpd == ''){
+        return alert('SKPD tidak boleh kosong!');
+    }
+    var url = window.location.href;
+    url = updateURLParameter(url, 'tahun', tahun);
+    url = updateURLParameter(url, 'bulan', bulan);
+    url = updateURLParameter(url, 'id_skpd', skpd);
+    location.href = url;
         var url = window.location.href;
         url = url.split('?')[0]+'?tahun='+tahun+'&bulan='+bulan+'&id_skpd='+skpd;
         location.href = url;
