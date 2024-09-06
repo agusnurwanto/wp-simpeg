@@ -57,7 +57,7 @@ if(in_array("admin_absensi", $user_meta->roles)){
                         <th class="text-center" style="vertical-align: middle;">Nama SKPD</th>
                         <th class="text-center" style="vertical-align: middle;">Waktu Mulai</th>
                         <th class="text-center" style="vertical-align: middle;">Waktu Akhir</th>
-                        <th class="text-center" style="vertical-align: middle; width: 100px;">Tipe Hari</th>
+                        <th class="text-center" style="vertical-align: middle; width: 100px;">Jenis Hari</th>
                         <th class="text-center" style="vertical-align: middle;">Jumlah Jam</th>
                         <th class="text-center" style="vertical-align: middle;">Total Nilai</th>
                         <th class="text-center" style="vertical-align: middle;">Keterangan Lembur</th>

@@ -52,7 +52,7 @@ $disabled = 'disabled';
                         <th class="text-center" style="vertical-align: middle;">Nama Pegawai</th>
                         <th class="text-center" style="vertical-align: middle;">Waktu Mulai</th>
                         <th class="text-center" style="vertical-align: middle;">Waktu Selesai</th>
-                        <th class="text-center" style="vertical-align: middle; width: 100px;">Tipe Hari</th>
+                        <th class="text-center" style="vertical-align: middle; width: 100px;">Jenis Hari</th>
                         <th class="text-center" style="vertical-align: middle;">Jumlah Jam</th>
                         <th class="text-center" style="vertical-align: middle;">Total Nilai</th>
                         <th class="text-center" style="vertical-align: middle;">Keterangan Lembur</th>
