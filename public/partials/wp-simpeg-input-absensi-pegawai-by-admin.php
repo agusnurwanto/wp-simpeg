@@ -518,8 +518,51 @@ function html_pegawai(opsi){
                     '</tbody>'+
                 '</table>'+
             '</td>'+
+            '<td style="width: 75px;" class="text-center aksi-pegawai">'+
+                '<button class="tambah-pegawai btn btn-warning btn-sm" onclick="tambah_pegawai(this); return false;"><i class="dashicons dashicons-plus"></i></button>'+
+                '<button class="copy-pegawai btn btn-info btn-sm" onclick="tambah_pegawai(this, 1); return false;"><i class="dashicons dashicons-book"></i></button>'+
+        '</td>'+
         '</tr>';
     return html;
+}
+
+function tambah_pegawai(that, copy=false){
+    var id_skpd = jQuery('#id_skpd').val();
+    if(id_skpd == ''){
+        jQuery('#daftar_pegawai tbody').html('');
+        return;
+    }
+    var tr = jQuery(that).closest('tbody').find('>tr').last();
+    var id = +tr.attr('data-id');
+    var newid = id + 1;
+    var tr_html = html_pegawai({
+        id: newid, 
+        html: global_response_pegawai[id_skpd].html
+    });
+    jQuery('#daftar_pegawai > tbody').append(tr_html);
+    jQuery('#id_pegawai_'+newid).select2({'width': '100%'});
+    if(copy){
+        var current_tr_id = jQuery(that).closest('tr').attr('data-id');
+        jQuery('#id_pegawai_'+newid).val(jQuery('#id_pegawai_'+current_tr_id).val()).trigger('change');
+        jQuery('#jenis_hari_'+newid).val(jQuery('#jenis_hari_'+current_tr_id).val()).trigger('change');
+        jQuery('#waktu_mulai_'+newid).val(jQuery('#waktu_mulai_'+current_tr_id).val()).trigger('change');
+        jQuery('#waktu_selesai_'+newid).val(jQuery('#waktu_selesai_'+current_tr_id).val()).trigger('change');
+        jQuery('#uang_makan_set_'+newid).prop('checked', jQuery('#uang_makan_set_'+current_tr_id).is(':checked')).trigger('change');
+    }
+    jQuery('#daftar_pegawai > tbody > tr').map(function(i, b){
+        if(i == 0){
+            return;
+            var html_hapus = ''+
+                '<button class="btn btn-warning btn-sm" onclick="tambah_pegawai(this); return false;"><i class="dashicons dashicons-plus"></i></button>'+
+                '<button class="copy-pegawai btn btn-info btn-sm" onclick="tambah_pegawai(this, 1); return false;"><i class="dashicons dashicons-book"></i></button>';
+        }else{
+            var html_hapus = ''+    
+                '<button class="btn btn-danger btn-sm" onclick="hapus_pegawai(this); return false;"><i class="dashicons dashicons-trash"></i></button>'+
+                '<button class="copy-pegawai btn btn-info btn-sm" onclick="tambah_pegawai(this, 1); return false;"><i class="dashicons dashicons-book"></i></button>';
+        }
+        jQuery(b).find('td').last().html(html_hapus);
+    });
+    jQuery('#id_spt_detail_'+newid).val('');
 }
 
 function get_pegawai_absensi(no_loading=false) {
@@ -847,8 +890,8 @@ function tambah_data_absensi_lembur(){
     jQuery('#status_admin').prop('checked', false);
     jQuery('#keterangan_status_admin').val('').prop('disabled', false);
     jQuery('#ket_lembur').val('').prop('disabled', false);
-    jQuery('#waktu_mulai_spt').trigger('change').prop('disabled', true);
-    jQuery('#waktu_selesai_spt').trigger('change').prop('disabled', true);
+    jQuery('#waktu_mulai_spt').trigger('change').prop('disabled', false);
+    jQuery('#waktu_selesai_spt').trigger('change').prop('disabled', false);
     jQuery('#lampiran').val('').show();
     jQuery('#file_lampiran_existing').hide();
     jQuery('#file_lampiran_existing').closest('.form-group').find('input').show();

@@ -33,7 +33,7 @@ if(in_array("administrator", $user_meta->roles)){
 <div class="cetak">
     <div style="padding: 10px;margin:0 0 3rem 0;">
         <input type="hidden" value="<?php echo get_option( SIMPEG_APIKEY ); ?>" id="api_key">
-        <h1 class="text-center" style="margin:3rem;">Input Data Absensi Pegawai<br> Tahun <?php echo $input['tahun_anggaran']; ?></h1>
+        <h1 class="text-center" style="margin:3rem;">Input Data Absensi Pegascsdacsdaawai<br> Tahun <?php echo $input['tahun_anggaran']; ?></h1>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_data_absensi_lembur();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
             </div>
@@ -532,14 +532,13 @@ function html_pegawai(opsi){
                     '</tbody>'+
                 '</table>'+
             '</td>'+
-            // '<td style="width: 75px;" class="text-center aksi-pegawai">'+
-            //     '<button class="tambah-pegawai btn btn-warning btn-sm" onclick="tambah_pegawai(this); return false;"><i class="dashicons dashicons-plus"></i></button>'+
-            //     '<button class="copy-pegawai btn btn-info btn-sm" onclick="tambah_pegawai(this, 1); return false;"><i class="dashicons dashicons-book"></i></button>'+
+            '<td style="width: 75px;" class="text-center aksi-pegawai">'+
+                '<button class="tambah-pegawai btn btn-warning btn-sm" onclick="tambah_pegawai(this); return false;"><i class="dashicons dashicons-plus"></i></button>'+
+                '<button class="copy-pegawai btn btn-info btn-sm" onclick="tambah_pegawai(this, 1); return false;"><i class="dashicons dashicons-book"></i></button>'+
         '</td>'+
         '</tr>';
     return html;
 }
-
 
 function tambah_pegawai(that, copy=false){
     var id_skpd = jQuery('#id_skpd').val();
@@ -908,8 +907,8 @@ function tambah_data_absensi_lembur(){
     jQuery('#keterangan_status_admin').closest('.form-group').hide().prop('disabled', false);
     jQuery('#status_admin').prop('checked', false);
     jQuery('#keterangan_status_admin').val('').prop('disabled', false);
-    jQuery('#waktu_mulai_spt').prop('disabled', false);
-    jQuery('#waktu_selesai_spt').prop('disabled', false);
+    jQuery('#waktu_mulai_spt').prop('disabled', true);
+    jQuery('#waktu_selesai_spt').prop('disabled', true);
     jQuery('#lampiran').val('').show();
     jQuery('#file_lampiran_existing').val('').hide();
     jQuery('#file_lampiran_existing').closest('.form-group').find('input').show();

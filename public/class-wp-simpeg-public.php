@@ -42,6 +42,7 @@ class Wp_Simpeg_Public {
 	 * @var      string    $version    The current version of this plugin.
 	 */
 	private $version;
+	private $functions;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -231,6 +232,13 @@ class Wp_Simpeg_Public {
             return '';
         }
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-input-absensi-pegawai-by-admin.php';
+    }
+
+    public function laporan_bulanan_absensi_per_gol($atts){
+        if(!empty($_GET) && !empty($_GET['post'])){
+            return '';
+        }
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-bulanan-absensi-per-golongan.php';
     }
 
 	function get_simpeg_map_url()
@@ -1906,6 +1914,7 @@ class Wp_Simpeg_Public {
 			    $input_absensi_pegawai_admin = '';
 			    $lap_bulanan_skpd = '';
 			    $lap_bulanan_pegawai = '';
+			    $lap_bulanan_golongan = '';
 			    $id_pegawai_lembur = get_user_meta($user_id, 'id_pegawai_lembur');
 			    
 			    if (!empty($id_pegawai_lembur)) {
@@ -1943,8 +1952,15 @@ class Wp_Simpeg_Public {
 							'show_header' => 1,
 							'post_status' => 'private'
 					));
+					$lap_gol = $this->functions->generatePage(array(
+							'nama_page' => 'Menu Laporan per Golongan '.$peg['id_skpd'].' '.$_GET['tahun'],
+							'content' => '[laporan_bulanan_absensi_per_gol id_skpd='.$peg['id_skpd'].' tahun_anggaran='.$_GET['tahun'].']',
+							'show_header' => 1,
+							'post_status' => 'private'
+					));
 					$lap_bulanan_skpd .= '<li style="display: inline-block"> <a style="margin-left: 10px;" href="' . $lap_skpd['url'] . '" target="_blank" class="btn btn-info">Menu Laporan per SKPD</a></li>';
 					$lap_bulanan_pegawai .= '<li style="display: inline-block"> <a style="margin-top: 10px;" href="' . $lap_peg['url'] . '" target="_blank" class="btn btn-info">Menu Laporan per Pegawai</a></li>';
+					$lap_bulanan_golongan .= '<li style="display: inline-block"> <a style="margin-top: 10px; margin-left: 10px;" href="' . $lap_gol['url'] . '" target="_blank" class="btn btn-info">Menu Laporan per Golongan</a></li>';
 			        
 			        echo '
 			            <h3 class="text-center">Menu Pegawai</h3>
@@ -1959,7 +1975,7 @@ class Wp_Simpeg_Public {
 			                <h3 class="text-center">Menu Admin</h3>
 			                <ul class="aksi-lembur text-center">
 			                    <li style="list-style: none; display: inline-block"><a href="' . $input_absensi_pegawai_admin['url'] . '" target="_blank" class="btn btn-info">Menu Input Absensi</a></li>
-			                    ' . $lap_bulanan_skpd . ''.$lap_bulanan_pegawai.'
+			                    ' . $lap_bulanan_skpd . ''. $lap_bulanan_pegawai .' '. $lap_bulanan_golongan .'
 			                </ul>';
 			        }
 			    } else {

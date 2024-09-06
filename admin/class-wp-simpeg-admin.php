@@ -43,6 +43,7 @@ class Wp_Simpeg_Admin {
 	 * @var      string    $version    The current version of this plugin.
 	 */
 	private $version;
+	private $functions;
 
 	/**
 	 * Initialize the class and set its properties.

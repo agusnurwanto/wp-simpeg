@@ -56,6 +56,7 @@ class Wp_Simpeg {
 	 * @var      string    $version    The current version of the plugin.
 	 */
 	protected $version;
+	protected $functions;
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -253,6 +254,7 @@ class Wp_Simpeg {
 		add_shortcode('input_absensi_pegawai_by_admin', array($plugin_public, 'input_absensi_pegawai_by_admin'));
 		add_shortcode('laporan_bulanan_skpd_by_admin', array($plugin_public, 'laporan_bulanan_skpd_by_admin'));
 		add_shortcode('laporan_bulanan_pegawai_by_admin', array($plugin_public, 'laporan_bulanan_pegawai_by_admin'));
+		add_shortcode('laporan_bulanan_absensi_per_gol', array($plugin_public, 'laporan_bulanan_absensi_per_gol'));
 
 		$this->loader->add_filter('carbon_fields_map_field_api_key',  $plugin_public, 'crb_get_gmaps_api_key_simpeg');
 
