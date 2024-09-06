@@ -49,15 +49,16 @@ $disabled = 'disabled';
             <table id="management_data_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                 <thead>
                     <tr>
-                        <th class="text-center">Nama Pegawai</th>
-                        <th class="text-center">Waktu Mulai</th>
-                        <th class="text-center">Waktu Selesai</th>
-                        <th class="text-center">Jumlah Jam</th>
-                        <th class="text-center">Total Nilai</th>
-                        <th class="text-center">Keterangan Lembur</th>
+                        <th class="text-center" style="vertical-align: middle;">Nama Pegawai</th>
+                        <th class="text-center" style="vertical-align: middle;">Waktu Mulai</th>
+                        <th class="text-center" style="vertical-align: middle;">Waktu Selesai</th>
+                        <th class="text-center" style="vertical-align: middle; width: 100px;">Tipe Hari</th>
+                        <th class="text-center" style="vertical-align: middle;">Jumlah Jam</th>
+                        <th class="text-center" style="vertical-align: middle;">Total Nilai</th>
+                        <th class="text-center" style="vertical-align: middle;">Keterangan Lembur</th>
                         <th class="text-center" style="width: 250px;">Foto Kegiatan</th>
-                        <th class="text-center">Status</th>
-                        <th class="text-center" style="width: 35px;">Aksi</th>
+                        <th class="text-center" style="vertical-align: middle;">Status</th>
+                        <th class="text-center" style="vertical-align: middle; width: 35px;">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -488,7 +489,7 @@ function get_data_absensi_lembur() {
             "columns": [
                 {
                     "data": 'nama_lengkap',
-                    className: "text-center"
+                    className: "text-left"
                 },
                 {
                     "data": 'waktu_mulai',
@@ -499,12 +500,16 @@ function get_data_absensi_lembur() {
                     className: "text-center"
                 },
                 {
+                    "data": 'tipe_hari',
+                    className: "text-center"
+                },
+                {
                     "data": 'jml_jam',
                     className: "text-center"
                 },
                 {
                     "data": 'total_nilai',
-                    className: "text-center"
+                    className: "text-right"
                 },
                 {
                     "data": 'ket_lembur',

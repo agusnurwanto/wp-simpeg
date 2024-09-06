@@ -2590,6 +2590,7 @@ class Wp_Simpeg_Public {
 	            	's.created_at',
 	            	'd.waktu_mulai',
 	            	'd.waktu_akhir',
+	            	'd.tipe_hari',
 	              	's.id'
 	            );
 	            $where = $sqlTot = $sqlRec = "";
@@ -2635,6 +2636,12 @@ class Wp_Simpeg_Public {
 
                 foreach($queryRecords as $recKey => $recVal){
                 	$queryRecords[$recKey]['total_nilai'] = $recVal['uang_makan'] + $recVal['uang_lembur'] - $recVal['jml_pajak'];
+                	// Tipe Hari: 1 = Hari Libur, 2 = Hari Kerja
+	                if($recVal['tipe_hari'] == 1){
+	                    $queryRecords[$recKey]['tipe_hari'] = '<span class="btn btn-danger btn-sm">Hari Libur</span>';
+	                } else if($recVal['tipe_hari'] == 2){
+	                    $queryRecords[$recKey]['tipe_hari'] = '<span class="btn btn-success btn-sm">Hari Kerja</span>';
+	                }
 
                     $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
 					if($recVal['status'] == 0){
@@ -3104,6 +3111,7 @@ class Wp_Simpeg_Public {
 	            	'p.nama_lengkap',
 	            	'd.waktu_mulai',
 	            	'd.waktu_akhir',
+	            	'd.tipe_hari',
 	              	's.id'
 	            );
 	            $where = $sqlTot = $sqlRec = "";
@@ -3149,6 +3157,12 @@ class Wp_Simpeg_Public {
 
                 foreach($queryRecords as $recKey => $recVal){
                 	$queryRecords[$recKey]['total_nilai'] = $recVal['uang_makan'] + $recVal['uang_lembur'] - $recVal['jml_pajak'];
+                	// Tipe Hari: 1 = Hari Libur, 2 = Hari Kerja
+	                if($recVal['tipe_hari'] == 1){
+	                    $queryRecords[$recKey]['tipe_hari'] = '<span class="btn btn-danger btn-sm">Hari Libur</span>';
+	                } else if($recVal['tipe_hari'] == 2){
+	                    $queryRecords[$recKey]['tipe_hari'] = '<span class="btn btn-success btn-sm">Hari Kerja</span>';
+	                }
                     $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
 					if($recVal['status'] == 0){
 	                    $btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
@@ -3402,6 +3416,7 @@ class Wp_Simpeg_Public {
 	            	'p.nama_lengkap',
 	            	'd.waktu_mulai',
 	            	'd.waktu_akhir',
+	            	'd.tipe_hari',
 	              	's.id'
 	            );
 	            $where = $sqlTot = $sqlRec = "";
@@ -3448,6 +3463,12 @@ class Wp_Simpeg_Public {
 
                 foreach($queryRecords as $recKey => $recVal){
                 	$queryRecords[$recKey]['total_nilai'] = $recVal['uang_makan'] + $recVal['uang_lembur'] - $recVal['jml_pajak'];
+                	// Tipe Hari: 1 = Hari Libur, 2 = Hari Kerja
+	                if($recVal['tipe_hari'] == 1){
+	                    $queryRecords[$recKey]['tipe_hari'] = '<span class="btn btn-danger btn-sm">Hari Libur</span>';
+	                } else if($recVal['tipe_hari'] == 2){
+	                    $queryRecords[$recKey]['tipe_hari'] = '<span class="btn btn-success btn-sm">Hari Kerja</span>';
+	                }
                     $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
 					if($recVal['status'] == 0){
 	                    $btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
