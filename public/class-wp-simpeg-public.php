@@ -240,11 +240,10 @@ class Wp_Simpeg_Public {
         }
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-laporan-bulanan-absensi-per-golongan.php';
     }
-
 	function get_simpeg_map_url()
 	{
 		$api_googlemap = get_option('_crb_google_api_simpeg');
-		$api_googlemap = "https://maps.googleapis.com/maps/api/js?key=$api_googlemap&callback=initMapSiks&libraries=places&libraries=drawing";
+		$api_googlemap = "https://maps.googleapis.com/maps/api/js?key=$api_googlemap&callback=initMapSimpeg&libraries=places&libraries=drawing";
 		return $api_googlemap;
 	}
 
@@ -2760,8 +2759,8 @@ class Wp_Simpeg_Public {
 					$ket_lembur = $data['ket_lembur'];
 					$waktu_mulai_spt = $data['waktu_mulai_spt'];
 					$waktu_selesai_spt = $data['waktu_selesai_spt'];
-					$latitude = $data['lat'];
-					$longitude = $data['lng'];
+					$latitude = $_POST['lat'];
+					$longitude = $_POST['lng'];
 					$user_id = um_user('ID');
 					$user_meta = get_userdata($user_id);
 					$uang_makan = 0;
@@ -3165,7 +3164,7 @@ class Wp_Simpeg_Public {
 	                }
                     $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
 					if($recVal['status'] == 0){
-	                    $btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
+						$btn .= '<a class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
 	                    $btn .= '<a class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-trash"></i></a>';	        
                         $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-primary" onclick="submit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Submit Data"><i class="dashicons dashicons-migrate"></i></a>';          
 	                    if ($recVal['status_ver_admin'] == '0'){

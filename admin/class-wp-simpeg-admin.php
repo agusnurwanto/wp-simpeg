@@ -270,7 +270,14 @@ class Wp_Simpeg_Admin {
 					->set_help_text('Referensi untuk untuk membuat ID Google Maps <a href="https://youtu.be/tAR63GBwk90" target="blank">https://youtu.be/tAR63GBwk90</a>'),
 				Field::make('text', 'crb_google_api_simpeg', 'Google Maps APIKEY')
 					->set_default_value('AIzaSyDBrDSUIMFDIleLOFUUXf1wFVum9ae3lJ0')
-					->set_help_text('Referensi untuk menampilkan google map <a href="https://developers.google.com/maps/documentation/javascript/examples/map-simple" target="blank">https://developers.google.com/maps/documentation/javascript/examples/map-simple</a>. Referensi untuk manajemen layer di Google Maps <a href="https://youtu.be/tAR63GBwk90" target="blank">https://youtu.be/tAR63GBwk90</a>')
+					->set_help_text('Referensi untuk menampilkan google map <a href="https://developers.google.com/maps/documentation/javascript/examples/map-simple" target="blank">https://developers.google.com/maps/documentation/javascript/examples/map-simple</a>. Referensi untuk manajemen layer di Google Maps <a href="https://youtu.be/tAR63GBwk90" target="blank">https://youtu.be/tAR63GBwk90</a>'),
+				Field::make('radio', 'crb_google_maps_simpeg', 'Status Google Maps')
+				    ->add_options(array(
+				     '0' => __('Manual'),
+				     '1' => __('Otomatis')
+				    ))
+				    ->set_default_value('1')
+				    ->set_help_text('Digunakan untuk mengatur lokasi map, jika dipilih Otomatis maka lokasi map diambil dari GPS device pengguna')
 			));
 
 		Container::make( 'theme_options', __( 'Data Pegawai' ) )

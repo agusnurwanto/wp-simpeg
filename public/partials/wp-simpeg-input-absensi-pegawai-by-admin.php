@@ -32,6 +32,9 @@ if(in_array("admin_absensi", $user_meta->roles)){
 }else{
     die('<h1 class="text-center">Anda tidak punya akses untuk melihat halaman ini!</h1>');
 }
+
+$center = $this->get_center();
+$google_maps = get_option('_crb_google_maps_simpeg');
 ?>
 <style type="text/css">
     .wrap-table{
@@ -142,6 +145,31 @@ if(in_array("admin_absensi", $user_meta->roles)){
                         <label>Keterangan</label>
                         <textarea class="form-control" id="ket_lembur" name="ket_lembur"></textarea>
                     </div>
+                    <div class="form-group row">
+                        <label class="col-md-2 col-form-label">Koordinat Latitude</label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="latitude" name="latitude" placeholder="0" disabled>
+                        </div>
+                        <label class="col-md-2 col-form-label">Koordinat Longitude</label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="longitude" name="longitude" placeholder="0" disabled>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2">Map</label>
+                        <div class="col-md-10">
+                            <div style="height:600px; width: 100%;" id="map-canvas-simpeg"></div>
+                        </div>
+                    </div>
+                    <?php
+                        if ($google_maps == '0') {
+                    ?>
+                    <?php
+                        } elseif ($google_maps == '1') {
+                    ?>
+                    <?php
+                        }
+                    ?>
                 </form>
             </div>
             <div class="modal-footer">
@@ -169,6 +197,10 @@ if(in_array("admin_absensi", $user_meta->roles)){
 </div>
 <script type="text/javascript" src="<?php echo SIMPEG_PLUGIN_URL; ?>admin/js/jszip.js"></script>
 <script type="text/javascript" src="<?php echo SIMPEG_PLUGIN_URL; ?>admin/js/xlsx.js"></script>
+<script >
+    window.maps_center_simpeg = <?php echo json_encode($center); ?>;
+</script>
+<script async defer src="<?php echo $this->get_simpeg_map_url(); ?>"></script>
 <script>    
 jQuery(document).ready(function(){
     // penyesuaian thema wp full width page
@@ -762,6 +794,42 @@ function edit_data(_id){
         success: function(res){
             jQuery('#wrap-loading').hide();
             if(res.status == 'success'){
+
+                // Lokasi Center Map
+                if (
+                    !res.data.lat ||
+                    !res.data.lng
+                ) {
+                    var lokasi_center = new google.maps.LatLng(maps_center_simpeg['lat'], maps_center_simpeg['lng']);
+                } else {
+                    var lokasi_center = new google.maps.LatLng(res.data.lat, res.data.lng);
+                }
+
+                if (typeof evm != 'undefined') {
+                    evm.setMap(null);
+                }
+
+                // Menampilkan Marker
+                window.evm = new google.maps.Marker({
+                    position: lokasi_center,
+                    map,
+                    draggable: true,
+                    title: 'Lokasi Map'
+                });
+
+                window.infoWindow = new google.maps.InfoWindow({
+                    content: JSON.stringify(res.data)
+                });
+
+                google.maps.event.addListener(evm, 'click', function(event) {
+                    infoWindow.setPosition(event.latLng);
+                    infoWindow.open(map);
+                });
+
+                google.maps.event.addListener(evm, 'mouseup', function(event) {
+                    jQuery('input[name="latitude"]').val(event.latLng.lat());
+                    jQuery('input[name="longitude"]').val(event.latLng.lng());
+                });
                 jQuery('#id_data').val(res.data.id).prop('disabled', false);
                 jQuery('#tahun_anggaran').val(res.data.tahun_anggaran).prop('disabled', true);
 
@@ -797,6 +865,8 @@ function edit_data(_id){
                                 jQuery('#file_lampiran_existing').attr('href', global_file_upload + res.data.file_lampiran).html(res.data.file_lampiran).show();
                                 jQuery('#lampiran').val('').show();
                                 jQuery('#ket_lembur').val(res.data.ket_lembur).prop('disabled', false);
+                                jQuery('#latitude').val(res.data.lat);
+                                jQuery('#longitude').val(res.data.lng);
                                 jQuery('#modalTambahDataAbsensiLembur .send_data').show();
                                 jQuery('#modalTambahDataAbsensiLembur').modal('show');
                             }, 1000);
@@ -824,6 +894,41 @@ function detail_data(_id){
         },
         success: function(res){
             if(res.status == 'success'){
+                // Lokasi Center Map
+                if (
+                    !res.data.lat ||
+                    !res.data.lng
+                ) {
+                    var lokasi_center = new google.maps.LatLng(maps_center_simpeg['lat'], maps_center_simpeg['lng']);
+                } else {
+                    var lokasi_center = new google.maps.LatLng(res.data.lat, res.data.lng);
+                }
+
+                if (typeof evm != 'undefined') {
+                    evm.setMap(null);
+                }
+
+                // Menampilkan Marker
+                window.evm = new google.maps.Marker({
+                    position: lokasi_center,
+                    map,
+                    draggable: false,
+                    title: 'Lokasi Map'
+                });
+
+                window.infoWindow = new google.maps.InfoWindow({
+                    content: JSON.stringify(res.data)
+                });
+
+                google.maps.event.addListener(evm, 'click', function(event) {
+                    infoWindow.setPosition(event.latLng);
+                    infoWindow.open(map);
+                });
+
+                google.maps.event.addListener(evm, 'mouseup', function(event) {
+                    jQuery('input[name="latitude"]').val(event.latLng.lat());
+                    jQuery('input[name="longitude"]').val(event.latLng.lng());
+                });
                 jQuery('#id_data').val(res.data.id).prop('disabled', false);
                 jQuery('#tahun_anggaran').val(res.data.tahun_anggaran).prop('disabled', true);
                 jQuery('#ket_lembur').val(res.data.ket_lembur).prop('disabled', true);
@@ -878,6 +983,25 @@ function detail_data(_id){
 
 //show tambah data
 function tambah_data_absensi_lembur(){
+    <?php if ($google_maps == 0) : ?>
+    var lokasi_center = new google.maps.LatLng(maps_center_simpeg['lat'], maps_center_simpeg['lng']);
+    if (typeof evm != 'undefined') {
+        evm.setMap(null);
+    }
+
+    // Menampilkan Marker
+    window.evm = new google.maps.Marker({
+        position: lokasi_center,
+        map,
+        draggable: true,
+        title: 'Lokasi Map'
+    });
+
+    google.maps.event.addListener(evm, 'mouseup', function(event) {
+        jQuery('input[name="latitude"]').val(event.latLng.lat());
+        jQuery('input[name="longitude"]').val(event.latLng.lng());
+    });
+    <?php endif; ?>
     jQuery('#id_data').val('');
     jQuery('#tahun_anggaran').val('<?php echo date('Y'); ?>').trigger('change').prop('disabled', false);
     jQuery('#id_skpd').val('<?php echo $input['id_skpd']; ?>').trigger('change').hide();
@@ -900,6 +1024,8 @@ function tambah_data_absensi_lembur(){
     jQuery('#lampiran').val('').show();
     jQuery('#file_lampiran_existing').hide();
     jQuery('#file_lampiran_existing').closest('.form-group').find('input').show();
+    jQuery('#longitude').val(maps_center_simpeg['lng']).show();
+    jQuery('#latitude').val(maps_center_simpeg['lat']).show();
     jQuery('#modalTambahDataAbsensiLembur .send_data').show();
     jQuery('#modalTambahDataAbsensiLembur').modal('show');
 }
@@ -985,6 +1111,8 @@ function submitTambahDataFormAbsensiLembur(){
         let form = new FormData();
         form.append('action', 'tambah_data_absensi_lembur');
         form.append('api_key', jQuery('#api_key').val());
+        form.append('lat', jQuery('input[name="latitude"]').val());
+        form.append('lng', jQuery('input[name="longitude"]').val());
         form.append('data', JSON.stringify(getFormData(jQuery("#form-absensi"))));
         if (typeof lampiran != 'undefined') {
             form.append('lampiran', lampiran);

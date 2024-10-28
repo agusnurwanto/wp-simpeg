@@ -354,107 +354,12 @@ function initMapSimpeg() {
     var lokasi_aset = new google.maps.LatLng(maps_center_simpeg['lat'], maps_center_simpeg['lng']);
     // Setting Map
     var mapOptions = {
-        zoom: 13,
+        zoom: 17,
         center: lokasi_aset,
         mapTypeId: google.maps.MapTypeId.HYBRID
     };
     // Membuat Map
     window.map = new google.maps.Map(document.getElementById("map-canvas-simpeg"), mapOptions);
-    window.chartWindow = {};
-    window.chartRenderWindow = {};
-    window.chartWindowDtks = {};
-    window.chartRenderWindowDtks = {};
-    window.infoWindow = {};
-
-    // Membuat Shape
-    maps_all_simpeg.map(function(data, i){
-        // console.log(data.coor);
-        data.coor.map(function(coor, ii){
-            var bidang1 = new google.maps.Polygon({
-                map: map,
-                paths: coor,
-                strokeColor: data.color,
-                strokeOpacity: 0.5,
-                strokeWeight: 2,
-                fillColor: data.color,
-                fillOpacity: 0.3
-            });
-            var index = data.index;
-            chartWindow[index] = data.chart;
-            chartWindowDtks[index] = data.chart_dtks;
-
-            // Menampilkan Informasi Data
-            var contentString = data.html;
-            infoWindow[index] = new google.maps.InfoWindow({
-                content: contentString
-            });
-            google.maps.event.addListener(bidang1, 'click', function(event) {
-                infoWindow[index].setPosition(event.latLng);
-                infoWindow[index].open(map);
-
-                var id = "chart-"+index;
-                if(!chartRenderWindow[id]){
-                    // menampilkan chart
-                    setTimeout(function(){
-                        if(!chartWindow[index]){
-                            return;
-                        }
-
-                        console.log('index, chartWindow[index]', index, chartWindow[index]);
-                        chartRenderWindow[id] = new Chart(document.getElementById(id).getContext('2d'), {
-                            type: "pie",
-                            data: {
-                                labels: chartWindow[index].label,
-                                datasets: [
-                                    {
-                                        label: "",
-                                        data: chartWindow[index].data,
-                                        backgroundColor: chartWindow[index].color
-                                    }
-                                ]
-                            },
-                            options: {
-                                responsive: true,
-                                plugins: {
-                                    legend: {
-                                        position: "bottom",
-                                        labels: {
-                                            font: {
-                                                size: 16
-                                            }
-                                        }
-                                    },
-                                    tooltip: {
-                                        bodyFont: {
-                                            size: 16
-                                        },
-                                        backgroundColor: "rgba(0, 0, 0, 0.8)",
-                                        boxPadding: 5
-                                    },
-                                    datalabels: {
-                                        formatter: (value, ctx) => {
-                                            let sum = 0;
-                                            let dataArr = ctx.chart.data.datasets[0].data;
-                                            dataArr.map(data => {
-                                                sum += data;
-                                            });
-                                            let percentage = ((value / sum) * 100).toFixed(2)+"%";
-                                            console.log('percentage, dataArr',value, percentage, dataArr);
-                                            return percentage;
-                                        },
-                                        color: '#000',
-                                    }
-                                }
-                            },
-                            plugins: [ChartDataLabels]
-                        });
-                    }, 500);
-                }else{
-                    chartRenderWindow[id].update();
-                }
-            });
-        });
-    })
 }
 function updateURLParameter(url, param, paramVal){
     var newAdditionalURL = "";
