@@ -2,8 +2,7 @@
 global $wpdb;
 
 $input = shortcode_atts(array(
-    'tahun_anggaran' => '2022',
-    'id_skpd' => ''
+    'tahun_anggaran' => '2022'
 ), $atts);
 
 $idtahun = $wpdb->get_results("select distinct tahun_anggaran from data_unit_lembur", ARRAY_A);
@@ -11,22 +10,12 @@ $tahun = "<option value='-1'>Pilih Tahun</option>";
 foreach($idtahun as $val){
     $tahun .= "<option value='$val[tahun_anggaran]'>$val[tahun_anggaran]</option>";
 }
-$skpd = $wpdb->get_row(
-    $wpdb->prepare("
-    SELECT 
-        nama_skpd
-    FROM data_unit_lembur
-    WHERE id_skpd=%d
-      AND tahun_anggaran=%d
-      AND active = 1
-", $input['id_skpd'], $input['tahun_anggaran']),
-    ARRAY_A
-);
+
 $user_id = um_user( 'ID' );
 $user_meta = get_userdata($user_id);
 $disabled = 'disabled';
 $can_tambah_data = false;
-if(in_array("admin_absensi", $user_meta->roles)){
+if(in_array("administrator", $user_meta->roles)){
     $can_tambah_data = true;
     $disabled = '';
 }else{
@@ -42,12 +31,12 @@ $google_maps = get_option('_crb_google_maps_simpeg');
         max-height: 100vh; 
         width: 100%; 
 }
-</style>s
+</style>
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <div class="cetak">
     <div style="padding: 10px;margin:0 0 3rem 0;">
         <input type="hidden" value="<?php echo get_option( SIMPEG_APIKEY ); ?>" id="api_key">
-        <h2 class="text-center" style="margin:3rem;">Input Data Absensi Pegawai<br> Tahun <?php echo $input['tahun_anggaran']; ?><br><?php echo $skpd['nama_skpd']; ?></h2>
+        <h1 class="text-center" style="margin:3rem;">Input Data Absensi Pegawai<br> Tahun <?php echo $input['tahun_anggaran']; ?></h1>
             <div style="margin-bottom: 25px;">
                 <button class="btn btn-primary" onclick="tambah_data_absensi_lembur();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
             </div>
@@ -56,18 +45,18 @@ $google_maps = get_option('_crb_google_maps_simpeg');
             <table id="management_data_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
                 <thead>
                     <tr>
-                        <th class="text-center" style="vertical-align: middle;">Nama Pegawai</th>
-                        <th class="text-center" style="vertical-align: middle;">Nama SKPD</th>
-                        <th class="text-center" style="vertical-align: middle;">Waktu Mulai</th>
-                        <th class="text-center" style="vertical-align: middle;">Waktu Akhir</th>
+                        <th class="text-center" style="vertical-align: middle;" >Nama Pegawai</th>
+                        <th class="text-center" style="vertical-align: middle;" >Nama SKPD</th>
+                        <th class="text-center" style="vertical-align: middle;" >Waktu Mulai</th>
+                        <th class="text-center" style="vertical-align: middle;" >Waktu Akhir</th>
                         <th class="text-center" style="vertical-align: middle; width: 100px;">Jenis Hari</th>
-                        <th class="text-center" style="vertical-align: middle;">Jumlah Jam</th>
-                        <th class="text-center" style="vertical-align: middle;">Total Nilai</th>
-                        <th class="text-center" style="vertical-align: middle;">Keterangan Lembur</th>
-                        <th class="text-center" style="vertical-align: middle; width: 250px;">Foto Kegiatan</th>
-                        <th class="text-center" style="vertical-align: middle;">Created at</th>
-                        <th class="text-center" style="vertical-align: middle;">Update at</th>
-                        <th class="text-center" style="vertical-align: middle;">Status</th>
+                        <th class="text-center" style="vertical-align: middle;" >Jumlah Jam</th>
+                        <th class="text-center" style="vertical-align: middle;" >Total Nilai</th>
+                        <th class="text-center" style="vertical-align: middle;" >Keterangan Lembur</th>
+                        <th class="text-center" style="width: 250px;">Foto Kegiatan</th>
+                        <th class="text-center" style="vertical-align: middle;" >Created at</th>
+                        <th class="text-center" style="vertical-align: middle;" >Update at</th>
+                        <th class="text-center" style="vertical-align: middle;" >Status</th>
                         <th class="text-center" style="vertical-align: middle; width: 35px;">Aksi</th>
                     </tr>
                 </thead>
@@ -82,7 +71,7 @@ $google_maps = get_option('_crb_google_maps_simpeg');
     <div class="modal-dialog" style="min-width: 90vw;" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="modalTambahDataAbsensiLemburLabel">Tambah Data Absensi</h5>
+                <h5 class="modal-title" id="modalTambahDataAbsensiLemburLabel">Tambah Data Absensi Pegawai</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -90,6 +79,7 @@ $google_maps = get_option('_crb_google_maps_simpeg');
             <div class="modal-body">
                 <form id="form-absensi">
                     <input type='hidden' id='id_data' name="id_data"/>
+                    <input type='hidden' id='tipe_verifikasi' name="tipe_verifikasi"/>
                     <div class="form-group">
                         <label>Pilih Tahun Anggaran</label>
                         <select class="form-control" id="tahun_anggaran" name="tahun_anggaran" onchange="get_skpd();">
@@ -97,11 +87,9 @@ $google_maps = get_option('_crb_google_maps_simpeg');
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="nama_skpd">Nama SKPD</label>
-                        <input type="text" class="form-control" id="nama_skpd" name="nama_skpd"  style="text-transform: uppercase;" value="<?php echo $skpd['nama_skpd']; ?>" disabled>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" id="id_skpd" name="id_skpd" onchange="get_pegawai_absensi();">
+                        <label>Pilih SKPD</label>
+                        <select class="form-control" id="id_skpd" name="id_skpd" onchange="get_pegawai();">
+                        </select>
                     </div>
                     <div class="form-group">
                         <table class="table table-bordered">
@@ -130,6 +118,7 @@ $google_maps = get_option('_crb_google_maps_simpeg');
                                 <th class="text-center" style="width: 220px;">Waktu</th>
                                 <th class="text-center" style="width: 220px;">Total</th>
                                 <th class="text-center">Keterangan</th>
+                                <!-- <th class="text-center">Aksi</th> -->
                             </tr>
                         </thead>
                         <tbody>
@@ -138,7 +127,9 @@ $google_maps = get_option('_crb_google_maps_simpeg');
                     <div class="form-group">
                         <label for="">Foto Kegiatan</label>
                         <input type="file" name="file" class="form-control-file" id="lampiran" accept="application/pdf, .png, .jpg, .jpeg">
-                        <div style="padding-top: 10px; padding-bottom: 10px;"><a id="file_lampiran_existing"></a></div>
+                        <div style="padding-top: 10px; padding-bottom: 10px;">
+                            <a id="file_lampiran_existing"></a>
+                        </div>
                     </div>
                     <div><small>Upload file maksimal 5 Mb, berformat .pdf .png .jpg .jpeg</small></div>
                     <div class="form-group">
@@ -178,7 +169,37 @@ $google_maps = get_option('_crb_google_maps_simpeg');
             </div>
         </div>
     </div>
-</div>
+</div><!-- 
+
+<div class="modal fade mt-4" id="modalVerifikasiAdmin" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Verifikasi oleh Admin</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type='hidden' name="id_data"/>
+                    <input type='hidden' name='tipe_verifikasi' value="admin"/>
+                    <div class="form-group">
+                        <label class="form-check-label"><input value="1" type="checkbox" id="status_admin" name="status_admin"> Disetujui</label>
+                    </div>
+                    <div class="form-group keterangan_ditolak">
+                        <label>Keterangan</label>
+                        <textarea class="form-control" id="keterangan_status_admin" name="keterangan_status_admin"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" onclick="submitVerifikasiLembur(this);" class="btn btn-primary send_data">Simpan</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal" aria-label="Close">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div> -->
 <div class="modal fade" id="verifikasiAdmin" role="dialog" data-backdrop="static" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
@@ -195,6 +216,7 @@ $google_maps = get_option('_crb_google_maps_simpeg');
         </div>
     </div>
 </div>
+
 <script type="text/javascript" src="<?php echo SIMPEG_PLUGIN_URL; ?>admin/js/jszip.js"></script>
 <script type="text/javascript" src="<?php echo SIMPEG_PLUGIN_URL; ?>admin/js/xlsx.js"></script>
 <script >
@@ -209,8 +231,10 @@ jQuery(document).ready(function(){
     
     get_data_absensi_lembur();
     window.global_file_upload = "<?php echo SIMPEG_PLUGIN_URL . 'public/media/simpeg/'; ?>";
+    jQuery('#id_skpd').select2({
+        'width': '100%'
+    });
 });
-
 
 function get_data_verify(id) {
     return new Promise(function(resolve, reject) {
@@ -348,14 +372,6 @@ function submit_data(id){
     }
 }
 
-function set_keterangan(that){
-    if(jQuery(that).is(':checked')){
-        jQuery(that).closest('form').find('.keterangan_ditolak').show();
-    }else{
-        jQuery(that).closest('form').find('.keterangan_ditolak').hide();
-    }
-}
-
 function get_skpd(no_loading=false) {
     return new Promise(function(resolve, reject){
         var tahun = jQuery('#tahun_anggaran').val();
@@ -462,7 +478,7 @@ function cek_time(that){
 
             console.log('start_peg_asli, end_peg_asli, start_asli, end_asli', start_peg_asli, end_peg_asli, start_asli, end_asli);
 
-            // jika start pegawai lebih dulu dari start Absensi
+            // jika start pegawai lebih dulu dari start SPT
             if(start_peg < start){
                 var new_val = start_asli+'T'+start_peg_asli.split('T')[1];
                 tr_peg.find('.time-start').val(new_val).trigger('change');
@@ -473,7 +489,7 @@ function cek_time(that){
                 console.log('start_peg > end new_val start_peg', new_val);
             }
 
-            // jika end pegawai lebih lama dari end Absensi
+            // jika end pegawai lebih lama dari end SPT
             if(end_peg > end){
                 var new_val = end_asli+'T'+end_peg_asli.split('T')[1];
                 tr_peg.find('.time-end').val(new_val).trigger('change');
@@ -598,7 +614,7 @@ function tambah_pegawai(that, copy=false){
     jQuery('#id_spt_detail_'+newid).val('');
 }
 
-function get_pegawai_absensi(no_loading=false) {
+function get_pegawai(no_loading=false) {
     return new Promise(function(resolve, reject){
         var id_skpd = jQuery('#id_skpd').val();
         if(id_skpd == ''){
@@ -616,7 +632,7 @@ function get_pegawai_absensi(no_loading=false) {
                 url: '<?php echo admin_url('admin-ajax.php'); ?>',
                 type:'post',
                 data:{
-                    'action' : 'get_pegawai_absensi_simpeg_by_admin',
+                    'action' : 'get_pegawai_simpeg',
                     'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
                     'id_skpd': id_skpd,
                     'tahun_anggaran': jQuery('#tahun_anggaran').val()
@@ -658,12 +674,25 @@ function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
+function hapus_pegawai(that){
+    var id = jQuery(that).closest('tr').attr('data-id');
+    jQuery('#daftar_pegawai tbody tr[data-id="'+id+'"]').remove();
+}
+
 function set_keterangan(that){
     var id = jQuery(that).attr('id');
     if(jQuery(that).is(':checked')){
         jQuery('#keterangan_'+id).closest('.form-group').hide();
     }else{
         jQuery('#keterangan_'+id).closest('.form-group').show();
+    }
+}
+
+function set_keterangan(that){
+    if(jQuery(that).is(':checked')){
+        jQuery(that).closest('form').find('.keterangan_ditolak').show();
+    }else{
+        jQuery(that).closest('form').find('.keterangan_ditolak').hide();
     }
 }
 
@@ -679,9 +708,8 @@ function get_data_absensi_lembur() {
                 type: 'post',
                 dataType: 'json',
                 data: {
-                'action': 'get_datatable_data_absensi_lembur_by_admin',
+                'action': 'get_datatable_data_absensi_lembur_admin',
                 'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
-                'id_skpd': '<?php echo $input['id_skpd']; ?>',
                 }
             },
             lengthMenu: [
@@ -840,7 +868,7 @@ function edit_data(_id){
                         jQuery('#id_skpd').val(res.data.id_skpd).trigger('change').prop('disabled', false).hide();
                         jQuery('#waktu_mulai_spt').val(res.data.waktu_mulai_spt).trigger('change').prop('disabled', true);
                         jQuery('#waktu_selesai_spt').val(res.data.waktu_selesai_spt).trigger('change').prop('disabled', true);
-                        get_pegawai_absensi(true)
+                        get_pegawai(true)
                         .then(function(){
                             res.data_detail.map(function(b, i){
                                 if(i >= 1){
@@ -864,9 +892,9 @@ function edit_data(_id){
                                 });
                                 jQuery('#file_lampiran_existing').attr('href', global_file_upload + res.data.file_lampiran).html(res.data.file_lampiran).show();
                                 jQuery('#lampiran').val('').show();
-                                jQuery('#ket_lembur').val(res.data.ket_lembur).prop('disabled', false);
                                 jQuery('#latitude').val(res.data.lat);
                                 jQuery('#longitude').val(res.data.lng);
+                                jQuery('#ket_lembur').val(res.data.ket_lembur).prop('disabled', false);
                                 jQuery('#modalTambahDataAbsensiLembur .send_data').show();
                                 jQuery('#modalTambahDataAbsensiLembur').modal('show');
                             }, 1000);
@@ -894,7 +922,6 @@ function detail_data(_id){
         },
         success: function(res){
             if(res.status == 'success'){
-                // Lokasi Center Map
                 if (
                     !res.data.lat ||
                     !res.data.lng
@@ -941,7 +968,7 @@ function detail_data(_id){
                         jQuery('#id_skpd').val(res.data.id_skpd).trigger('change').prop('disabled', true).hide();
                         jQuery('#waktu_mulai_spt').val(res.data.waktu_mulai_spt).trigger('change').prop('disabled', true);
                         jQuery('#waktu_selesai_spt').val(res.data.waktu_selesai_spt).trigger('change').prop('disabled', true);
-                        get_pegawai_absensi(true)
+                        get_pegawai(true)
                         .then(function(){
                             res.data_detail.map(function(b, i){
                                 if(i >= 1){
@@ -983,6 +1010,7 @@ function detail_data(_id){
 
 //show tambah data
 function tambah_data_absensi_lembur(){
+
     <?php if ($google_maps == 0) : ?>
     var lokasi_center = new google.maps.LatLng(maps_center_simpeg['lat'], maps_center_simpeg['lng']);
     if (typeof evm != 'undefined') {
@@ -1004,25 +1032,17 @@ function tambah_data_absensi_lembur(){
     <?php endif; ?>
     jQuery('#id_data').val('');
     jQuery('#tahun_anggaran').val('<?php echo date('Y'); ?>').trigger('change').prop('disabled', false);
-    jQuery('#id_skpd').val('<?php echo $input['id_skpd']; ?>').trigger('change').hide();
-    get_pegawai_absensi(true).then(function(){
-        jQuery('#uang_makan_1').val('').prop('disabled', true);
-        jQuery('#uang_lembur_1').val('').prop('disabled', true);
-        jQuery('#pajak_1').val('').prop('disabled', false);
-        jQuery('#sbu_makan_1').val('').prop('disabled', false);
-        jQuery('#sbu_lembur_1').val('').prop('disabled', false);
-        jQuery('#id_pegawai_1').trigger('change').prop('disabled', false);
-    })
-    jQuery('#keterangan_status_admin').closest('.form-group').hide().prop('disabled', false);
+    jQuery('#id_skpd').val('').trigger('change').prop('disabled', false);
+    jQuery('#ket_lembur').val('').prop('disabled', false);
     jQuery('#id_admin').val('').prop('disabled', false);
     jQuery('#status_ver_admin').val('').prop('disabled', false);
+    jQuery('#keterangan_status_admin').closest('.form-group').hide().prop('disabled', false);
     jQuery('#status_admin').prop('checked', false);
     jQuery('#keterangan_status_admin').val('').prop('disabled', false);
-    jQuery('#ket_lembur').val('').prop('disabled', false);
-    jQuery('#waktu_mulai_spt').trigger('change').prop('disabled', false);
-    jQuery('#waktu_selesai_spt').trigger('change').prop('disabled', false);
+    jQuery('#waktu_mulai_spt').prop('disabled', true);
+    jQuery('#waktu_selesai_spt').prop('disabled', true);
     jQuery('#lampiran').val('').show();
-    jQuery('#file_lampiran_existing').hide();
+    jQuery('#file_lampiran_existing').val('').hide();
     jQuery('#file_lampiran_existing').closest('.form-group').find('input').show();
     jQuery('#longitude').val(maps_center_simpeg['lng']).show();
     jQuery('#latitude').val(maps_center_simpeg['lat']).show();
@@ -1137,7 +1157,7 @@ function submitTambahDataFormAbsensiLembur(){
     }
 }
 
-function get_uang_lembur(that) {
+function get_uang_lembur(that, fromEdit = false) {
     var id = jQuery(that).closest('tr').attr('data-id');
     var golongan = jQuery('#id_pegawai_' + id + ' option:selected').attr('golongan');
     var waktu_mulai = jQuery('#waktu_mulai_' + id).val();
@@ -1146,6 +1166,11 @@ function get_uang_lembur(that) {
     jam = Math.round(jam / (1000 * 60 * 60));
     var jenis_hari = jQuery('#jenis_hari_' + id).val();
 
+    jQuery('#uang_lembur_'+id).val(0);
+    jQuery('#uang_makan_'+id).val(0);
+    if(isNaN(jam)){
+        jam = 0;
+    }
     var max_jam = 8;
     var warning_message = "";
     if (jenis_hari == 2) {
@@ -1155,17 +1180,12 @@ function get_uang_lembur(that) {
         warning_message = "Jam pada hari libur tidak boleh lebih dari 8 jam.";
     }
 
-    if (jam > max_jam) {
+    if (jam > max_jam && !fromEdit) {
         alert(warning_message);
         jQuery('#waktu_selesai_' + id).val(waktu_mulai);
         jam = 0;
     }
     
-    jQuery('#uang_lembur_'+id).val(0);
-    jQuery('#uang_makan_'+id).val(0);
-    if(isNaN(jam)){
-        jam = 0;
-    }
     jQuery('#jumlah_jam_'+id).html(jam+' jam');
     jQuery('#jml_jam_lembur_'+id).val(jam);
     jQuery('#jml_hari_lembur_'+id).val(jam);
@@ -1264,13 +1284,5 @@ function get_sbu(no_loading = false){
             return resolve(data_sbu_global[tahun]);
         }
     });
-}
-function set_keterangan(that){
-    var id = jQuery(that).attr('id');
-    if(jQuery(that).is(':checked')){
-        jQuery('#keterangan_'+id).closest('.form-group').hide();
-    }else{
-        jQuery('#keterangan_'+id).closest('.form-group').show();
-    }
 }
 </script>

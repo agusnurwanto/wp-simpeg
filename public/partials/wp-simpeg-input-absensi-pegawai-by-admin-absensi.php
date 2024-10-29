@@ -3,10 +3,14 @@ global $wpdb;
 
 $input = shortcode_atts(array(
     'tahun_anggaran' => '2022',
-    'id_skpd' => '',
-    'id' => ''
+    'id_skpd' => ''
 ), $atts);
 
+$idtahun = $wpdb->get_results("select distinct tahun_anggaran from data_unit_lembur", ARRAY_A);
+$tahun = "<option value='-1'>Pilih Tahun</option>";
+foreach($idtahun as $val){
+    $tahun .= "<option value='$val[tahun_anggaran]'>$val[tahun_anggaran]</option>";
+}
 $skpd = $wpdb->get_row(
     $wpdb->prepare("
     SELECT 
@@ -18,16 +22,17 @@ $skpd = $wpdb->get_row(
 ", $input['id_skpd'], $input['tahun_anggaran']),
     ARRAY_A
 );
-
-$idtahun = $wpdb->get_results("select distinct tahun_anggaran from data_unit_lembur", ARRAY_A);
-$tahun = "<option value='-1'>Pilih Tahun</option>";
-foreach($idtahun as $val){
-    $tahun .= "<option value='$val[tahun_anggaran]'>$val[tahun_anggaran]</option>";
-}
-
 $user_id = um_user( 'ID' );
 $user_meta = get_userdata($user_id);
 $disabled = 'disabled';
+$can_tambah_data = false;
+if(in_array("admin_absensi", $user_meta->roles)){
+    $can_tambah_data = true;
+    $disabled = '';
+}else{
+    die('<h1 class="text-center">Anda tidak punya akses untuk melihat halaman ini!</h1>');
+}
+
 $center = $this->get_center();
 $google_maps = get_option('_crb_google_maps_simpeg');
 ?>
@@ -37,7 +42,7 @@ $google_maps = get_option('_crb_google_maps_simpeg');
         max-height: 100vh; 
         width: 100%; 
 }
-</style>
+</style>s
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <div class="cetak">
     <div style="padding: 10px;margin:0 0 3rem 0;">
@@ -52,13 +57,16 @@ $google_maps = get_option('_crb_google_maps_simpeg');
                 <thead>
                     <tr>
                         <th class="text-center" style="vertical-align: middle;">Nama Pegawai</th>
+                        <th class="text-center" style="vertical-align: middle;">Nama SKPD</th>
                         <th class="text-center" style="vertical-align: middle;">Waktu Mulai</th>
-                        <th class="text-center" style="vertical-align: middle;">Waktu Selesai</th>
+                        <th class="text-center" style="vertical-align: middle;">Waktu Akhir</th>
                         <th class="text-center" style="vertical-align: middle; width: 100px;">Jenis Hari</th>
                         <th class="text-center" style="vertical-align: middle;">Jumlah Jam</th>
                         <th class="text-center" style="vertical-align: middle;">Total Nilai</th>
                         <th class="text-center" style="vertical-align: middle;">Keterangan Lembur</th>
-                        <th class="text-center" style="width: 250px;">Foto Kegiatan</th>
+                        <th class="text-center" style="vertical-align: middle; width: 250px;">Foto Kegiatan</th>
+                        <th class="text-center" style="vertical-align: middle;">Created at</th>
+                        <th class="text-center" style="vertical-align: middle;">Update at</th>
                         <th class="text-center" style="vertical-align: middle;">Status</th>
                         <th class="text-center" style="vertical-align: middle; width: 35px;">Aksi</th>
                     </tr>
@@ -171,6 +179,22 @@ $google_maps = get_option('_crb_google_maps_simpeg');
         </div>
     </div>
 </div>
+<div class="modal fade" id="verifikasiAdmin" role="dialog" data-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="verifikasiAdminLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
 <script type="text/javascript" src="<?php echo SIMPEG_PLUGIN_URL; ?>admin/js/jszip.js"></script>
 <script type="text/javascript" src="<?php echo SIMPEG_PLUGIN_URL; ?>admin/js/xlsx.js"></script>
 <script >
@@ -186,6 +210,117 @@ jQuery(document).ready(function(){
     get_data_absensi_lembur();
     window.global_file_upload = "<?php echo SIMPEG_PLUGIN_URL . 'public/media/simpeg/'; ?>";
 });
+
+
+function get_data_verify(id) {
+    return new Promise(function(resolve, reject) {
+        jQuery('#wrap-loading').show();
+        jQuery.ajax({
+            url: ajax.url,
+            type: "post",
+            data: {
+                "action": "get_data_absensi_lembur_verify",
+                "api_key": jQuery("#api_key").val(),
+                "id": id
+            },
+            dataType: "json",
+            success: function(res) {
+                if (res.status) {
+                    let ket_ver_admin = '';
+                    if (res.role === 'administrator') {
+                        if (res.data.keterangan_status_admin != null) {
+                            ket_ver_admin += '<ol>';
+                            res.data.keterangan_status_admin.split(' | ').map(function(b, i) {
+                                ket_ver_admin += '<li>' + b + '</li>';
+                            });
+                            ket_ver_admin += '</ol>';
+                        }
+                    }
+                    let html = "" +
+                        "<tr class='catatan-verify-ssh' style='display:none'>" +
+                        "<td colspan='2'>" +
+                        "<label for='ket_ver_admin' style='display:inline-block;'>Alasan " + "</label><br><span class='medium-bold-2' id='ket_ver_admin'>" + ket_ver_admin + "</span>" +
+                        "</td>" +
+                        "</tr>";
+                    jQuery(".add-desc-verify-ssh").after(html);
+                }
+                jQuery('#wrap-loading').hide();
+                resolve();
+            }
+        });
+    })
+}
+
+function verifikasi_admin(id) {
+    jQuery('#verifikasiAdmin').modal('show');
+    jQuery("#verifikasiAdminLabel").html("Verifikasi Absensi");
+    jQuery("#verifikasiAdmin .modal-dialog").removeClass("modal-lg modal-xl");
+    jQuery("#verifikasiAdmin .modal-dialog").addClass("modal-sm");
+    jQuery("#verifikasiAdmin .modal-body").html("" +
+        "<div class='verify-admin'><table>" +
+        "<tr>" +
+        "<td><input class='verify-absensi' id='verify-absensi-yes' name='verify_absensi' value='2' type='radio' checked><label for='verify-absensi-yes'>Setuju</label></td>" +
+        "<td><input class='verify-absensi' id='verify-absensi-no' name='verify_absensi' value='0' type='radio'><label for='verify-absensi-no'>Tolak</label></td>" +
+        "</tr>" +
+        "<tr class='add-desc-verify-absensi' style='display:none;'>" +
+        "<td colspan='2'><label for='alasan_verify_absensi' style='display:inline-block;'>Alasan</label><textarea id='alasan_verify_absensi'></textarea></td>" +
+        "</tr>" +
+        "</div>");
+    jQuery("#verifikasiAdmin .modal-footer").html("<button style='margin: 0 0 2rem 0.5rem;border-radius:0.2rem;' class='btn_submit_verify_absensi' onclick='submit_verify_absensi(" + id + ")'>Simpan</button>");
+    jQuery("#verify-absensi-no").on("click", function() {
+        var check = jQuery(this).is(':checked');
+        if (check) {
+            jQuery(".add-desc-verify-absensi").show();
+            jQuery(".catatan-verify-absensi").show();
+        }
+    });
+    jQuery("#verify-absensi-yes").on("click", function() {
+        var check = jQuery(this).is(':checked');
+        if (check) {
+            jQuery(".add-desc-verify-absensi").hide();
+            jQuery(".catatan-verify-absensi").hide();
+        }
+    });
+
+    get_data_verify(id);
+}
+
+function submit_verify_absensi(id) {
+    var verify_absensi = jQuery("input[name='verify_absensi']:checked").val();
+    var reason_verify_absensi = jQuery("#alasan_verify_absensi").val();
+    if (verify_absensi == 0 && reason_verify_absensi.trim() == '') {
+        alert('Alasan ditolak tidak boleh kosong.');
+        return false;
+    } else {
+        jQuery("#wrap-loading").show();
+        jQuery.ajax({
+            url: "<?php echo admin_url('admin-ajax.php'); ?>",
+            type: 'post',
+            data: {
+                'action': 'submit_verify_absensi',
+                'api_key': jQuery("#api_key").val(),
+                'verify_absensi': verify_absensi,
+                'reason_verify_absensi': reason_verify_absensi,
+                'id': id
+            },
+            dataType: 'json',
+            beforeSend: function() {
+                jQuery('.btn_submit_verify_absensi').attr("disabled", "disabled");
+            },
+            success: function(response) {
+                jQuery("#wrap-loading").hide();
+                if (response.status == 'success') {
+                    alert(response.message);
+                    jQuery('#verifikasiAdmin').modal('hide');
+                    data_absensi_lembur.draw();
+                } else {
+                    alert("GAGAL! " + response.message);
+                }
+                jQuery('.submitBtn').removeAttr("disabled");
+            }
+        });
+    }
+}
 
 function submit_data(id){
     if(confirm('Apakah anda yakin untuk mengirim data ini ke proses selanjutnya?')){
@@ -416,8 +551,51 @@ function html_pegawai(opsi){
                     '</tbody>'+
                 '</table>'+
             '</td>'+
+        //     '<td style="width: 75px;" class="text-center aksi-pegawai">'+
+        //         '<button class="tambah-pegawai btn btn-warning btn-sm" onclick="tambah_pegawai(this); return false;"><i class="dashicons dashicons-plus"></i></button>'+
+        //         '<button class="copy-pegawai btn btn-info btn-sm" onclick="tambah_pegawai(this, 1); return false;"><i class="dashicons dashicons-book"></i></button>'+
+        // '</td>'+
         '</tr>';
     return html;
+}
+
+function tambah_pegawai(that, copy=false){
+    var id_skpd = jQuery('#id_skpd').val();
+    if(id_skpd == ''){
+        jQuery('#daftar_pegawai tbody').html('');
+        return;
+    }
+    var tr = jQuery(that).closest('tbody').find('>tr').last();
+    var id = +tr.attr('data-id');
+    var newid = id + 1;
+    var tr_html = html_pegawai({
+        id: newid, 
+        html: global_response_pegawai[id_skpd].html
+    });
+    jQuery('#daftar_pegawai > tbody').append(tr_html);
+    jQuery('#id_pegawai_'+newid).select2({'width': '100%'});
+    if(copy){
+        var current_tr_id = jQuery(that).closest('tr').attr('data-id');
+        jQuery('#id_pegawai_'+newid).val(jQuery('#id_pegawai_'+current_tr_id).val()).trigger('change');
+        jQuery('#jenis_hari_'+newid).val(jQuery('#jenis_hari_'+current_tr_id).val()).trigger('change');
+        jQuery('#waktu_mulai_'+newid).val(jQuery('#waktu_mulai_'+current_tr_id).val()).trigger('change');
+        jQuery('#waktu_selesai_'+newid).val(jQuery('#waktu_selesai_'+current_tr_id).val()).trigger('change');
+        jQuery('#uang_makan_set_'+newid).prop('checked', jQuery('#uang_makan_set_'+current_tr_id).is(':checked')).trigger('change');
+    }
+    jQuery('#daftar_pegawai > tbody > tr').map(function(i, b){
+        if(i == 0){
+            return;
+            var html_hapus = ''+
+                '<button class="btn btn-warning btn-sm" onclick="tambah_pegawai(this); return false;"><i class="dashicons dashicons-plus"></i></button>'+
+                '<button class="copy-pegawai btn btn-info btn-sm" onclick="tambah_pegawai(this, 1); return false;"><i class="dashicons dashicons-book"></i></button>';
+        }else{
+            var html_hapus = ''+    
+                '<button class="btn btn-danger btn-sm" onclick="hapus_pegawai(this); return false;"><i class="dashicons dashicons-trash"></i></button>'+
+                '<button class="copy-pegawai btn btn-info btn-sm" onclick="tambah_pegawai(this, 1); return false;"><i class="dashicons dashicons-book"></i></button>';
+        }
+        jQuery(b).find('td').last().html(html_hapus);
+    });
+    jQuery('#id_spt_detail_'+newid).val('');
 }
 
 function get_pegawai_absensi(no_loading=false) {
@@ -430,7 +608,7 @@ function get_pegawai_absensi(no_loading=false) {
         if(typeof global_response_pegawai == 'undefined'){
             global_response_pegawai = {};
         }
-        if(!global_response_pegawai[id_skpd]){ 
+        if(!global_response_pegawai[id_skpd]){
             if(!no_loading){
                 jQuery("#wrap-loading").show();
             }
@@ -438,10 +616,9 @@ function get_pegawai_absensi(no_loading=false) {
                 url: '<?php echo admin_url('admin-ajax.php'); ?>',
                 type:'post',
                 data:{
-                    'action' : 'get_pegawai_absensi_simpeg',
+                    'action' : 'get_pegawai_absensi_simpeg_by_admin',
                     'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
                     'id_skpd': id_skpd,
-                    id: "<?php echo $input['id']; ?>",
                     'tahun_anggaran': jQuery('#tahun_anggaran').val()
                 },
                 dataType: 'json',
@@ -502,9 +679,9 @@ function get_data_absensi_lembur() {
                 type: 'post',
                 dataType: 'json',
                 data: {
-                'action': 'get_datatable_data_absensi_lembur',
+                'action': 'get_datatable_data_absensi_lembur_by_admin',
                 'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
-                'id': '<?php echo $input['id']; ?>',
+                'id_skpd': '<?php echo $input['id_skpd']; ?>',
                 }
             },
             lengthMenu: [
@@ -520,6 +697,10 @@ function get_data_absensi_lembur() {
             "columns": [
                 {
                     "data": 'nama_lengkap',
+                    className: "text-left"
+                },
+                {
+                    "data": 'nama_skpd',
                     className: "text-left"
                 },
                 {
@@ -548,6 +729,14 @@ function get_data_absensi_lembur() {
                 },
                 {
                     "data": 'file_lampiran',
+                    className: "text-center"
+                },
+                {
+                    "data": 'created_at',
+                    className: "text-center"
+                },
+                {
+                    "data": 'update_at',
                     className: "text-center"
                 },
                 {
@@ -603,7 +792,9 @@ function edit_data(_id){
             'id': _id,
         },
         success: function(res){
+            jQuery('#wrap-loading').hide();
             if(res.status == 'success'){
+
                 // Lokasi Center Map
                 if (
                     !res.data.lat ||
@@ -646,7 +837,7 @@ function edit_data(_id){
                 .then(function(){
                     get_skpd(true)
                     .then(function(){
-                        jQuery('#id_skpd').val(res.data.id_skpd).trigger('change').prop('disabled', true).hide();
+                        jQuery('#id_skpd').val(res.data.id_skpd).trigger('change').prop('disabled', false).hide();
                         jQuery('#waktu_mulai_spt').val(res.data.waktu_mulai_spt).trigger('change').prop('disabled', true);
                         jQuery('#waktu_selesai_spt').val(res.data.waktu_selesai_spt).trigger('change').prop('disabled', true);
                         get_pegawai_absensi(true)
@@ -659,7 +850,7 @@ function edit_data(_id){
                             setTimeout(function(){
                                 res.data_detail.map(function(b, i){
                                     var id = i+1;
-                                    jQuery('#id_pegawai_'+id).val(b.id_pegawai).trigger('change').prop('disabled', true);
+                                    jQuery('#id_pegawai_'+id).val(b.id_pegawai).trigger('change').prop('disabled', false);
                                     jQuery('#id_spt_detail_'+id).val(b.id).prop('disabled', true);
                                     jQuery('#jenis_hari_'+id).val(b.tipe_hari).trigger('change').prop('disabled', false);
                                     jQuery('#waktu_mulai_'+id).val(b.waktu_mulai).trigger('change').prop('disabled', false);
@@ -678,7 +869,6 @@ function edit_data(_id){
                                 jQuery('#longitude').val(res.data.lng);
                                 jQuery('#modalTambahDataAbsensiLembur .send_data').show();
                                 jQuery('#modalTambahDataAbsensiLembur').modal('show');
-                                jQuery('#wrap-loading').hide();
                             }, 1000);
                         });
                     });
@@ -793,7 +983,7 @@ function detail_data(_id){
 
 //show tambah data
 function tambah_data_absensi_lembur(){
-
+    <?php if ($google_maps == 0) : ?>
     var lokasi_center = new google.maps.LatLng(maps_center_simpeg['lat'], maps_center_simpeg['lng']);
     if (typeof evm != 'undefined') {
         evm.setMap(null);
@@ -811,15 +1001,17 @@ function tambah_data_absensi_lembur(){
         jQuery('input[name="latitude"]').val(event.latLng.lat());
         jQuery('input[name="longitude"]').val(event.latLng.lng());
     });
+    <?php endif; ?>
     jQuery('#id_data').val('');
     jQuery('#tahun_anggaran').val('<?php echo date('Y'); ?>').trigger('change').prop('disabled', false);
     jQuery('#id_skpd').val('<?php echo $input['id_skpd']; ?>').trigger('change').hide();
     get_pegawai_absensi(true).then(function(){
-        jQuery('#uang_makan').val('0').prop('disabled', true);
-        jQuery('#uang_lembur').val('0').prop('disabled', true);
-        jQuery('#sbu_makan').val('').prop('disabled', false);
-        jQuery('#sbu_lembur').val('').prop('disabled', false);
-        jQuery('#id_pegawai_1').val('<?php echo $input['id']; ?>').trigger('change');
+        jQuery('#uang_makan_1').val('').prop('disabled', true);
+        jQuery('#uang_lembur_1').val('').prop('disabled', true);
+        jQuery('#pajak_1').val('').prop('disabled', false);
+        jQuery('#sbu_makan_1').val('').prop('disabled', false);
+        jQuery('#sbu_lembur_1').val('').prop('disabled', false);
+        jQuery('#id_pegawai_1').trigger('change').prop('disabled', false);
     })
     jQuery('#keterangan_status_admin').closest('.form-group').hide().prop('disabled', false);
     jQuery('#id_admin').val('').prop('disabled', false);
@@ -827,8 +1019,8 @@ function tambah_data_absensi_lembur(){
     jQuery('#status_admin').prop('checked', false);
     jQuery('#keterangan_status_admin').val('').prop('disabled', false);
     jQuery('#ket_lembur').val('').prop('disabled', false);
-    jQuery('#waktu_mulai_spt').trigger('change').prop('disabled', true);
-    jQuery('#waktu_selesai_spt').trigger('change').prop('disabled', true);
+    jQuery('#waktu_mulai_spt').trigger('change').prop('disabled', false);
+    jQuery('#waktu_selesai_spt').trigger('change').prop('disabled', false);
     jQuery('#lampiran').val('').show();
     jQuery('#file_lampiran_existing').hide();
     jQuery('#file_lampiran_existing').closest('.form-group').find('input').show();
@@ -945,7 +1137,7 @@ function submitTambahDataFormAbsensiLembur(){
     }
 }
 
-function get_uang_lembur(that) {
+function get_uang_lembur(that, fromEdit = false) {
     var id = jQuery(that).closest('tr').attr('data-id');
     var golongan = jQuery('#id_pegawai_' + id + ' option:selected').attr('golongan');
     var waktu_mulai = jQuery('#waktu_mulai_' + id).val();
@@ -954,6 +1146,11 @@ function get_uang_lembur(that) {
     jam = Math.round(jam / (1000 * 60 * 60));
     var jenis_hari = jQuery('#jenis_hari_' + id).val();
 
+    jQuery('#uang_lembur_'+id).val(0);
+    jQuery('#uang_makan_'+id).val(0);
+    if(isNaN(jam)){
+        jam = 0;
+    }
     var max_jam = 8;
     var warning_message = "";
     if (jenis_hari == 2) {
@@ -963,17 +1160,12 @@ function get_uang_lembur(that) {
         warning_message = "Jam pada hari libur tidak boleh lebih dari 8 jam.";
     }
 
-    if (jam > max_jam) {
+    if (jam > max_jam && !fromEdit) {
         alert(warning_message);
         jQuery('#waktu_selesai_' + id).val(waktu_mulai);
         jam = 0;
     }
     
-    jQuery('#uang_lembur_'+id).val(0);
-    jQuery('#uang_makan_'+id).val(0);
-    if(isNaN(jam)){
-        jam = 0;
-    }
     jQuery('#jumlah_jam_'+id).html(jam+' jam');
     jQuery('#jml_jam_lembur_'+id).val(jam);
     jQuery('#jml_hari_lembur_'+id).val(jam);

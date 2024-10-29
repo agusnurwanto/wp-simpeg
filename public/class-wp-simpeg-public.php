@@ -161,7 +161,7 @@ class Wp_Simpeg_Public {
         if(!empty($_GET) && !empty($_GET['post'])){
             return '';
         }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-absensi-pegawai-lembur.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-input-absensi-pegawai.php';
     }
 
     public function laporan_bulanan_lembur($atts){
@@ -224,14 +224,14 @@ class Wp_Simpeg_Public {
         if(!empty($_GET) && !empty($_GET['post'])){
             return '';
         }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-input-absensi-pegawai.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-input-absensi-pegawai-by-admin.php';
     }
 
     public function input_absensi_pegawai_by_admin($atts){
         if(!empty($_GET) && !empty($_GET['post'])){
             return '';
         }
-        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-input-absensi-pegawai-by-admin.php';
+        require_once plugin_dir_path(dirname(__FILE__)) . 'public/partials/wp-simpeg-input-absensi-pegawai-by-admin-absensi.php';
     }
 
     public function laporan_bulanan_absensi_per_gol($atts){
