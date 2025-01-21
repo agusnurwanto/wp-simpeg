@@ -230,6 +230,7 @@ class Wp_Simpeg {
 		$this->loader->add_action('wp_ajax_hapus_data_absensi_lembur_by_id', $plugin_public, 'hapus_data_absensi_lembur_by_id');
 		$this->loader->add_action('wp_ajax_get_pegawai_absensi_simpeg', $plugin_public, 'get_pegawai_absensi_simpeg');
 		$this->loader->add_action('wp_ajax_verifikasi_absensi_lembur', $plugin_public, 'verifikasi_absensi_lembur');
+		$this->loader->add_action('wp_ajax_get_pegawai_laporan_simpeg', $plugin_public, 'get_pegawai_laporan_simpeg');
 
 		$this->loader->add_action('wp_ajax_get_datatable_data_absensi_lembur_admin', $plugin_public, 'get_datatable_data_absensi_lembur_admin');
 		$this->loader->add_action('wp_ajax_submit_verify_absensi', $plugin_public, 'submit_verify_absensi');

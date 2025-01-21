@@ -3523,5 +3523,38 @@ class Wp_Simpeg_Public {
 	    }
 	    die(json_encode($return));
 	}
- 
+ 	
+	public function get_pegawai_laporan_simpeg(){
+	    global $wpdb;
+	    $ret = array(
+	        'status' => 'success',
+	        'message' => 'Berhasil get data!',
+	        'data' => array()
+	    );
+	    if(!empty($_POST)){
+	        if(!empty($_POST['api_key']) && $_POST['api_key'] == get_option(SIMPEG_APIKEY)) {
+	            $tahun_anggaran = $_POST['tahun'];
+	            $ret['data'] = $wpdb->get_results($wpdb->prepare('
+	                SELECT 
+	                    *
+	                FROM data_pegawai_lembur
+	                WHERE active=1
+	                    AND tahun=%d
+	            ', $tahun_anggaran), ARRAY_A);
+	            $html = '<option value="">Pilih Pegawai</option>';
+	            foreach($ret['data'] as $pegawai){
+	                $html .= '<option golongan="'.$pegawai['kode_gol'].'" value="'.$pegawai['id'].'">'.$pegawai['gelar_depan'].' '.$pegawai['nama'].' '.$pegawai['gelar_belakang'].' (ID = '.$pegawai['id'].')</option>';
+	            }
+	            $ret['html'] = $html;
+	        }else{
+	            $ret['status']  = 'error';
+	            $ret['message'] = 'Api key tidak ditemukan!';
+	        }
+	    }else{
+	        $ret['status']  = 'error';
+	        $ret['message'] = 'Format Salah!';
+	    }
+
+	    die(json_encode($ret));
+	}
 }

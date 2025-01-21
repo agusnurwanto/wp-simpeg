@@ -246,12 +246,11 @@ foreach($data_all as $peg_all){
 <div id="wrap-action"></div>
 <div class="text-center" style="margin-top: 30px;">
     <label style="margin-left: 10px;" for="tahun">Tahun:</label>
-    <select style="margin-left: 10px;" name="tahun" id="tahun">
+    <select style="margin-left: 10px;" name="tahun" id="tahun" onchange="get_pegawai();">
         <?php echo $select_tahun; ?>
     </select>
     <label style="margin-left: 10px;" for="pegawai">Pegawai:</label>
     <select style="width: 400px;" name="pegawai" id="pegawai">
-        <?php echo $select_pegawai; ?>
     </select>
     <button style="margin-left: 10px; height: 45px; width: 75px;" onclick="submit();" class="btn btn-sm btn-primary">Cari</button>
 </div>
@@ -417,7 +416,55 @@ jQuery(document).ready(function(){
     jQuery('#secondary').parent().remove();
     
     jQuery('#pegawai').select2();
+    get_pegawai();
 });
+function get_pegawai(no_loading=false) {
+    return new Promise(function(resolve, reject){
+        var tahun = jQuery('#tahun').val();
+        if(tahun == '-1'){
+            jQuery('#pegawai').html('').trigger('change');
+            alert('Tahun anggaran tidak boleh kosong!');
+            return resolve();
+        }
+        if(typeof global_response_pegawai == 'undefined'){
+            global_response_pegawai = {};
+        }
+        let cek_id_pegawai = <?php echo $input['id']; ?>;
+        if(!global_response_pegawai[tahun]){
+            if(!no_loading){
+                jQuery("#wrap-loading").show();
+            }
+            jQuery.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                type:'post',
+                data:{
+                    'action' : 'get_pegawai_laporan_simpeg',
+                    'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
+                    'tahun': tahun
+                },
+                dataType: 'json',
+                success:function(response){
+                    if(!no_loading){
+                        jQuery("#wrap-loading").hide();
+                    }
+                    if(response.status == 'success'){
+                        global_response_pegawai[tahun] = response;
+                        jQuery('#pegawai').html(global_response_pegawai[tahun].html).trigger('change');
+                        if(cek_id_pegawai != 0){
+                            jQuery('#pegawai').val(cek_id_pegawai).trigger('change');
+                        }
+                        return resolve();
+                    }else{
+                        alert(`GAGAL! \n${response.message}`);
+                    }
+                }
+            });
+        }else{
+            jQuery('#pegawai').html(global_response_pegawai[tahun].html).trigger('change');
+            return resolve();
+        }
+    });
+}
 function submit(){
         var tahun = jQuery('#tahun').val();
         var pegawai = jQuery('#pegawai').val();

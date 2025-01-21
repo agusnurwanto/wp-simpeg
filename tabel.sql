@@ -189,6 +189,7 @@ CREATE TABLE `data_absensi_lembur` (
 
 CREATE TABLE `data_absensi_lembur_detail` (
   `id` int(11) NOT NULL auto_increment,
+  `id_spt` int(11) NOT NULL,
   `id_pegawai` int(11) NOT NULL,
   `id_standar_harga_lembur` int(11) NOT NULL,
   `id_standar_harga_makan` int(11) NOT NULL,
