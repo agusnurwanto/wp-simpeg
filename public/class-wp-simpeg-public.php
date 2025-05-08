@@ -1103,10 +1103,13 @@ class Wp_Simpeg_Public {
 	            $spt_filtered_by_pegawai = '';
 	            if ($id_pegawai > 0) {
 	                $query_spt = "
-	                    SELECT DISTINCT d.id_spt
+	                    SELECT DISTINCT 
+	                    	d.id_spt
 	                    FROM data_spt_lembur_detail d
-	                    INNER JOIN data_spt_lembur s ON d.id_spt = s.id AND s.active = d.active
-	                    WHERE d.id_pegawai = %d AND s.active = 1
+	                    INNER JOIN data_spt_lembur s ON d.id_spt = s.id 
+	                    	AND s.active = d.active
+	                    WHERE d.id_pegawai = %d 
+	                    	AND s.active = 1
 	                ";
 
 	                if (!$is_administrator && $tahun_anggaran > 0) {
@@ -1148,10 +1151,11 @@ class Wp_Simpeg_Public {
 	                $where
 	            ";
 
-	            if($params['length'] != -1){
-	                $limit = " LIMIT ".intval($params['start']).", ".intval($params['length']);
-	                $sqlRec .= " ORDER BY ".$columns[$params['order'][0]['column']]." ".esc_sql($params['order'][0]['dir']).$limit;
-	            }
+	            $limit = '';
+                if($params['length'] != -1){
+                    $limit = "  LIMIT ".$wpdb->prepare('%d', $params['start'])." ,".$wpdb->prepare('%d', $params['length']);
+                }
+            	$sqlRec .=  " ORDER BY s.update_at DESC".$limit;
 
 	            $totalRecords = $wpdb->get_var($sql_tot);
 	            $queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);

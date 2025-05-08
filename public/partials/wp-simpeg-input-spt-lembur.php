@@ -71,7 +71,7 @@ foreach($get_pegawai as $pegawai){
         <h1 class="text-center" style="margin:3rem;">Input Data Surat Perintah Tugas (SPT)</h1>
         <div class="text-center" style="max-width: 700px; margin: auto; margin-top: 30px;">
             <label style="margin-left: 10px; <?php echo $hide_style; ?>" for="tahun">Tahun:</label>
-            <select style="width: 550px; <?php echo $hide_style; ?>" name="tahun" id="tahun" onchange="get_pegawai();">
+            <select style="width: 550px; <?php echo $hide_style; ?>" name="tahun" id="tahun" onchange="get_filter_pegawai();">
                 <?php echo $select_tahun; ?>
             </select><br>
             <label style="margin-left: 10px;" for="pegawai">Pegawai:</label>
@@ -279,6 +279,7 @@ jQuery(document).ready(function(){
     
     get_data_spt_lembur();
     get_pegawai();
+    get_filter_pegawai();
     jQuery('#id_skpd').select2({
         'width': '100%'
     });
@@ -1284,7 +1285,7 @@ function submitImportData(){
         }
     });
 }
-function get_pegawai(no_loading=false) {
+function get_filter_pegawai(no_loading=false) {
     return new Promise(function(resolve, reject){
         var tahun = jQuery('#tahun').val();
         if(tahun == '-1'){
