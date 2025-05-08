@@ -301,7 +301,7 @@ class Wp_Simpeg_Admin {
 	            	</ol>
 		        	' ),
 		        Field::make( 'html', 'crb_simpeg_pegawai_upload_html' )
-	            	->set_html( '<h3>Import EXCEL data Pegawai</h3>Pilih file excel .xlsx : <input type="file" id="file-excel" onchange="filePickedSimpeg(event);"><br>Contoh format file excel bisa <a target="_blank" href="'.SIMPEG_PLUGIN_URL. 'public/media/simpeg/datapegawai.xlsx">download di sini</a>. Sheet file excel yang akan diimport harus diberi nama <b>data</b>. Untuk kolom nilai angka ditulis tanpa tanda titik.' ),
+	            	->set_html( '<h3>Import EXCEL data Pegawai</h3>Pilih file excel .xlsx : <input type="file" id="file-excel" onchange="filePickedSimpeg(event);"><br>Contoh format file excel bisa <a target="_blank" href="'.SIMPEG_PLUGIN_URL. 'public/media/simpeg/contoh_data_pegawai.xlsx">download di sini</a>. Sheet file excel yang akan diimport harus diberi nama <b>data</b>. Untuk kolom nilai angka ditulis tanpa tanda titik.' ),
 		        Field::make( 'html', 'crb_simpeg_pegawai' )
 	            	->set_html( 'Data JSON : <textarea id="data-excel" class="cf-select__input"></textarea>' ),
 		        Field::make( 'html', 'crb_simpeg_pegawai_save_button' )
@@ -375,7 +375,7 @@ class Wp_Simpeg_Admin {
 				// 	$newData['user_role'] = 'ppk';
 				// }
 				$data_db = array(
-					'id_skpd' => $newData['id_skpd'],
+				    'id_skpd' => $newData['id_skpd'],
 				    'nik' => $newData['nik'],
 				    'nip' => $newData['nip'],
 				    'gelar_depan' => $newData['gelar_depan'],
@@ -411,27 +411,28 @@ class Wp_Simpeg_Admin {
 				    'tahun' => $newData['tahun'],
 				    'user_role' => $newData['user_role'],
 				);
+
 				$wpdb->last_error = "";
 				$cek_id = $wpdb->get_var($wpdb->prepare("
-					SELECT 
-						id 
-					from data_pegawai_lembur 
-					where nip=%s,
-						nik=%s"
-					, $newData['nip']));
-				if(empty($cek_id)){
-					$wpdb->insert("data_pegawai_lembur", $data_db);
-					$ret['data']['insert'][] = $data_db;
-				}else{
-					$wpdb->update("data_pegawai_lembur", $data_db, array(
-						"id" => $cek_id
-					));
-					// wp_update_user($data_db);
-					$ret['data']['update'][] = $data_db;
+				    SELECT id 
+				    FROM data_pegawai_lembur 
+				    WHERE nip = %s AND nik = %s AND tahun = %s
+				", $newData['nip'], $newData['nik'], $newData['tahun']));
+
+				if (empty($cek_id)) {
+				    $wpdb->insert("data_pegawai_lembur", $data_db);
+				    $ret['data']['insert'][] = $data_db;
+				} else {
+				    $wpdb->update("data_pegawai_lembur", $data_db, array(
+				        "id" => $cek_id
+				    ));
+				    $ret['data']['update'][] = $data_db;
 				}
-				if(!empty($wpdb->last_error)){
-					$ret['data']['error'][] = array($wpdb->last_error, $data_db);
-				};
+
+				if (!empty($wpdb->last_error)) {
+				    $ret['data']['error'][] = array($wpdb->last_error, $data_db);
+				}
+
 
 			}
 		}else {

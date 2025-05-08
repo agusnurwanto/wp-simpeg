@@ -1,5 +1,16 @@
 <?php
 global $wpdb;
+$input = shortcode_atts( array(
+    'tahun' => date('Y'),
+    'id' => '',
+), $atts );
+
+if(!empty($_GET) && !empty($_GET['tahun'])){
+    $input['tahun'] = $_GET['tahun'];
+}
+if(!empty($_GET) && !empty($_GET['id'])){
+    $input['id'] = $_GET['id'];
+} 
 $idtahun = $wpdb->get_results("select distinct tahun_anggaran from data_unit_lembur", ARRAY_A);
 $tahun = "<option value='-1'>Pilih Tahun</option>";
 foreach($idtahun as $val){
@@ -10,18 +21,41 @@ $user_id = um_user( 'ID' );
 $user_meta = get_userdata($user_id);
 $disabled = 'disabled';
 $can_tambah_data = false;
+$is_admin = true; 
 if(in_array("administrator", $user_meta->roles)){
     $can_tambah_data = true;
     $disabled = '';
+    $is_admin = false; 
 }else if(in_array("kepala", $user_meta->roles)){
 }else if(in_array("ppk", $user_meta->roles)){
 }else if(in_array("kasubag_keuangan", $user_meta->roles)){
 }else if(in_array("pptk", $user_meta->roles)){
     $can_tambah_data = true;
-}else{
-    die('<h1 class="text-center">Anda tidak punya akses untuk melihat halaman ini!</h1>');
 }
+$hide_style = $is_admin ? 'display: none;' : '';
 // print_r($total_pencairan); die($wpdb->last_query);
+$get_tahun = $wpdb->get_results('
+    SELECT 
+        tahun_anggaran 
+    from data_unit_lembur
+    group by tahun_anggaran 
+    order by tahun_anggaran ASC
+', ARRAY_A);
+$select_tahun = "<option value=''>Pilih Tahun</option>";
+foreach($get_tahun as $tahun_value){
+    $select = $tahun_value['tahun_anggaran'] == $input['tahun'] ? 'selected' : '';
+    $select_tahun .= "<option value='".$tahun_value['tahun_anggaran']."' ".$select.">".$tahun_value['tahun_anggaran']."</option>";
+}
+$get_pegawai = $wpdb->get_results('
+    SELECT 
+        *
+    FROM data_pegawai_lembur
+    WHERE active=1
+', ARRAY_A);
+$select_pegawai = '<option value="">Pilih Pegawai</option>';
+foreach($get_pegawai as $pegawai){
+    $select_pegawai .= '<option golongan="'.$pegawai['kode_gol'].'" value="'.$pegawai['id'].'">'.$pegawai['gelar_depan'].' '.$pegawai['nama'].' '.$pegawai['gelar_belakang'].'</option>';
+}
 ?>
 <style type="text/css">
     .wrap-table{
@@ -35,6 +69,16 @@ if(in_array("administrator", $user_meta->roles)){
     <div style="padding: 10px;margin:0 0 3rem 0;">
         <input type="hidden" value="<?php echo get_option( SIMPEG_APIKEY ); ?>" id="api_key">
         <h1 class="text-center" style="margin:3rem;">Input Data Surat Perintah Tugas (SPT)</h1>
+        <div class="text-center" style="max-width: 700px; margin: auto; margin-top: 30px;">
+            <label style="margin-left: 10px; <?php echo $hide_style; ?>" for="tahun">Tahun:</label>
+            <select style="width: 550px; <?php echo $hide_style; ?>" name="tahun" id="tahun" onchange="get_pegawai();">
+                <?php echo $select_tahun; ?>
+            </select><br>
+            <label style="margin-left: 10px;" for="pegawai">Pegawai:</label>
+            <select style="width: 450px;" name="pegawai" id="pegawai">
+            </select>
+            <button style="margin-left: 10px; height: 45px; width: 75px; margin-top: 10px;" onclick="submit(); return false;" class="btn btn-sm btn-primary">Cari</button>
+        </div>
     <?php
         if($can_tambah_data){
             echo '
@@ -53,6 +97,7 @@ if(in_array("administrator", $user_meta->roles)){
                         <th class="text-center">Nomor SPT</th>
                         <th class="text-center">SKPD</th>
                         <th class="text-center">Jumlah Pegawai</th>
+                        <th class="text-center">Nama Pegawai</th>
                         <th class="text-center">Jumlah Jam</th>
                         <th class="text-center">Uang Makan</th>
                         <th class="text-center">Uang Lembur</th>
@@ -233,8 +278,12 @@ jQuery(document).ready(function(){
     jQuery('#secondary').parent().remove();
     
     get_data_spt_lembur();
+    get_pegawai();
     jQuery('#id_skpd').select2({
         'width': '100%'
+    });
+    jQuery('#pegawai').select2({
+        allowClear: true
     });
 });
 
@@ -661,7 +710,9 @@ function set_keterangan(that){
 }
 
 function get_data_spt_lembur(){
-    if(typeof datapencairan_spt_lembur == 'undefined'){
+    var selectedPegawai = getParameterByName('id');
+
+    if(typeof datapencairan_spt_lembur === 'undefined'){
         window.datapencairan_spt_lembur = jQuery('#management_data_table').on('preXhr.dt', function(e, settings, data){
             jQuery("#wrap-loading").show();
         }).DataTable({
@@ -671,9 +722,11 @@ function get_data_spt_lembur(){
                 url: '<?php echo admin_url('admin-ajax.php'); ?>',
                 type: 'post',
                 dataType: 'json',
-                data:{
-                    'action': 'get_datatable_data_spt_lembur',
-                    'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
+                data: function(d){
+                    d.action = 'get_datatable_data_spt_lembur';
+                    d.api_key = '<?php echo get_option(SIMPEG_APIKEY); ?>';
+                    d.id_pegawai = selectedPegawai;
+                    d.tahun_anggaran = <?php echo $input['tahun']; ?>;
                 }
             },
             lengthMenu: [[20, 50, 100, -1], [20, 50, 100, "All"]],
@@ -681,7 +734,7 @@ function get_data_spt_lembur(){
             "aoColumnDefs": [
                 { "bSortable": false, "aTargets": [ 8, 10 ] }
             ],
-            "drawCallback": function( settings ){
+            "drawCallback": function(settings){
                 jQuery("#wrap-loading").hide();
             },
             "columns": [
@@ -693,13 +746,13 @@ function get_data_spt_lembur(){
                     "data": 'nama_skpd',
                     className: "text-center"
                 },
-                // {
-                //     "data": 'nama_pegawai',
-                //     className: "text-center"
-                // },
                 {
                     "data": 'jml_peg',
                     className: "text-center"
+                },
+                {
+                    "data": 'nama_pegawai',
+                    className: "text-left"
                 },
                 {
                     "data": 'jml_jam',
@@ -735,10 +788,19 @@ function get_data_spt_lembur(){
                 }
             ]
         });
-    }else{
-        datapencairan_spt_lembur.draw();
+    } else {
+        datapencairan_spt_lembur.ajax.reload();
     }
 }
+
+// Jalankan saat halaman siap
+jQuery(document).ready(function(){
+    var selectedId = getParameterByName('id');
+    if(selectedId){
+        jQuery('#pegawai').val(selectedId).trigger('change');
+    }
+    get_data_spt_lembur();
+});
 
 function hapus_data(id){
     let confirmDelete = confirm("Apakah anda yakin akan menghapus data ini?");
@@ -1221,5 +1283,89 @@ function submitImportData(){
             }
         }
     });
+}
+function get_pegawai(no_loading=false) {
+    return new Promise(function(resolve, reject){
+        var tahun = jQuery('#tahun').val();
+        if(tahun == '-1'){
+            jQuery('#pegawai').html('').trigger('change');
+            return resolve();
+        }
+        if(typeof global_response_pegawai == 'undefined'){
+            global_response_pegawai = {};
+        }
+        let cek_id_pegawai = <?php echo ($input['id'] !== '') ? json_encode($input['id']) : '0'; ?>;
+        if(!global_response_pegawai[tahun]){
+            if(!no_loading){
+                jQuery("#wrap-loading").show();
+            }
+            jQuery.ajax({
+                url: '<?php echo admin_url('admin-ajax.php'); ?>',
+                type:'post',
+                data:{
+                    'action' : 'get_pegawai_laporan_simpeg',
+                    'api_key': '<?php echo get_option( SIMPEG_APIKEY ); ?>',
+                    'tahun': tahun
+                },
+                dataType: 'json',
+                success:function(response){
+                    if(!no_loading){
+                        jQuery("#wrap-loading").hide();
+                    }
+                    if(response.status == 'success'){
+                        global_response_pegawai[tahun] = response;
+                        jQuery('#pegawai').html(global_response_pegawai[tahun].html).trigger('change');
+                        if(cek_id_pegawai != 0){
+                            jQuery('#pegawai').val(cek_id_pegawai).trigger('change');
+                        }
+                        return resolve();
+                    }else{
+                        alert(`GAGAL! \n${response.message}`);
+                    }
+                }
+            });
+        }else{
+            jQuery('#pegawai').html(global_response_pegawai[tahun].html).trigger('change');
+            return resolve();
+        }
+    });
+}
+function updateURLParameter(url, param, paramVal){
+    var newAdditionalURL = '';
+    var tempArray = url.split('?');
+    var baseURL = tempArray[0];
+    var additionalURL = tempArray[1];
+    var temp = '';
+
+    if (additionalURL) {
+        tempArray = additionalURL.split('&');
+        for (var i=0; i<tempArray.length; i++){
+            if(tempArray[i].split('=')[0] != param){
+                newAdditionalURL += temp + tempArray[i];
+                temp = '&';
+            }
+        }
+    }
+
+    var rows_txt = temp + '' + param + '=' + paramVal;
+    return baseURL + '?' + newAdditionalURL + rows_txt;
+}
+
+function submit(){
+    var tahun = jQuery('#tahun').val();
+    var pegawai = jQuery('#pegawai').val();
+    var url = window.location.href;
+    url = updateURLParameter(url, 'tahun', tahun);
+    url = updateURLParameter(url, 'id', pegawai);
+    location.href = url;
+}
+
+function getParameterByName(name, url = window.location.href) {
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 </script>

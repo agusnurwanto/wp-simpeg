@@ -1054,105 +1054,175 @@ class Wp_Simpeg_Public {
 	    );
 
 	    if(!empty($_POST)){
-	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option( SIMPEG_APIKEY )) {
+	        if (!empty($_POST['api_key']) && $_POST['api_key'] == get_option(SIMPEG_APIKEY)) {           
 	            $user_id = um_user( 'ID' );
 	            $user_meta = get_userdata($user_id);
-	            $params = $columns = $totalRecords = $data = array();
+	            $disabled = 'disabled';
+	            $can_tambah_data = false;
+	            if(in_array("administrator", $user_meta->roles)){
+	                $can_tambah_data = true;
+	                $disabled = '';
+	            }else if(in_array("kepala", $user_meta->roles)){
+	            }else if(in_array("ppk", $user_meta->roles)){
+	            }else if(in_array("kasubag_keuangan", $user_meta->roles)){
+	            }else if(in_array("pptk", $user_meta->roles)){
+	                $can_tambah_data = true;
+	            }
+
+	            $is_administrator = in_array("administrator", $user_meta->roles);
 	            $params = $_REQUEST;
-	            $columns = array( 
-	            	'u.nama_skpd',
-	            	's.nomor_spt',
-	            	's.jml_peg',
-	            	's.jml_jam',
-	            	's.uang_makan',
-	            	's.uang_lembur',
-	            	's.jml_pajak',
-	            	's.ket_lembur',
-	            	's.ket_ver_ppk',
-	            	's.status',
-	            	's.status_ver_bendahara', 
-	            	's.ket_ver_bendahara',
-	            	's.status_ver_bendahara_spj', 
-	            	's.ket_ver_bendahara_spj',
-	            	's.ket_ver_kepala',
-	              	's.id'
+	            $columns = array(
+	                'u.nama_skpd',
+	                's.nomor_spt',
+	                's.jml_peg',
+	                's.jml_jam',
+	                's.uang_makan',
+	                's.uang_lembur',
+	                's.jml_pajak',
+	                's.ket_lembur',
+	                's.ket_ver_ppk',
+	                's.status',
+	                's.status_ver_bendahara',
+	                's.ket_ver_bendahara',
+	                's.status_ver_bendahara_spj',
+	                's.ket_ver_bendahara_spj',
+	                's.ket_ver_kepala',
+	                's.id'
 	            );
-	            $where = $sqlTot = $sqlRec = "";
 
-	            if( !empty($params['search']['value']) ) { 
-	                $where .=" OR u.nama_skpd LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
-	                $where .=" OR s.nomor_spt LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
-	                $where .=" OR s.ket_lembur LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%");
+	            $id_pegawai = isset($params['id_pegawai']) ? intval($params['id_pegawai']) : 0;
+	            $tahun_anggaran = isset($params['tahun_anggaran']) ? intval($params['tahun_anggaran']) : 0;
+
+	            $where = "";
+	            if(!empty($params['search']['value'])) { 
+	                $where .= " AND (u.nama_skpd LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%")."
+	                    OR s.nomor_spt LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%")."
+	                    OR s.ket_lembur LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%").")";
 	            }
 
-	            // getting total number records without any search
-	            $sql_tot = "SELECT count(id) as jml FROM `data_spt_lembur` s";
-	            $sql = "
-	            	SELECT 
-	            		".implode(', ', $columns)." 
-	            	FROM `data_spt_lembur` s
-	            	LEFT JOIN data_unit_lembur as u on s.id_skpd=u.id_skpd
-	            		AND s.tahun_anggaran=u.tahun_anggaran
-	            		AND s.active=u.active";
-	            $where_first = " WHERE 1=1 AND s.active=1";
-	            $sqlTot .= $sql_tot.$where_first;
-	            $sqlRec .= $sql.$where_first;
-	            if(isset($where) && $where != '') {
-	                $sqlTot .= $where;
-	                $sqlRec .= $where;
+	            $spt_filtered_by_pegawai = '';
+	            if ($id_pegawai > 0) {
+	                $query_spt = "
+	                    SELECT DISTINCT d.id_spt
+	                    FROM data_spt_lembur_detail d
+	                    INNER JOIN data_spt_lembur s ON d.id_spt = s.id AND s.active = d.active
+	                    WHERE d.id_pegawai = %d AND s.active = 1
+	                ";
+
+	                if (!$is_administrator && $tahun_anggaran > 0) {
+	                    $query_spt .= $wpdb->prepare(" AND s.tahun_anggaran = %d", $tahun_anggaran);
+	                }
+
+	                $query_spt = $wpdb->prepare($query_spt, $id_pegawai);
+	                $spt_ids = $wpdb->get_col($query_spt);
+
+	                if (!empty($spt_ids)) {
+	                    $ids_in = implode(',', array_map('intval', $spt_ids));
+	                    $where .= " AND s.id IN ($ids_in)";
+	                } else {
+	                    $where .= " AND 1=0";
+	                }
+	            } else {
+	                if (!$is_administrator && $tahun_anggaran > 0) {
+	                    $where .= $wpdb->prepare(" AND s.tahun_anggaran = %d", $tahun_anggaran);
+	                }
 	            }
 
-                $limit = '';
-                if($params['length'] != -1){
-                    $limit = "  LIMIT ".$wpdb->prepare('%d', $params['start'])." ,".$wpdb->prepare('%d', $params['length']);
-                }
-                $sqlRec .=  " ORDER BY ". $columns[$params['order'][0]['column']]."   ".str_replace("'", '', $wpdb->prepare('%s', $params['order'][0]['dir'])).$limit;
+	            $sql_tot = "
+	                SELECT COUNT(s.id) as jml 
+	                FROM data_spt_lembur s 
+	                LEFT JOIN data_unit_lembur as u ON s.id_skpd=u.id_skpd 
+	                    AND s.tahun_anggaran=u.tahun_anggaran 
+	                    AND s.active=u.active
+	                WHERE s.active=1 
+	                $where
+	            ";
 
-                $queryTot = $wpdb->get_results($sqlTot, ARRAY_A);
-                $totalRecords = $queryTot[0]['jml'];
-                $queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
+	            $sqlRec = "
+	                SELECT ".implode(', ', $columns)." 
+	                FROM data_spt_lembur s 
+	                LEFT JOIN data_unit_lembur as u ON s.id_skpd=u.id_skpd 
+	                    AND s.tahun_anggaran=u.tahun_anggaran 
+	                    AND s.active=u.active
+	                WHERE s.active=1 
+	                $where
+	            ";
 
-                $is_admin = in_array("administrator", $user_meta->roles);
-                $is_pptk = in_array("pptk", $user_meta->roles);
-                $is_kasubag = in_array("kasubag_keuangan", $user_meta->roles);
-                $is_ppk = in_array("ppk", $user_meta->roles);
-                $is_kepala = in_array("kepala", $user_meta->roles);
+	            if($params['length'] != -1){
+	                $limit = " LIMIT ".intval($params['start']).", ".intval($params['length']);
+	                $sqlRec .= " ORDER BY ".$columns[$params['order'][0]['column']]." ".esc_sql($params['order'][0]['dir']).$limit;
+	            }
 
-				$laporan_spt_lembur = $this->functions->generatePage(array(
-					'nama_page' => 'Laporan Surat Perintah Tugas',
-					'content' => '[laporan_spt_lembur]',
-					'show_header' => 1,
-					'post_status' => 'private'
-				));
+	            $totalRecords = $wpdb->get_var($sql_tot);
+	            $queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
 
-                foreach($queryRecords as $recKey => $recVal){
-                    $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
+	            $pegawai_list = $wpdb->get_results("
+	                SELECT 
+	                    d.id_spt,
+	                    p.id,
+	                    p.gelar_depan, 
+	                    p.nama, 
+	                    p.gelar_belakang
+	                FROM data_spt_lembur_detail d
+	                INNER JOIN data_spt_lembur s ON d.id_spt = s.id 
+	                    AND s.active = d.active
+	                INNER JOIN data_pegawai_lembur p ON d.id_pegawai = p.id 
+	                    AND p.active = d.active 
+	                    AND p.tahun = s.tahun_anggaran
+	                WHERE s.active = 1
+	                ORDER BY p.nama ASC
+	            ", ARRAY_A);
+
+	            $pegawai_by_spt = [];
+	            foreach ($pegawai_list as $pgw) {
+	                $nama_lengkap = $pgw['gelar_depan'] . $pgw['nama'] . $pgw['gelar_belakang'];
+	                $pegawai_by_spt[$pgw['id_spt']][] = $nama_lengkap;
+	            }
+
+	            $laporan_spt_lembur = $this->functions->generatePage(array(
+	                'nama_page' => 'Laporan Surat Perintah Tugas',
+	                'content' => '[laporan_spt_lembur]',
+	                'show_header' => 1,
+	                'post_status' => 'private'
+	            ));
+
+	            foreach($queryRecords as $recKey => $recVal){
+	                $btn = '<a class="btn btn-sm btn-primary" onclick="detail_data(\''.$recVal['id'].'\'); return false;" href="#" title="Detail Data"><i class="dashicons dashicons-search"></i></a>';
+
 	                if($recVal['status'] == 0){
-                    	$btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
-                        $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Hapus Data"><i class="dashicons dashicons-trash"></i></a>';
-                        $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-primary" onclick="submit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Submit Data"><i class="dashicons dashicons-migrate"></i></a>';
+	                    if($can_tambah_data) {
+	                        $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-warning" onclick="edit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Edit Data"><i class="dashicons dashicons-edit"></i></a>';
+	                        $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-danger" onclick="hapus_data(\''.$recVal['id'].'\'); return false;" href="#" title="Hapus Data"><i class="dashicons dashicons-trash"></i></a>';
+	                        $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-primary" onclick="submit_data(\''.$recVal['id'].'\'); return false;" href="#" title="Submit Data"><i class="dashicons dashicons-migrate"></i></a>';
+	                    }
 
 	                    if ($recVal['status_ver_bendahara'] == '0'){
 	                        $pesan = '<br><b>Keterangan:</b> '.$recVal['ket_ver_bendahara']; 
-	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">SPT Ditolak</span>'.$pesan;
+	                        $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">SPT Ditolak</span>'.$pesan;
 	                    }else{
-	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit</span>';
+	                        $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit</span>';
 	                    }
 	                }else if($recVal['status'] == 1) {
-                    	$btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-success" onclick="verifikasi_kasubag_keuangan(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kasubag Keuangan"><i class="dashicons dashicons-yes"></i></a>';
+	                    if($can_tambah_data) {
+	                        $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-success" onclick="verifikasi_kasubag_keuangan(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kasubag Keuangan"><i class="dashicons dashicons-yes"></i></a>';
+	                    }
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Menunggu verifikasi Kasubag Keuangan</span>';
 	                }elseif($recVal['status'] == 2) {
-                    	$btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-success" onclick="verifikasi_ppk(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi PPK"><i class="dashicons dashicons-yes"></i></a>';
+	                    if($can_tambah_data) {
+	                        $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-success" onclick="verifikasi_ppk(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi PPK"><i class="dashicons dashicons-yes"></i></a>';
+	                    }
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Menunggu verifikasi PPK</span>';
 	                }elseif($recVal['status'] == 3) {
-                    	$btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-success" onclick="verifikasi_kepala(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kepala"><i class="dashicons dashicons-yes"></i></a>';
+	                    if($can_tambah_data) {
+	                        $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-success" onclick="verifikasi_kepala(\''.$recVal['id'].'\'); return false;" href="#" title="Verifikasi Kepala"><i class="dashicons dashicons-yes"></i></a>';
+	                    }
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">Menunggu verifikasi Kepala</span>';
 	                }elseif($recVal['status'] == 4) {
 	                    if ($recVal['status_ver_bendahara_spj'] == '0'){
 	                        $pesan = '<br><b>Keterangan:</b> '.$recVal['ket_ver_bendahara_spj']; 
-	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">SPJ Ditolak</span>'.$pesan;
+	                        $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">SPJ Ditolak</span>'.$pesan;
 	                    }else{
-	                    	$queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit SPJ</span>';
+	                        $queryRecords[$recKey]['status'] = '<span class="btn btn-primary btn-sm">Menunggu Submit SPJ</span>';
 	                    }
 	                }elseif($recVal['status'] == 5) {
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-success btn-sm">SPJ Menunggu verifikasi Kasubag Keuangan</span>';
@@ -1162,36 +1232,39 @@ class Wp_Simpeg_Public {
 	                    $queryRecords[$recKey]['status'] = '<span class="btn btn-danger btn-sm">Not Found</span>';
 	                }
 
-                    $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-primary" target="_blank" href="'.$laporan_spt_lembur['url'].'&id_spt='.$recVal['id'].'" title="Print SPT"><i class="dashicons dashicons-printer"></i></a>';
+	                $btn .= '<a style="margin-top: 5px;" class="btn btn-sm btn-primary" target="_blank" href="'.$laporan_spt_lembur['url'].'&id_spt='.$recVal['id'].'" title="Print SPT"><i class="dashicons dashicons-printer"></i></a>';
 	                $queryRecords[$recKey]['aksi'] = $btn;
 	                $queryRecords[$recKey]['uang_lembur'] = $this->rupiah($recVal['uang_lembur']);
 	                $queryRecords[$recKey]['uang_makan'] = $this->rupiah($recVal['uang_makan']);
 	                $queryRecords[$recKey]['jml_pajak'] = $this->rupiah($recVal['jml_pajak']);
-	            }
-	     
-	            $json_data = array(
-	                "draw"            => intval( $params['draw'] ),   
-	                "recordsTotal"    => intval( $totalRecords ),  
-	                "recordsFiltered" => intval($totalRecords),
-	                "data"            => $queryRecords,
-	                "sql"             => $sqlRec
-	            );
 
-	            die(json_encode($json_data));
-	        }else{
-	            $return = array(
-	                'status' => 'error',
-	                'message'   => 'Api Key tidak sesuai!'
+	                if (isset($pegawai_by_spt[$recVal['id']])) {
+	                    $nama_pegawai_list = '<ul>';
+	                    foreach ($pegawai_by_spt[$recVal['id']] as $nama_pegawai) {
+	                        $nama_pegawai_list .= '<li>' . htmlspecialchars($nama_pegawai) . '</li>';
+	                    }
+	                    $nama_pegawai_list .= '</ul>';
+	                } else {
+	                    $nama_pegawai_list = '';
+	                }
+	                $queryRecords[$recKey]['nama_pegawai'] = $nama_pegawai_list;
+	            }
+
+	            $json_data = array(
+	                "draw"            => intval($params['draw']),
+	                "recordsTotal"    => intval($totalRecords),
+	                "recordsFiltered" => intval($totalRecords),
+	                "data"            => $queryRecords
 	            );
+	            die(json_encode($json_data));
+	        } else {
+	            die(json_encode(array('status' => 'error', 'message' => 'Api Key tidak sesuai!')));
 	        }
-	    }else{
-	        $return = array(
-	            'status' => 'error',
-	            'message'   => 'Format tidak sesuai!'
-	        );
+	    } else {
+	        die(json_encode(array('status' => 'error', 'message' => 'Format tidak sesuai!')));
 	    }
-	    die(json_encode($return));
-	} 
+	}
+
 
 	public function get_data_spj_by_id(){
 	    global $wpdb;
@@ -1993,8 +2066,38 @@ class Wp_Simpeg_Public {
 			$id_pegawai_lembur = get_user_meta($user_id, 'id_pegawai_lembur');
 			if(!empty($id_pegawai_lembur)){
 				$input_spt_lembur = $this->functions->generatePage(array(
-					'nama_page' => 'Input SPT Lembur',
-					'content' => '[input_spt_lembur]',
+					'nama_page' => 'Input SPT Lembur '.$_GET['tahun'],
+					'content' => '[input_spt_lembur tahun='.$_GET['tahun'].']',
+					'show_header' => 1,
+					'post_status' => 'private'
+				));
+				$menu_spj = '';
+				if(
+					in_array("kasubag_keuangan", $user_meta->roles)
+					|| in_array("pptk", $user_meta->roles)
+				){
+					$input_spj_lembur = $this->functions->generatePage(array(
+						'nama_page' => 'Input SPJ Lembur',
+						'content' => '[input_spj_lembur]',
+						'show_header' => 1,
+						'post_status' => 'private'
+					));
+					$menu_spj = '<li style="display: inline-block"> <a style="margin-left: 10px;" href="'.$input_spj_lembur['url'].'" target="_blank" class="btn btn-info">SPJ Lembur</a></li>';
+				}
+				echo '
+				<ul class="aksi-lembur text-center">
+					<li style="list-style: none; display: inline-block"><a href="'.$input_spt_lembur['url'].'" target="_blank" class="btn btn-info">SPT Lembur</a></li>
+					'.$menu_spj.'
+				</ul>';
+			}else{
+				echo 'User ID pegawai tidak ditemukan!';
+			}
+		} else {
+			$id_pegawai_lembur = get_user_meta($user_id, 'id_pegawai_lembur');
+			if(!empty($id_pegawai_lembur)){
+				$input_spt_lembur = $this->functions->generatePage(array(
+					'nama_page' => 'Input SPT Lembur '.$_GET['tahun'],
+					'content' => '[input_spt_lembur tahun='.$_GET['tahun'].']',
 					'show_header' => 1,
 					'post_status' => 'private'
 				));
