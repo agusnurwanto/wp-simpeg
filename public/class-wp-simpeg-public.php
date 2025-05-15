@@ -283,6 +283,7 @@ class Wp_Simpeg_Public {
 	                WHERE tahun_anggaran=%d
 	                	AND active=1
 	            ', $_POST['tahun_anggaran']), ARRAY_A);
+	            // print_r($ret['data']); die($wpdb->last_query);
 	            $html = '<option value="">Pilih SKPD</option>';
 	            foreach($ret['data'] as $skpd){
 	            	$html .= '<option value="'.$skpd['id_skpd'].'">'.$skpd['kode_skpd'].' '.$skpd['nama_skpd'].' ( ID = '.$skpd['id_skpd'].')</option>';
@@ -961,6 +962,7 @@ class Wp_Simpeg_Public {
 			            'jml_pajak'=> $jml_pajak,
 	                    'user' => $user_meta->display_name,
 	                    'update_at' => current_time('mysql'),
+	                    'created_at' => current_time('mysql'),
 						'active' => 1
 	                );
 	                if($tipe_verifikasi == 'ppk'){
@@ -1087,11 +1089,13 @@ class Wp_Simpeg_Public {
 	                's.status_ver_bendahara_spj',
 	                's.ket_ver_bendahara_spj',
 	                's.ket_ver_kepala',
+	                's.created_at',
 	                's.id'
 	            );
 
 	            $id_pegawai = isset($params['id_pegawai']) ? intval($params['id_pegawai']) : 0;
 	            $tahun_anggaran = isset($params['tahun_anggaran']) ? intval($params['tahun_anggaran']) : 0;
+	            $bulan = isset($params['bulan']) ? intval($params['bulan']) : 0;
 
 	            $where = "";
 	            if(!empty($params['search']['value'])) { 
@@ -1100,65 +1104,83 @@ class Wp_Simpeg_Public {
 	                    OR s.ket_lembur LIKE ".$wpdb->prepare('%s', "%".$params['search']['value']."%").")";
 	            }
 
-	            $spt_filtered_by_pegawai = '';
 	            if ($id_pegawai > 0) {
-	                $query_spt = "
-	                    SELECT DISTINCT 
-	                    	d.id_spt
-	                    FROM data_spt_lembur_detail d
-	                    INNER JOIN data_spt_lembur s ON d.id_spt = s.id 
-	                    	AND s.active = d.active
-	                    WHERE d.id_pegawai = %d 
-	                    	AND s.active = 1
-	                ";
+				    $get_id_spt = "
+				        SELECT DISTINCT 
+				        	d.id_spt
+				        FROM data_spt_lembur_detail d
+				        INNER JOIN data_spt_lembur s ON d.id_spt = s.id 
+				            AND s.active = d.active
+				        WHERE d.id_pegawai = %d 
+				        	AND s.active = 1
+				    ";
 
-	                if (!$is_administrator && $tahun_anggaran > 0) {
-	                    $query_spt .= $wpdb->prepare(" AND s.tahun_anggaran = %d", $tahun_anggaran);
-	                }
+				    if (!$is_administrator && $tahun_anggaran > 0) {
+				        $get_id_spt .= $wpdb->prepare(" AND s.tahun_anggaran = %d", $tahun_anggaran);
+				    }
 
-	                $query_spt = $wpdb->prepare($query_spt, $id_pegawai);
-	                $spt_ids = $wpdb->get_col($query_spt);
+				    $get_id_spt = $wpdb->prepare($get_id_spt, $id_pegawai);
+				    $spt_ids = $wpdb->get_col($get_id_spt);
 
-	                if (!empty($spt_ids)) {
-	                    $ids_in = implode(',', array_map('intval', $spt_ids));
-	                    $where .= " AND s.id IN ($ids_in)";
-	                } else {
-	                    $where .= " AND 1=0";
-	                }
-	            } else {
-	                if (!$is_administrator && $tahun_anggaran > 0) {
-	                    $where .= $wpdb->prepare(" AND s.tahun_anggaran = %d", $tahun_anggaran);
-	                }
-	            }
+				    if (!empty($spt_ids)) {
+				        $ids_in = implode(',', array_map('intval', $spt_ids));
+				        $where .= " AND s.id IN ($ids_in)";
+				    } else {
+				        $where .= " AND 1=0"; 
+				    }
 
-	            $sql_tot = "
-	                SELECT COUNT(s.id) as jml 
-	                FROM data_spt_lembur s 
-	                LEFT JOIN data_unit_lembur as u ON s.id_skpd=u.id_skpd 
-	                    AND s.tahun_anggaran=u.tahun_anggaran 
-	                    AND s.active=u.active
-	                WHERE s.active=1 
-	                $where
-	            ";
+				    if ($bulan > 0) {
+				        $where .= $wpdb->prepare(" 
+				        	AND (
+				            	(
+				            		s.created_at != '0000-00-00' 
+				            			AND MONTH(s.created_at
+				            	) = %d
+				            )
+				            OR (
+				            	s.created_at = '0000-00-00' 
+				            		AND MONTH(
+				            			s.update_at
+				            	) = %d
+				            )
+				        )", $bulan, $bulan);
+				    }
 
-	            $sqlRec = "
-	                SELECT ".implode(', ', $columns)." 
-	                FROM data_spt_lembur s 
-	                LEFT JOIN data_unit_lembur as u ON s.id_skpd=u.id_skpd 
-	                    AND s.tahun_anggaran=u.tahun_anggaran 
-	                    AND s.active=u.active
-	                WHERE s.active=1 
-	                $where
-	            ";
+				} else {
+				    if (!$is_administrator && $tahun_anggaran > 0) {
+				        $where .= $wpdb->prepare(" AND s.tahun_anggaran = %d", $tahun_anggaran);
+				    }
+				}
 
-	            $limit = '';
-                if($params['length'] != -1){
-                    $limit = "  LIMIT ".$wpdb->prepare('%d', $params['start'])." ,".$wpdb->prepare('%d', $params['length']);
-                }
-            	$sqlRec .=  " ORDER BY s.update_at DESC".$limit;
+				$sql_tot = "
+				    SELECT 
+				    	COUNT(s.id) as jml 
+				    FROM data_spt_lembur s 
+				    LEFT JOIN data_unit_lembur as u ON s.id_skpd = u.id_skpd 
+				        AND s.tahun_anggaran = u.tahun_anggaran 
+				        AND s.active = u.active
+				    WHERE s.active = 1 
+				    $where
+				";
 
-	            $totalRecords = $wpdb->get_var($sql_tot);
-	            $queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
+				$sqlRec = "
+				    SELECT ".implode(', ', $columns)." 
+				    FROM data_spt_lembur s 
+				    LEFT JOIN data_unit_lembur as u ON s.id_skpd = u.id_skpd 
+				        AND s.tahun_anggaran = u.tahun_anggaran 
+				        AND s.active = u.active
+				    WHERE s.active = 1 
+				    $where
+				";
+
+				$limit = '';
+				if ($params['length'] != -1) {
+				    $limit = " LIMIT ".intval($params['start'])." ,".intval($params['length']);
+				}
+				$sqlRec .= " ORDER BY s.update_at DESC".$limit;
+
+				$totalRecords = $wpdb->get_var($sql_tot);
+				$queryRecords = $wpdb->get_results($sqlRec, ARRAY_A);
 
 	            $pegawai_list = $wpdb->get_results("
 	                SELECT 
@@ -3663,5 +3685,58 @@ class Wp_Simpeg_Public {
 	    }
 
 	    die(json_encode($ret));
+	}
+	function get_spt_lampiran_size(){
+	    global $wpdb;
+
+	    $id_pegawai = isset($_POST['id_pegawai']) ? intval($_POST['id_pegawai']) : 0;
+
+	    $get_id_spt = $wpdb->get_col($wpdb->prepare('
+	        SELECT s.id
+	        FROM data_spt_lembur_detail d
+	        INNER JOIN data_spt_lembur s 
+	            ON d.id_spt = s.id 
+	            	AND s.active = d.active
+	        WHERE d.id_pegawai = %d 
+	        	AND s.active = 1
+	    ', $id_pegawai));
+
+	    if (empty($get_id_spt)) {
+	        wp_send_json_success([
+	        	'ukuran' => 0
+	        ]);
+	    }
+
+	    $id_spt = implode(',', array_fill(0, count($get_id_spt), '%d'));
+	    $get_lampiran_file = "
+	        SELECT file_daftar_hadir, foto_lembur
+	        FROM data_spj_lembur
+	        WHERE id_spt IN ($id_spt)
+	    ";
+	    $lampiran_file = $wpdb->get_results($wpdb->prepare($get_lampiran_file, $get_id_spt), ARRAY_A);
+
+	    $path = defined('SIMPEG_PLUGIN_PATH') ? SIMPEG_PLUGIN_PATH . 'public/media/simpeg/' : '';
+	    $total_size = 0;
+
+	    foreach ($lampiran_file as $lampiran) {
+	        $files = [
+	            $lampiran['file_daftar_hadir'] ?? '',
+	            $lampiran['foto_lembur'] ?? '' 
+	        ];
+
+	        foreach ($files as $file) {
+	            if (!empty($file)) {
+	                $file_path = $path . $file;
+	                if (file_exists($file_path)) {
+	                    $total_size += filesize($file_path);
+	                }
+	            }
+	        }
+	    }
+
+	    wp_send_json([
+	        'status' => 'success',
+	        'ukuran' => $total_size
+	    ]);
 	}
 }

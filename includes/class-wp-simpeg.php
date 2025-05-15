@@ -214,6 +214,7 @@ class Wp_Simpeg {
 		$this->loader->add_action('wp_ajax_hapus_data_laporan_spt_by_id', $plugin_public, 'hapus_data_laporan_spt_by_id');
 		$this->loader->add_action('wp_ajax_get_data_laporan_spt_by_id', $plugin_public, 'get_data_laporan_spt_by_id');
 		$this->loader->add_action('wp_ajax_tambah_data_laporan_spt', $plugin_public, 'tambah_data_laporan_spt');
+		$this->loader->add_action('wp_ajax_get_spt_lampiran_size', $plugin_public, 'get_spt_lampiran_size');
 
 		$this->loader->add_action('wp_ajax_get_skpd_simpeg', $plugin_public, 'get_skpd_simpeg');
 		$this->loader->add_action('wp_ajax_get_pegawai_simpeg', $plugin_public, 'get_pegawai_simpeg');

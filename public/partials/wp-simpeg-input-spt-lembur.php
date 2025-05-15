@@ -3,6 +3,7 @@ global $wpdb;
 $input = shortcode_atts( array(
     'tahun' => date('Y'),
     'id' => '',
+    'bulan' => date('m')*1
 ), $atts );
 
 if(!empty($_GET) && !empty($_GET['tahun'])){
@@ -11,6 +12,25 @@ if(!empty($_GET) && !empty($_GET['tahun'])){
 if(!empty($_GET) && !empty($_GET['id'])){
     $input['id'] = $_GET['id'];
 } 
+if(!empty($_GET) && !empty($_GET['bulan'])){
+    $input['bulan'] = $_GET['bulan'];
+}
+
+$namaBulan = array(
+    1 => 'Januari',
+    2 => 'Februari',
+    3 => 'Maret',
+    4 => 'April',
+    5 => 'Mei',
+    6 => 'Juni',
+    7 => 'Juli',
+    8 => 'Agustus',
+    9 => 'September',
+    10 => 'Oktober',
+    11 => 'November',
+    12 => 'Desember'
+);
+
 $idtahun = $wpdb->get_results("select distinct tahun_anggaran from data_unit_lembur", ARRAY_A);
 $tahun = "<option value='-1'>Pilih Tahun</option>";
 foreach($idtahun as $val){
@@ -70,49 +90,64 @@ foreach($get_pegawai as $pegawai){
         <input type="hidden" value="<?php echo get_option( SIMPEG_APIKEY ); ?>" id="api_key">
         <h1 class="text-center" style="margin:3rem;">Input Data Surat Perintah Tugas (SPT)</h1>
         <div class="text-center" style="max-width: 700px; margin: auto; margin-top: 30px;">
-            <label style="margin-left: 10px; <?php echo $hide_style; ?>" for="tahun">Tahun:</label>
-            <select style="width: 550px; <?php echo $hide_style; ?>" name="tahun" id="tahun" onchange="get_filter_pegawai();">
+            <label for="bulan">Bulan:  </label>
+            <select style="margin-left: 10px;" name="bulan" id="bulan">
+                <?php
+                foreach ($namaBulan as $angkaBulan => $nama) {
+                    $select = '';
+                    if($angkaBulan == $input['bulan']){
+                        $select = 'selected';
+                    }
+                    echo "<option value=\"$angkaBulan\" $select>$nama</option>";
+                }
+                ?>
+            </select>
+            <label style="margin-left: 10px;" for="tahun">Tahun:</label>
+            <select style="margin-left: 10px;" name="tahun" id="tahun" onchange="get_filter_pegawai();">
                 <?php echo $select_tahun; ?>
-            </select><br>
+            </select>
             <label style="margin-left: 10px;" for="pegawai">Pegawai:</label>
             <select style="width: 450px;" name="pegawai" id="pegawai">
             </select>
             <button style="margin-left: 10px; height: 45px; width: 75px; margin-top: 10px;" onclick="submit(); return false;" class="btn btn-sm btn-primary">Cari</button>
         </div>
-    <?php
-        if($can_tambah_data){
-            echo '
-            <div style="margin-bottom: 25px;">
-                <button class="btn btn-primary" onclick="tambah_data_spt_lembur();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
-                <button class="btn btn-warning" onclick="import_data_spt_lembur();"><i class="dashicons dashicons-media-spreadsheet"></i> Import Data</button>
-            </div>
-            ';
-        }
-    ?>
+        <?php
+            if($can_tambah_data){
+                echo '
+                <div style="margin-bottom: 25px;">
+                    <button class="btn btn-primary" onclick="tambah_data_spt_lembur();"><i class="dashicons dashicons-plus"></i> Tambah Data</button>
+                    <button class="btn btn-warning" onclick="import_data_spt_lembur();"><i class="dashicons dashicons-media-spreadsheet"></i> Import Data</button>
+                </div>
+                ';
+            }
+        ?>
+        <div id="result-info" style="display:none;">
+            Ukuran Data : <span id="total-size">-</span> bytes
+            & Waktu Pencarian : <span id="search-time">-</span> detik
         </div>
-        <div class="wrap-table">
-            <table id="management_data_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th class="text-center">Nomor SPT</th>
-                        <th class="text-center">SKPD</th>
-                        <th class="text-center">Jumlah Pegawai</th>
-                        <th class="text-center">Nama Pegawai</th>
-                        <th class="text-center">Jumlah Jam</th>
-                        <th class="text-center">Uang Makan</th>
-                        <th class="text-center">Uang Lembur</th>
-                        <th class="text-center">Total Pajak</th>
-                        <th class="text-center">Keterangan Lembur</th>
-                        <th class="text-center">Keterangan Verifikasi</th>
-                        <th class="text-center">Status</th>
-                        <th class="text-center" style="width: 35px;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>
-    </div>          
+    </div>
+    <div class="wrap-table">
+        <table id="management_data_table" cellpadding="2" cellspacing="0" style="font-family:\'Open Sans\',-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif; border-collapse: collapse; width:100%; overflow-wrap: break-word;" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th class="text-center">Nomor SPT</th>
+                    <th class="text-center">SKPD</th>
+                    <th class="text-center">Jumlah Pegawai</th>
+                    <th class="text-center">Nama Pegawai</th>
+                    <th class="text-center">Jumlah Jam</th>
+                    <th class="text-center">Uang Makan</th>
+                    <th class="text-center">Uang Lembur</th>
+                    <th class="text-center">Total Pajak</th>
+                    <th class="text-center">Keterangan Lembur</th>
+                    <th class="text-center">Keterangan Verifikasi</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center" style="width: 35px;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>      
 </div>
 
 <div class="modal fade mt-4" id="modalTambahDataSPTLembur" role="dialog" aria-hidden="true">
@@ -281,11 +316,21 @@ jQuery(document).ready(function(){
     get_pegawai();
     get_filter_pegawai();
     jQuery('#id_skpd').select2({
-        'width': '100%'
+        'width': '100%',
+        allowClear: true
     });
     jQuery('#pegawai').select2({
         allowClear: true
     });
+    var bulan = getParameterByName('bulan');
+    var tahun = getParameterByName('tahun');
+    var id = getParameterByName('id');
+    
+    if(bulan && tahun && id){
+        get_total_size_lampiran(id);
+    } else {
+        jQuery('#result-info').hide();
+    }
 });
 
 function submitVerifikasiLembur(that){
@@ -728,6 +773,7 @@ function get_data_spt_lembur(){
                     d.api_key = '<?php echo get_option(SIMPEG_APIKEY); ?>';
                     d.id_pegawai = selectedPegawai;
                     d.tahun_anggaran = <?php echo $input['tahun']; ?>;
+                    d.bulan = <?php echo $input['bulan']; ?>;
                 }
             },
             lengthMenu: [[20, 50, 100, -1], [20, 50, 100, "All"]],
@@ -860,7 +906,7 @@ function edit_data(_id, tipe_verifikasi=false){
                 }
                 jQuery('#id_data').val(res.data.id).prop('disabled', false);
                 jQuery('#nomor_spt').val(res.data.nomor_spt).prop('disabled', false);
-                jQuery('#tahun_anggaran').val(res.data.tahun_anggaran).prop('disabled', false);
+                jQuery('#bulan').val(res.data.tahun_anggaran).prop('disabled', false);
                 jQuery('#daftar_pegawai > tbody').html('');
                 jQuery('#ket_lembur').val(res.data.ket_lembur).prop('disabled', false);
                 jQuery('#dasar_lembur').val(res.data.dasar_lembur).prop('disabled', false);
@@ -1295,7 +1341,7 @@ function get_filter_pegawai(no_loading=false) {
         if(typeof global_response_pegawai == 'undefined'){
             global_response_pegawai = {};
         }
-        let cek_id_pegawai = <?php echo ($input['id'] !== '') ? json_encode($input['id']) : '0'; ?>;
+        let cek_id_pegawai = <?php echo isset($input['id']) && $input['id'] !== '' ? json_encode($input['id']) : '0'; ?>;
         if(!global_response_pegawai[tahun]){
             if(!no_loading){
                 jQuery("#wrap-loading").show();
@@ -1316,7 +1362,7 @@ function get_filter_pegawai(no_loading=false) {
                     if(response.status == 'success'){
                         global_response_pegawai[tahun] = response;
                         jQuery('#pegawai').html(global_response_pegawai[tahun].html).trigger('change');
-                        if(cek_id_pegawai != 0){
+                        if(cek_id_pegawai != 0 && jQuery(`#pegawai option[value="${cek_id_pegawai}"]`).length > 0){
                             jQuery('#pegawai').val(cek_id_pegawai).trigger('change');
                         }
                         return resolve();
@@ -1327,6 +1373,9 @@ function get_filter_pegawai(no_loading=false) {
             });
         }else{
             jQuery('#pegawai').html(global_response_pegawai[tahun].html).trigger('change');
+            if(cek_id_pegawai != 0 && jQuery(`#pegawai option[value="${cek_id_pegawai}"]`).length > 0){
+                jQuery('#pegawai').val(cek_id_pegawai).trigger('change');
+            }
             return resolve();
         }
     });
@@ -1355,10 +1404,36 @@ function updateURLParameter(url, param, paramVal){
 function submit(){
     var tahun = jQuery('#tahun').val();
     var pegawai = jQuery('#pegawai').val();
+    var bulan = jQuery('#bulan').val();
     var url = window.location.href;
+    url = updateURLParameter(url, 'bulan', bulan);
     url = updateURLParameter(url, 'tahun', tahun);
     url = updateURLParameter(url, 'id', pegawai);
     location.href = url;
+}
+
+function get_total_size_lampiran(id_pegawai){
+    const startTime = performance.now();
+    jQuery("#wrap-loading").show();
+    jQuery('#result-info').hide();
+
+    jQuery.ajax({
+        url: '<?php echo admin_url("admin-ajax.php"); ?>',
+        type: 'post',
+        data: {
+            action: 'get_spt_lampiran_size',
+            id_pegawai: id_pegawai
+        },
+        dataType: 'json',
+        success: function(response){
+            const endTime = performance.now();
+            const duration = ((endTime - startTime) / 1000).toFixed(2);
+            jQuery('#search-time').text(duration);
+            jQuery('#total-size').text(response.ukuran || '0');
+            jQuery('#result-info').show();
+            jQuery("#wrap-loading").hide();
+        }
+    });
 }
 
 function getParameterByName(name, url = window.location.href) {

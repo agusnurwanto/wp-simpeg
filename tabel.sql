@@ -103,6 +103,7 @@ CREATE TABLE `data_spt_lembur` (
   `user` text DEFAULT NULL,
   `status` tinyint(4) DEFAULT NULL COMMENT '0=belum diverifikasi, 1=disetujui kasubag keuangan, 2=disetujui ppk, 3=disetujui kepala, 4=selesai', 
   `update_at` datetime NOT NULL,
+  `created_at` datetime NOT NULL,
   `active` tinyint(4) DEFAULT '1' COMMENT '0=hapus, 1=aktif',
   PRIMARY KEY  (id)
 );
